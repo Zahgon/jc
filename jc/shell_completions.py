@@ -224,138 +224,33 @@ help_options = ['--help', '-h']
 special_options = ['--version', '-v', '--bash-comp', '-B', '--zsh-comp', '-Z']
 
 def get_commands():
-    command_list = []
-    for cmd in all_parser_info():
-        if 'magic_commands' in cmd:
-            command_list.extend(cmd['magic_commands'])
-
-    return sorted(list(set([i.split()[0] for i in command_list])))
+    pass
 
 
 def get_options():
-    options_list = []
-    for opt in long_options_map:
-        options_list.append(opt)
-        options_list.append('-' + long_options_map[opt][0])
-
-    return options_list
+    pass
 
 
 def get_parsers():
-    p_list = []
-    for cmd in all_parser_info(show_hidden=True):
-        if 'argument' in cmd:
-            p_list.append(cmd['argument'])
-
-    return p_list
+    pass
 
 
 def get_parsers_descriptions():
-    pd_list = []
-    for p in all_parser_info(show_hidden=True):
-        if 'description' in p:
-            pd_list.append(f"'{p['argument']}:{p['description']}'")
-
-    return pd_list
+    pass
 
 
 def get_zsh_command_descriptions(command_list):
-    zsh_commands = []
-    for cmd in command_list:
-        zsh_commands.append(f"""'{cmd}:run "{cmd}" command with magic syntax.'""")
-
-    return zsh_commands
+    pass
 
 
 def get_descriptions(opt_list):
     """Return a list of options:description items."""
-    opt_desc_list = []
-
-    for item in opt_list:
-        # get long options
-        if item in long_options_map:
-            opt_desc_list.append(f"'{item}:{long_options_map[item][1]}'")
-            continue
-
-        # get short options
-        for k, v in long_options_map.items():
-            if item[1:] == v[0]:
-                opt_desc_list.append(f"'{item}:{v[1]}'")
-                continue
-
-    return opt_desc_list
+    pass
 
 
 def bash_completion():
-    parsers_str = ' '.join(get_parsers())
-    opts_no_special = get_options()
-
-    for s_option in special_options:
-        opts_no_special.remove(s_option)
-
-    for a_option in about_options:
-        opts_no_special.remove(a_option)
-
-    for h_option in help_options:
-        opts_no_special.remove(h_option)
-
-    options_str = ' '.join(opts_no_special)
-    about_options_str = ' '.join(about_options)
-    about_mod_options_str = ' '.join(about_mod_options)
-    help_options_str = ' '.join(help_options)
-    special_options_str = ' '.join(special_options)
-    commands_str = ' '.join(get_commands())
-    return bash_template.substitute(
-        bash_parsers=parsers_str,
-        bash_special_options=special_options_str,
-        bash_about_options=about_options_str,
-        bash_about_mod_options=about_mod_options_str,
-        bash_help_options=help_options_str,
-        bash_options=options_str,
-        bash_commands=commands_str
-    )
+    pass
 
 
 def zsh_completion():
-    parsers_str = ' '.join(get_parsers())
-    parsers_describe = '\n        '.join(get_parsers_descriptions())
-    opts_no_special = get_options()
-
-    for s_option in special_options:
-        opts_no_special.remove(s_option)
-
-    for a_option in about_options:
-        opts_no_special.remove(a_option)
-
-    for h_option in help_options:
-        opts_no_special.remove(h_option)
-
-    options_str = ' '.join(opts_no_special)
-    options_describe = '\n        '.join(get_descriptions(opts_no_special))
-    about_options_str = ' '.join(about_options)
-    about_options_describe = '\n        '.join(get_descriptions(about_options))
-    about_mod_options_str = ' '.join(about_mod_options)
-    about_mod_options_describe = '\n        '.join(get_descriptions(about_mod_options))
-    help_options_str = ' '.join(help_options)
-    help_options_describe = '\n        '.join(get_descriptions(help_options))
-    special_options_str = ' '.join(special_options)
-    special_options_describe = '\n        '.join(get_descriptions(special_options))
-    commands_str = ' '.join(get_commands())
-    commands_describe = '\n        '.join(get_zsh_command_descriptions(get_commands()))
-
-    return zsh_template.substitute(
-        zsh_parsers=parsers_str,
-        zsh_parsers_describe=parsers_describe,
-        zsh_special_options=special_options_str,
-        zsh_special_options_describe=special_options_describe,
-        zsh_about_options=about_options_str,
-        zsh_about_options_describe=about_options_describe,
-        zsh_about_mod_options=about_mod_options_str,
-        zsh_about_mod_options_describe=about_mod_options_describe,
-        zsh_help_options=help_options_str,
-        zsh_help_options_describe=help_options_describe,
-        zsh_options=options_str,
-        zsh_options_describe=options_describe,
-        zsh_commands=commands_str,
-        zsh_commands_describe=commands_describe
-    )
+    pass

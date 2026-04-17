@@ -170,29 +170,7 @@ __version__ = info.version
 def _split_addr(addr_str: str) -> Tuple:
     """Check the type of address (v4, v6, mac) and split out the address,
     prefix, and port. Values are None if they don't exist."""
-    address = possible_addr = prefix = port = possible_port = None
-
-    try:
-        address, prefix = addr_str.rsplit('/', maxsplit=1)
-    except Exception:
-        address = addr_str
-
-    # is this a mac address? then stop
-    if re.match(r'(?:\S\S\:){5}\S\S', address):
-        return address, prefix, port
-
-    # is it an ipv4 with port or just ipv6?
-    if ':' in address:
-        try:
-            possible_addr, possible_port = address.rsplit(':', maxsplit=1)
-            _ = ipaddress.IPv4Address(possible_addr)
-            address = possible_addr
-            port = possible_port
-        # assume it was an IPv6 address
-        except Exception:
-            pass
-
-    return address, prefix, port
+    pass
 
 
 def _process(proc_data: JSONDictType) -> JSONDictType:
@@ -207,46 +185,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured to conform to the schema.
     """
-    int_list = {'bytes_received', 'bytes_sent', 'max_bcast_mcast_queue_len'}
-    date_fields = {'connected_since', 'updated', 'last_reference'}
-    addr_fields = {'real_address', 'virtual_address'}
-
-    if 'clients' in proc_data:
-        for item in proc_data['clients']:
-            for k, v in item.copy().items():
-                if k in int_list:
-                    item[k] = jc.utils.convert_to_int(v)
-
-                if k in date_fields:
-                    dt = jc.utils.timestamp(item[k], format_hint=(1000,))
-                    item[k + '_epoch'] = dt.naive
-
-                if k in addr_fields:
-                    addr, prefix, port = _split_addr(v)
-                    item[k] = addr
-                    item[k + '_prefix'] = jc.utils.convert_to_int(prefix)
-                    item[k + '_port'] = jc.utils.convert_to_int(port)
-
-    if 'routing_table' in proc_data:
-        for item in proc_data['routing_table']:
-            for k, v in item.copy(). items():
-                if k in date_fields:
-                    dt = jc.utils.timestamp(item[k], format_hint=(1000,))
-                    item[k + '_epoch'] = dt.naive
-
-                if k in addr_fields:
-                    addr, prefix, port = _split_addr(v)
-                    item[k] = addr
-                    item[k + '_prefix'] = jc.utils.convert_to_int(prefix)
-                    item[k + '_port'] = jc.utils.convert_to_int(port)
-
-    if 'global_stats' in proc_data:
-        for k, v in proc_data['global_stats'].items():
-            if k in int_list:
-                if k in int_list:
-                    proc_data['global_stats'][k] = jc.utils.convert_to_int(v)
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -267,86 +206,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    clients: List[Dict] = []
-    routing_table: List[Dict] = []
-    global_stats: Dict = {}
-    section: str = ''  # clients, routing, stats
-    updated: str = ''
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            if line.startswith('OpenVPN CLIENT LIST'):
-                section = 'clients'
-                continue
-
-            if line.startswith('ROUTING TABLE'):
-                section = 'routing'
-                continue
-
-            if line.startswith('GLOBAL STATS'):
-                section = 'stats'
-                continue
-
-            if line.startswith('END'):
-                break
-
-            if section == 'clients' and line.startswith('Updated,'):
-                _, updated = line.split(',', maxsplit=1)
-                continue
-
-            if section == 'clients' and line.startswith('Common Name,Real Address,'):
-                continue
-
-            if section == 'clients':
-                c_name, real_addr, r_bytes, s_bytes, connected = line.split(',', maxsplit=5)
-                clients.append(
-                    {
-                        'common_name': c_name,
-                        'real_address': real_addr,
-                        'bytes_received': r_bytes,
-                        'bytes_sent': s_bytes,
-                        'connected_since': connected,
-                        'updated': updated
-                    }
-                )
-                continue
-
-            if section == 'routing' and line.startswith('Virtual Address,Common Name,'):
-                continue
-
-            if section == 'routing':
-                # Virtual Address,Common Name,Real Address,Last Ref
-                # 192.168.255.118,baz@example.com,10.10.10.10:63414,Thu Jun 18 08:12:09 2015
-                virt_addr, c_name, real_addr, last_ref = line.split(',', maxsplit=4)
-                route = {
-                    'virtual_address': virt_addr,
-                    'common_name': c_name,
-                    'real_address': real_addr,
-                    'last_reference': last_ref
-                }
-
-                # fixup for virtual addresses ending in "C"
-                if 'virtual_address' in route:
-                    if route['virtual_address'].endswith('C'):
-                        route['virtual_address'] = route['virtual_address'][:-1]
-
-                routing_table.append(route)
-                continue
-
-            if section == "stats":
-                if line.startswith('Max bcast/mcast queue length'):
-                    global_stats['max_bcast_mcast_queue_len'] = line.split(',', maxsplit=1)[1]
-                    continue
-
-        raw_output['clients'] = clients
-        raw_output['routing_table'] = routing_table
-        raw_output['global_stats'] = {}
-        raw_output['global_stats'].update(global_stats)
-
-    return raw_output if raw else _process(raw_output)
+    pass

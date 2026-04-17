@@ -117,19 +117,7 @@ class CRLReason(Enumerated):
             such a way that it makes sense after the phrase "because of" or
             "due to".
         """
-
-        return {
-            'unspecified': 'an unspecified reason',
-            'key_compromise': 'a compromised key',
-            'ca_compromise': 'the CA being compromised',
-            'affiliation_changed': 'an affiliation change',
-            'superseded': 'certificate supersession',
-            'cessation_of_operation': 'a cessation of operation',
-            'certificate_hold': 'a certificate hold',
-            'remove_from_crl': 'removal from the CRL',
-            'privilege_withdrawn': 'privilege withdrawl',
-            'aa_compromise': 'the AA being compromised',
-        }[self.native]
+        pass
 
 
 class CRLEntryExtensionId(ObjectIdentifier):
@@ -180,18 +168,7 @@ class RevokedCertificate(Sequence):
         Sets common named extensions to private attributes and creates a list
         of critical extensions
         """
-
-        self._critical_extensions = set()
-
-        for extension in self['crl_entry_extensions']:
-            name = extension['extn_id'].native
-            attribute_name = '_%s_value' % name
-            if hasattr(self, attribute_name):
-                setattr(self, attribute_name, extension['extn_value'].parsed)
-            if extension['critical'].native:
-                self._critical_extensions.add(name)
-
-        self._processed_extensions = True
+        pass
 
     @property
     def critical_extensions(self):
@@ -202,10 +179,7 @@ class RevokedCertificate(Sequence):
         :return:
             A set of unicode strings
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._critical_extensions
+        pass
 
     @property
     def crl_reason_value(self):
@@ -215,10 +189,7 @@ class RevokedCertificate(Sequence):
         :return:
             None or a CRLReason object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._crl_reason_value
+        pass
 
     @property
     def invalidity_date_value(self):
@@ -231,10 +202,7 @@ class RevokedCertificate(Sequence):
         :return:
             None or a GeneralizedTime object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._invalidity_date_value
+        pass
 
     @property
     def certificate_issuer_value(self):
@@ -246,10 +214,7 @@ class RevokedCertificate(Sequence):
         :return:
             None or an x509.GeneralNames object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._certificate_issuer_value
+        pass
 
     @property
     def issuer_name(self):
@@ -257,15 +222,7 @@ class RevokedCertificate(Sequence):
         :return:
             None, or an asn1crypto.x509.Name object for the issuer of the cert
         """
-
-        if self._issuer_name is False:
-            self._issuer_name = None
-            if self.certificate_issuer_value:
-                for general_name in self.certificate_issuer_value:
-                    if general_name.name == 'directory_name':
-                        self._issuer_name = general_name.chosen
-                        break
-        return self._issuer_name
+        pass
 
 
 class RevokedCertificates(SequenceOf):
@@ -310,18 +267,7 @@ class CertificateList(Sequence):
         Sets common named extensions to private attributes and creates a list
         of critical extensions
         """
-
-        self._critical_extensions = set()
-
-        for extension in self['tbs_cert_list']['crl_extensions']:
-            name = extension['extn_id'].native
-            attribute_name = '_%s_value' % name
-            if hasattr(self, attribute_name):
-                setattr(self, attribute_name, extension['extn_value'].parsed)
-            if extension['critical'].native:
-                self._critical_extensions.add(name)
-
-        self._processed_extensions = True
+        pass
 
     @property
     def critical_extensions(self):
@@ -332,10 +278,7 @@ class CertificateList(Sequence):
         :return:
             A set of unicode strings
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._critical_extensions
+        pass
 
     @property
     def issuer_alt_name_value(self):
@@ -346,10 +289,7 @@ class CertificateList(Sequence):
         :return:
             None or an x509.GeneralNames object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._issuer_alt_name_value
+        pass
 
     @property
     def crl_number_value(self):
@@ -360,10 +300,7 @@ class CertificateList(Sequence):
         :return:
             None or an Integer object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._crl_number_value
+        pass
 
     @property
     def delta_crl_indicator_value(self):
@@ -374,10 +311,7 @@ class CertificateList(Sequence):
         :return:
             None or an Integer object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._delta_crl_indicator_value
+        pass
 
     @property
     def issuing_distribution_point_value(self):
@@ -388,10 +322,7 @@ class CertificateList(Sequence):
         :return:
             None or an IssuingDistributionPoint object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._issuing_distribution_point_value
+        pass
 
     @property
     def authority_key_identifier_value(self):
@@ -402,10 +333,7 @@ class CertificateList(Sequence):
         :return:
             None or an AuthorityKeyIdentifier object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._authority_key_identifier_value
+        pass
 
     @property
     def freshest_crl_value(self):
@@ -416,10 +344,7 @@ class CertificateList(Sequence):
         :return:
             None or a CRLDistributionPoints object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._freshest_crl_value
+        pass
 
     @property
     def authority_information_access_value(self):
@@ -430,10 +355,7 @@ class CertificateList(Sequence):
         :return:
             None or an AuthorityInfoAccessSyntax object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._authority_information_access_value
+        pass
 
     @property
     def issuer(self):
@@ -441,8 +363,7 @@ class CertificateList(Sequence):
         :return:
             An asn1crypto.x509.Name object for the issuer of the CRL
         """
-
-        return self['tbs_cert_list']['issuer']
+        pass
 
     @property
     def authority_key_identifier(self):
@@ -451,11 +372,7 @@ class CertificateList(Sequence):
             None or a byte string of the key_identifier from the authority key
             identifier extension
         """
-
-        if not self.authority_key_identifier_value:
-            return None
-
-        return self.authority_key_identifier_value['key_identifier'].native
+        pass
 
     @property
     def issuer_cert_urls(self):
@@ -465,19 +382,7 @@ class CertificateList(Sequence):
             an individual DER-encoded X.509 certificate, or a DER-encoded CMS
             message containing multiple certificates
         """
-
-        if self._issuer_cert_urls is None:
-            self._issuer_cert_urls = []
-            if self.authority_information_access_value:
-                for entry in self.authority_information_access_value:
-                    if entry['access_method'].native == 'ca_issuers':
-                        location = entry['access_location']
-                        if location.name != 'uniform_resource_identifier':
-                            continue
-                        url = location.native
-                        if url.lower()[0:7] == 'http://':
-                            self._issuer_cert_urls.append(url)
-        return self._issuer_cert_urls
+        pass
 
     @property
     def delta_crl_distribution_points(self):
@@ -487,22 +392,7 @@ class CertificateList(Sequence):
         :return:
             A list of zero or more DistributionPoint objects
         """
-
-        if self._delta_crl_distribution_points is None:
-            self._delta_crl_distribution_points = []
-
-            if self.freshest_crl_value is not None:
-                for distribution_point in self.freshest_crl_value:
-                    distribution_point_name = distribution_point['distribution_point']
-                    # RFC 5280 indicates conforming CA should not use the relative form
-                    if distribution_point_name.name == 'name_relative_to_crl_issuer':
-                        continue
-                    # This library is currently only concerned with HTTP-based CRLs
-                    for general_name in distribution_point_name.chosen:
-                        if general_name.name == 'uniform_resource_identifier':
-                            self._delta_crl_distribution_points.append(distribution_point)
-
-        return self._delta_crl_distribution_points
+        pass
 
     @property
     def signature(self):
@@ -510,8 +400,7 @@ class CertificateList(Sequence):
         :return:
             A byte string of the signature
         """
-
-        return self['signature'].native
+        pass
 
     @property
     def sha1(self):
@@ -519,10 +408,7 @@ class CertificateList(Sequence):
         :return:
             The SHA1 hash of the DER-encoded bytes of this certificate list
         """
-
-        if self._sha1 is None:
-            self._sha1 = hashlib.sha1(self.dump()).digest()
-        return self._sha1
+        pass
 
     @property
     def sha256(self):
@@ -530,7 +416,4 @@ class CertificateList(Sequence):
         :return:
             The SHA-256 hash of the DER-encoded bytes of this certificate list
         """
-
-        if self._sha256 is None:
-            self._sha256 = hashlib.sha256(self.dump()).digest()
-        return self._sha256
+        pass

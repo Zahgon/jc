@@ -51,19 +51,7 @@ def int_to_bytes(value, signed=False, width=None):
     :return:
         A byte string
     """
-
-    if width is None:
-        if signed:
-            if value < 0:
-                bits_required = abs(value + 1).bit_length()
-            else:
-                bits_required = value.bit_length()
-            if bits_required % 8 == 0:
-                bits_required += 1
-        else:
-            bits_required = value.bit_length()
-        width = math.ceil(bits_required / 8) or 1
-    return value.to_bytes(width, byteorder='big', signed=signed)
+    pass
 
 def int_from_bytes(value, signed=False):
     """
@@ -78,20 +66,14 @@ def int_from_bytes(value, signed=False):
     :return:
         An integer
     """
-
-    return int.from_bytes(value, 'big', signed=signed)
+    pass
 
 
 def _format_offset(off):
     """
     Format a timedelta into "[+-]HH:MM" format or "" for None
     """
-
-    if off is None:
-        return ''
-    mins = off.days * 24 * 60 + off.seconds // 60
-    sign = '-' if mins < 0 else '+'
-    return sign + '%02d:%02d' % divmod(abs(mins), 60)
+    pass
 
 
 class _UtcWithDst(tzinfo):
@@ -100,13 +82,13 @@ class _UtcWithDst(tzinfo):
     """
 
     def tzname(self, dt):
-        return 'UTC'
+        pass
 
     def utcoffset(self, dt):
-        return timedelta(0)
+        pass
 
     def dst(self, dt):
-        return timedelta(0)
+        pass
 
 
 utc_with_dst = _UtcWithDst()
@@ -125,12 +107,7 @@ def create_timezone(offset):
     :return:
         A datetime.timezone object
     """
-
-    try:
-        tz = _timezone_cache[offset]
-    except KeyError:
-        tz = _timezone_cache[offset] = timezone(offset)
-    return tz
+    pass
 
 
 class extended_date(object):
@@ -166,8 +143,7 @@ class extended_date(object):
         :return:
             The integer 0
         """
-
-        return 0
+        pass
 
     @property
     def month(self):
@@ -175,8 +151,7 @@ class extended_date(object):
         :return:
             An integer from 1 to 12
         """
-
-        return self._y2k.month
+        pass
 
     @property
     def day(self):
@@ -184,8 +159,7 @@ class extended_date(object):
         :return:
             An integer from 1 to 31
         """
-
-        return self._y2k.day
+        pass
 
     def strftime(self, format):
         """
@@ -198,12 +172,7 @@ class extended_date(object):
             A str, the formatted date as a unicode string
             in Python 3 and a byte string in Python 2
         """
-
-        # Format the date twice, once with year 2000, once with year 4000.
-        # The only differences in the result will be in the millennium. Find them and replace by zeros.
-        y2k = self._y2k.strftime(format)
-        y4k = self._y2k.replace(year=4000).strftime(format)
-        return ''.join('0' if (c2, c4) == ('2', '4') else c2 for c2, c4 in zip(y2k, y4k))
+        pass
 
     def isoformat(self):
         """
@@ -213,8 +182,7 @@ class extended_date(object):
             The date formatted to %Y-%m-%d as a unicode string in Python 3
             and a byte string in Python 2
         """
-
-        return self.strftime('0000-%m-%d')
+        pass
 
     def replace(self, year=None, month=None, day=None):
         """
@@ -224,24 +192,7 @@ class extended_date(object):
         :return:
             A datetime.date or asn1crypto.util.extended_date object
         """
-
-        if year is None:
-            year = self.year
-        if month is None:
-            month = self.month
-        if day is None:
-            day = self.day
-
-        if year > 0:
-            cls = date
-        else:
-            cls = extended_date
-
-        return cls(
-            year,
-            month,
-            day
-        )
+        pass
 
     def __str__(self):
         """
@@ -281,13 +232,7 @@ class extended_date(object):
         return not self.__eq__(other)
 
     def _comparison_error(self, other):
-        raise TypeError(unwrap(
-            '''
-            An asn1crypto.util.extended_date object can only be compared to
-            an asn1crypto.util.extended_date or datetime.date object, not %s
-            ''',
-            type_name(other)
-        ))
+        pass
 
     def __cmp__(self, other):
         """
@@ -363,8 +308,7 @@ class extended_datetime(object):
         :return:
             The integer 0
         """
-
-        return 0
+        pass
 
     @property
     def month(self):
@@ -372,8 +316,7 @@ class extended_datetime(object):
         :return:
             An integer from 1 to 12
         """
-
-        return self._y2k.month
+        pass
 
     @property
     def day(self):
@@ -381,8 +324,7 @@ class extended_datetime(object):
         :return:
             An integer from 1 to 31
         """
-
-        return self._y2k.day
+        pass
 
     @property
     def hour(self):
@@ -390,8 +332,7 @@ class extended_datetime(object):
         :return:
             An integer from 1 to 24
         """
-
-        return self._y2k.hour
+        pass
 
     @property
     def minute(self):
@@ -399,8 +340,7 @@ class extended_datetime(object):
         :return:
             An integer from 1 to 60
         """
-
-        return self._y2k.minute
+        pass
 
     @property
     def second(self):
@@ -408,8 +348,7 @@ class extended_datetime(object):
         :return:
             An integer from 1 to 60
         """
-
-        return self._y2k.second
+        pass
 
     @property
     def microsecond(self):
@@ -417,8 +356,7 @@ class extended_datetime(object):
         :return:
             An integer from 0 to 999999
         """
-
-        return self._y2k.microsecond
+        pass
 
     @property
     def tzinfo(self):
@@ -426,32 +364,28 @@ class extended_datetime(object):
         :return:
             If object is timezone aware, a datetime.tzinfo object, else None.
         """
-
-        return self._y2k.tzinfo
+        pass
 
     def utcoffset(self):
         """
         :return:
             If object is timezone aware, a datetime.timedelta object, else None.
         """
-
-        return self._y2k.utcoffset()
+        pass
 
     def time(self):
         """
         :return:
             A datetime.time object
         """
-
-        return self._y2k.time()
+        pass
 
     def date(self):
         """
         :return:
             An asn1crypto.util.extended_date of the date
         """
-
-        return extended_date(0, self.month, self.day)
+        pass
 
     def strftime(self, format):
         """
@@ -463,12 +397,7 @@ class extended_datetime(object):
         :return:
             A str of the formatted datetime
         """
-
-        # Format the datetime twice, once with year 2000, once with year 4000.
-        # The only differences in the result will be in the millennium. Find them and replace by zeros.
-        y2k = self._y2k.strftime(format)
-        y4k = self._y2k.replace(year=4000).strftime(format)
-        return ''.join('0' if (c2, c4) == ('2', '4') else c2 for c2, c4 in zip(y2k, y4k))
+        pass
 
     def isoformat(self, sep='T'):
         """
@@ -483,11 +412,7 @@ class extended_datetime(object):
             The formatted datetime as a unicode string in Python 3 and a byte
             string in Python 2
         """
-
-        s = '0000-%02d-%02d%c%02d:%02d:%02d' % (self.month, self.day, sep, self.hour, self.minute, self.second)
-        if self.microsecond:
-            s += '.%06d' % self.microsecond
-        return s + _format_offset(self.utcoffset())
+        pass
 
     def replace(self, year=None, *args, **kwargs):
         """
@@ -506,11 +431,7 @@ class extended_datetime(object):
         :return:
             A datetime.datetime or asn1crypto.util.extended_datetime object
         """
-
-        if year:
-            return self._y2k.replace(year, *args, **kwargs)
-
-        return extended_datetime.from_y2k(self._y2k.replace(2000, *args, **kwargs))
+        pass
 
     def astimezone(self, tz):
         """
@@ -522,8 +443,7 @@ class extended_datetime(object):
         :return:
             A new extended_datetime or datetime.datetime object
         """
-
-        return extended_datetime.from_y2k(self._y2k.astimezone(tz))
+        pass
 
     def timestamp(self):
         """
@@ -532,8 +452,7 @@ class extended_datetime(object):
         :return:
             A float representing the seconds since 1970-01-01 UTC. This will be a negative value.
         """
-
-        return self._y2k.timestamp() - self.DAYS_IN_2000_YEARS * 86400
+        pass
 
     def __str__(self):
         """
@@ -585,15 +504,7 @@ class extended_datetime(object):
         :param other:
             The object being compared to
         """
-
-        raise TypeError(unwrap(
-            '''
-            An asn1crypto.util.extended_datetime object can only be compared to
-            an asn1crypto.util.extended_datetime or datetime.datetime object,
-            not %s
-            ''',
-            type_name(other)
-        ))
+        pass
 
     def __cmp__(self, other):
         """
@@ -681,21 +592,4 @@ class extended_datetime(object):
         :return:
             A new extended_datetime or datetime.datetime object.
         """
-
-        year = value.year - 2000
-
-        if year > 0:
-            new_cls = datetime
-        else:
-            new_cls = cls
-
-        return new_cls(
-            year,
-            value.month,
-            value.day,
-            value.hour,
-            value.minute,
-            value.second,
-            value.microsecond,
-            value.tzinfo
-        )
+        pass

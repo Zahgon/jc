@@ -43,7 +43,7 @@ Examples:
     2
     00:02:19,482 --> 00:02:21,609
     Very good, Lieutenant.
-    ...
+    pass
 
     $ cat attack_of_the_clones.srt | jc --srt
     [
@@ -83,7 +83,7 @@ Examples:
             },
             "content": "Very good, Lieutenant."
         },
-        ...
+        pass
     ]
 """
 import jc.utils
@@ -196,26 +196,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries representing an SRT document.
     """
-
-    int_list = {'index'}
-    timestamp_list = {"start", "end"}
-    timestamp_int_list = {"hours", "minutes", "seconds", "milliseconds"}
-
-    for entry in proc_data:
-        # Converting {"index"} to int.
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-            # Converting {"hours", "minutes", "seconds", "milliseconds"} to int.
-            if key in timestamp_list:
-                timestamp = entry[key]
-                for timestamp_key in timestamp:
-                    if timestamp_key in timestamp_int_list:
-                        timestamp[timestamp_key] = jc.utils.convert_to_int(
-                            timestamp[timestamp_key])
-
-    return proc_data
+    pass
 
 
 def parse_timestamp(timestamp: str) -> Dict:
@@ -229,17 +210,7 @@ def parse_timestamp(timestamp: str) -> Dict:
         "timestamp": "hours:minutes:seconds,milliseconds"
     }
     """
-    ts_match = TIMESTAMP_REGEX.match(timestamp)
-    if ts_match:
-        hours, minutes, seconds, milliseconds = ts_match.groups()
-        return {
-            "hours": hours,
-            "minutes": minutes,
-            "seconds": seconds,
-            "milliseconds": milliseconds,
-            "timestamp": timestamp
-        }
-    return {}
+    pass
 
 
 def parse(
@@ -260,22 +231,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-    if not jc.utils.has_data(data):
-        return raw_output
-
-    for subtitle in SRT_REGEX.finditer(data):
-        index, start, end, content = subtitle.groups()
-        raw_output.append(
-            {
-                "index": index,
-                "start": parse_timestamp(start),
-                "end": parse_timestamp(end),
-                "content": content.replace("\r\n", "\n")
-            }
-        )
-
-    return raw_output if raw else _process(raw_output)
+    pass

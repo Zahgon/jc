@@ -14,22 +14,22 @@ import codecs
 class TeletexCodec(codecs.Codec):
 
     def encode(self, input_, errors='strict'):
-        return codecs.charmap_encode(input_, errors, ENCODING_TABLE)
+        pass
 
     def decode(self, input_, errors='strict'):
-        return codecs.charmap_decode(input_, errors, DECODING_TABLE)
+        pass
 
 
 class TeletexIncrementalEncoder(codecs.IncrementalEncoder):
 
     def encode(self, input_, final=False):
-        return codecs.charmap_encode(input_, self.errors, ENCODING_TABLE)[0]
+        pass
 
 
 class TeletexIncrementalDecoder(codecs.IncrementalDecoder):
 
     def decode(self, input_, final=False):
-        return codecs.charmap_decode(input_, self.errors, DECODING_TABLE)[0]
+        pass
 
 
 class TeletexStreamWriter(TeletexCodec, codecs.StreamWriter):
@@ -46,19 +46,7 @@ def teletex_search_function(name):
     """
     Search function for teletex codec that is passed to codecs.register()
     """
-
-    if name != 'teletex':
-        return None
-
-    return codecs.CodecInfo(
-        name='teletex',
-        encode=TeletexCodec().encode,
-        decode=TeletexCodec().decode,
-        incrementalencoder=TeletexIncrementalEncoder,
-        incrementaldecoder=TeletexIncrementalDecoder,
-        streamreader=TeletexStreamReader,
-        streamwriter=TeletexStreamWriter,
-    )
+    pass
 
 
 def register():

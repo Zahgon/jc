@@ -90,7 +90,7 @@ class Attribute(Sequence):
     }
 
     def _values_spec(self):
-        return self._oid_specs.get(self['type'].native, SetOfAny)
+        pass
 
     _spec_callbacks = {
         'values': _values_spec
@@ -112,12 +112,7 @@ class Pfx(Sequence):
 
     @property
     def authenticated_safe(self):
-        if self._authenticated_safe is None:
-            content = self['auth_safe']['content']
-            if isinstance(content, SignedData):
-                content = content['content_info']['content']
-            self._authenticated_safe = AuthenticatedSafe.load(content.native)
-        return self._authenticated_safe
+        pass
 
 
 class AuthenticatedSafe(SequenceOf):

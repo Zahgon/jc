@@ -32,7 +32,7 @@ Examples:
     142, 160, 28, 10, 5, 3,  60, 0.28,  3167
     175, 180, 18,  8, 4, 1,  12, 0.43,  4033
     129, 132, 13,  6, 3, 1,  41, 0.33,  1471
-    ...
+    pass
 
     $ cat homes.csv | jc --csv -p
     [
@@ -69,7 +69,7 @@ Examples:
         "Acres": "0.33",
         "Taxes": "1471"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Union, Type
@@ -105,9 +105,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
         List of Dictionaries. Each Dictionary represents a row in the csv
         file.
     """
-
-    # No further processing
-    return proc_data
+    pass
 
 
 def parse(
@@ -128,34 +126,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    # remove BOM bytes, if present
-    if isinstance(data, str):
-        data = data.encode('utf-8')
-
-    data = data.decode('utf-8-sig')
-
-    raw_output = []
-    cleandata = data.splitlines()
-
-    # Clear any blank lines
-    cleandata = list(filter(None, cleandata))
-
-    if jc.utils.has_data(data):
-
-        dialect: Union[str, Type[csv.Dialect]]  = 'excel'  # default in csv module
-        try:
-            dialect = csv.Sniffer().sniff(data[:1024])
-            if '""' in data:
-                dialect.doublequote = True
-        except Exception:
-            pass
-
-        reader = csv.DictReader(cleandata, dialect=dialect)
-
-        for row in reader:
-            raw_output.append(row)
-
-    return raw_output if raw else _process(raw_output)
+    pass

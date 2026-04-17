@@ -65,7 +65,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -86,29 +86,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-        data = data.strip()
-        domain = data.rsplit('@', maxsplit=1)[1]
-        local = data.rsplit('@', maxsplit=1)[0]
-
-        local_plus_prefix = None
-        local_plus_suffix = None
-        try:
-            local_plus_suffix = local.split('+', maxsplit=1)[1]
-            local_plus_prefix = local.split('+', maxsplit=1)[0]
-        except IndexError:
-            pass
-
-        raw_output = {
-            'username': local_plus_prefix or local,
-            'domain': domain,
-            'local': local,
-            'local_plus_suffix': local_plus_suffix
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

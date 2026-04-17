@@ -184,38 +184,15 @@ def _process(proc_data):
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for entry in proc_data:
-        float_list = {
-            'percent_user', 'percent_nice', 'percent_system', 'percent_iowait',
-            'percent_steal', 'percent_idle', 'tps', 'kb_read_s', 'mb_read_s', 'kb_wrtn_s',
-            'mb_wrtn_s', 'rrqm_s', 'wrqm_s', 'r_s', 'w_s', 'rmb_s', 'rkb_s', 'wmb_s',
-            'wkb_s', 'avgrq_sz', 'avgqu_sz', 'await', 'r_await', 'w_await', 'svctm',
-            'percent_util', 'percent_rrqm', 'percent_wrqm', 'aqu_sz', 'rareq_sz', 'wareq_sz',
-            'd_s', 'dkb_s', 'dmb_s', 'drqm_s', 'percent_drqm', 'd_await', 'dareq_sz',
-            'f_s', 'f_await', 'kb_dscd_s', 'mb_dscd_s'
-        }
-
-        int_list = {'kb_read', 'mb_read', 'kb_wrtn', 'mb_wrtn', 'kb_dscd', 'mb_dscd'}
-
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-            if key in float_list:
-                entry[key] = jc.utils.convert_to_float(entry[key])
-
-    return proc_data
+    pass
 
 
 def _normalize_headers(line):
-    return line.replace('%', 'percent_').replace('/', '_').replace('-', '_').lower()
+    pass
 
 
 def _create_obj_list(section_list, section_name):
-    output_list = jc.parsers.universal.simple_table_parse(section_list)
-    for item in output_list:
-        item['type'] = section_name
-    return output_list
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -232,59 +209,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    if jc.utils.has_data(data):
-        section = ''  # either 'cpu' or 'device'
-        headers = ''
-        cpu_list = []
-        device_list = []
-
-        for line in filter(None, data.splitlines()):
-            if line.startswith('avg-cpu:'):
-                if cpu_list:
-                    raw_output.extend(_create_obj_list(cpu_list, 'cpu'))
-                    cpu_list = []
-
-                if device_list:
-                    raw_output.extend(_create_obj_list(device_list, 'device'))
-                    device_list = []
-
-                section = 'cpu'
-                headers = _normalize_headers(line)
-                headers = headers.strip().split(':', maxsplit=1)[1:]
-                headers = ' '.join(headers)
-                cpu_list.append(headers)
-                continue
-
-            if line.startswith('Device'):
-                if cpu_list:
-                    raw_output.extend(_create_obj_list(cpu_list, 'cpu'))
-                    cpu_list = []
-
-                if device_list:
-                    raw_output.extend(_create_obj_list(device_list, 'device'))
-                    device_list = []
-
-                section = 'device'
-                headers = _normalize_headers(line)
-                headers = headers.replace(':', ' ')
-                device_list.append(headers)
-                continue
-
-            if section == 'cpu':
-                cpu_list.append(line)
-
-            if section == 'device':
-                device_list.append(line)
-
-        if cpu_list:
-            raw_output.extend(_create_obj_list(cpu_list, 'cpu'))
-
-        if device_list:
-            raw_output.extend(_create_obj_list(device_list, 'device'))
-
-    return raw_output if raw else _process(raw_output)
+    pass

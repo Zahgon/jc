@@ -161,7 +161,7 @@ Examples:
         "TcpDuplicateDataRehash": 0,
         "type": "TcpExt"
       },
-      ...
+      pass
     ]
 
     $ cat /proc/net/netstat | jc --proc-net-netstat -p -r
@@ -290,7 +290,7 @@ Examples:
         "TcpDuplicateDataRehash": "0",
         "type": "TcpExt"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -324,12 +324,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for item in proc_data:
-        for key, val in item.items():
-            if key != 'type':
-                item[key] = int(val)
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -350,33 +345,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    rows: List = []
-    this_row: str = ''
-    headers: str = ''
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            row_name, header_data = line.split(':', maxsplit=1)
-
-            if row_name in rows:
-                # this is data
-                _, row_data = line.split(':', maxsplit=1)
-                data_table = headers + row_data
-                output_line = simple_table_parse(data_table.splitlines())
-                output_line[0]['type'] = this_row
-                raw_output.extend(output_line)
-                continue
-
-            else:
-                # this is a header row
-                rows.append(row_name)
-                this_row = row_name
-                headers = header_data + '\n'
-                continue
-
-    return raw_output if raw else _process(raw_output)
+    pass

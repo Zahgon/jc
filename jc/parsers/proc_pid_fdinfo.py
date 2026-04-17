@@ -127,26 +127,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    root_int_list = {'pos', 'flags', 'mnt_id', 'ino', 'clockid', 'ticks',
-                     'settime flags', 'size', 'count'}
-    epoll_int_list = {'tfd', 'pos'}
-    inotify_int_list = {'wd'}
-
-    for key, val in proc_data.items():
-        if key in root_int_list:
-            proc_data[key] = int(val)
-
-    if 'epoll' in proc_data:
-        for key, val in proc_data['epoll'].items():
-            if key in epoll_int_list:
-                proc_data['epoll'][key] = int(val)
-
-    if 'inotify' in proc_data:
-        for key, val in proc_data['inotify'].items():
-            if key in inotify_int_list:
-                proc_data['inotify'][key] = int(val)
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -167,52 +148,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    split_me = {'it_value:', 'it_interval:'}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            # epoll files
-            if line.startswith('tfd:'):
-                line_match = re.findall(r'(?P<key>\S+):(?:\s+)?(?P<val>\S+s*)', line)
-                if line_match:
-                    raw_output.update({'epoll': {k.strip(): v.strip() for k, v in line_match}})
-                continue
-
-            # inotify files
-            if line.startswith('inotify'):
-                split_line = line[8:].split()
-                raw_output['inotify'] = {}
-                for item in split_line:
-                    k, v = item.split(':', maxsplit=1)
-                    raw_output['inotify'][k] = v
-                continue
-
-            # fanotify files
-            if line.startswith('fanotify'):
-                split_line = line[9:].split()
-
-                if not 'fanotify' in raw_output:
-                    raw_output['fanotify'] = {}
-
-                for item in split_line:
-                    k, v = item.split(':', maxsplit=1)
-                    raw_output['fanotify'][k] = v
-                continue
-
-            # timerfd files
-            if line.split()[0] in split_me:
-                split_line = line.replace(':', '').replace('(', '').replace(')', '').replace(',', '').split()
-                raw_output[split_line[0]] = [int(x) for x in split_line[1:]]
-                continue
-
-            key, val = line.split(':', maxsplit=1)
-            raw_output[key.strip()] = val.strip()
-            continue
-
-    return raw_output if raw else _process(raw_output)
+    pass

@@ -89,14 +89,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'runtime'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -117,68 +110,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    output_line = {}
-
-    if jc.utils.has_data(data):
-        for line in filter(None, data.splitlines()):
-            # ignore any lines with only whitespace
-            if not jc.utils.has_data(line):
-                continue
-
-            # extended info fields
-            if line.lstrip().startswith('#EXTINF:'):
-                splitline = line.strip().split(':', maxsplit=1)
-
-                # best-effort to parse additional extended fields
-                # if a parsing error occurs, a warning message will be
-                # printed to STDERR and `unparsed_info` added
-                try:
-                    extline = shlex.shlex(splitline[1], posix=True)
-                    extline.whitespace_split = True
-                    extline.whitespace = ', '  # add comma to whitespace detection
-                    extline.quotes = '"'  # remove single quotes
-                    extline_list = list(extline)
-                    runtime = extline_list.pop(0)
-                    display_list = []
-
-                    for item in extline_list:
-                        if '=' in item:
-                            k, v = item.split('=', maxsplit=1)
-                            output_line.update({k: v})
-
-                        else:
-                            display_list.append(item)
-
-                    display = ' '.join(display_list)
-                    output_line.update({
-                        'runtime': runtime,
-                        'display': display
-                    })
-
-                except Exception:
-                    if not quiet:
-                        jc.utils.warning_message([
-                            'Not able to parse non-standard extensions in the following line:',
-                            line
-                        ])
-                    output_line = {'unparsed_info': line}
-
-                continue
-
-            # ignore all other extension info (obsolete)
-            if line.lstrip().startswith('#'):
-                continue
-
-            # any lines left over are paths
-            output_line.update(
-                {'path': line.strip()}
-            )
-
-            raw_output.append(output_line)
-            output_line = {}
-
-    return raw_output if raw else _process(raw_output)
+    pass

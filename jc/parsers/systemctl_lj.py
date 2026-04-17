@@ -99,14 +99,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {'job'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -123,37 +116,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    # Clear any blank lines
-    linedata = list(filter(None, data.splitlines()))
-    raw_output = []
-
-    if jc.utils.has_data(data):
-
-        cleandata = []
-
-        # clean up non-ascii characters, if any
-        for entry in linedata:
-            cleandata.append(entry.encode('ascii', errors='ignore').decode())
-
-        header_text = cleandata[0]
-        header_text = header_text.lower()
-        header_list = header_text.split()
-
-        raw_output = []
-
-        for entry in cleandata[1:]:
-            if 'No jobs running.' in entry or 'jobs listed.' in entry:
-                break
-
-            else:
-                entry_list = entry.split(maxsplit=4)
-                output_line = dict(zip(header_list, entry_list))
-                raw_output.append(output_line)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

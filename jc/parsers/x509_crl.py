@@ -307,27 +307,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc_global.quiet = quiet  # to inject quiet setting into asn1crypto library
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-        # convert to bytes, if not already, for PEM detection since that's
-        # what pem.detect() needs. (cli.py will auto-convert to UTF-8 if it can)
-        try:
-            der_bytes = bytes(data, 'utf-8')  # type: ignore
-        except TypeError:
-            der_bytes = data  # type: ignore
-
-        if pem.detect(der_bytes):
-            for type_name, headers, der_bytes in pem.unarmor(der_bytes, multiple=True):
-                if type_name == 'X509 CRL':
-                    crl_obj = crl.CertificateList.load(der_bytes)
-                    break
-        else:
-            crl_obj = crl.CertificateList.load(der_bytes)
-
-        raw_output = _fix_objects(crl_obj.native)
-
-    return raw_output
+    pass

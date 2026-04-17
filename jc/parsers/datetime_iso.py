@@ -175,9 +175,7 @@ UTC = datetime.timezone.utc
 def _FixedOffset(
     offset_hours: float, offset_minutes: float, name: str
 ) -> datetime.timezone:
-    return datetime.timezone(
-        datetime.timedelta(hours=offset_hours, minutes=offset_minutes), name
-    )
+    pass
 
 
 def _parse_timezone(
@@ -185,22 +183,7 @@ def _parse_timezone(
     default_timezone: typing.Optional[datetime.timezone] = UTC,
 ) -> typing.Optional[datetime.timezone]:
     """Parses ISO 8601 time zone specs into tzinfo offsets"""
-    tz = matches.get("timezone", None)
-    if tz == "Z":
-        return UTC
-    # This isn't strictly correct, but it's common to encounter dates without
-    # timezones so I'll assume the default (which defaults to UTC).
-    # Addresses issue 4.
-    if tz is None:
-        return default_timezone
-    sign = matches.get("tz_sign", None)
-    hours = int(matches.get("tz_hour", 0))
-    minutes = int(matches.get("tz_minute", 0))
-    description = f"{sign}{hours:02d}:{minutes:02d}"
-    if sign == "-":
-        hours = -hours
-        minutes = -minutes
-    return _FixedOffset(hours, minutes, description)
+    pass
 
 
 def _parse_date(
@@ -219,35 +202,7 @@ def _parse_date(
     :raises: _ParseError when there is a problem parsing the date or
              constructing the datetime instance.
     """
-    try:
-        m = ISO8601_REGEX.match(datestring)
-    except Exception as e:
-        raise _ParseError(e)
-
-    if not m:
-        raise _ParseError(f"Unable to parse date string {datestring!r}")
-
-    # Drop any Nones from the regex matches
-    # TODO: check if there's a way to omit results in regexes
-    groups: typing.Dict[str, str] = {
-        k: v for k, v in m.groupdict().items() if v is not None
-    }
-
-    try:
-        return datetime.datetime(
-            year=int(groups.get("year", 0)),
-            month=int(groups.get("month", groups.get("monthdash", 1))),
-            day=int(groups.get("day", groups.get("daydash", 1))),
-            hour=int(groups.get("hour", 0)),
-            minute=int(groups.get("minute", 0)),
-            second=int(groups.get("second", 0)),
-            microsecond=int(
-                Decimal(f"0.{groups.get('second_fraction', 0)}") * Decimal("1000000.0")
-            ),
-            tzinfo=_parse_timezone(groups, default_timezone=default_timezone),
-        )
-    except Exception as e:
-        raise _ParseError(e)
+    pass
 
 ####################################################
 
@@ -264,8 +219,7 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    # no further processing
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -282,33 +236,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    if jc.utils.has_data(data):
-
-        dt = _parse_date(data)
-
-        raw_output = {
-            'year': dt.year,
-            'month': dt.strftime('%b'),
-            'month_num': dt.month,
-            'day': dt.day,
-            'weekday': dt.strftime('%a'),
-            'weekday_num': dt.isoweekday(),
-            'hour': int(dt.strftime('%I')),
-            'hour_24': dt.hour,
-            'minute': dt.minute,
-            'second': dt.second,
-            'microsecond': dt.microsecond,
-            'period': dt.strftime('%p').upper(),
-            'utc_offset': dt.strftime('%z') or None,
-            'day_of_year': int(dt.strftime('%j')),
-            'week_of_year': int(dt.strftime('%W')),
-            'iso': dt.isoformat(),
-            'timestamp': int(dt.timestamp())
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

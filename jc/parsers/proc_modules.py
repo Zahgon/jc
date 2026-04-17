@@ -67,7 +67,7 @@ Examples:
         "status": "Live",
         "location": "0xffffffffc0a03000"
       },
-      ...
+      pass
     ]
 
     $ cat /proc/modules | jc --proc-modules -p -r
@@ -98,7 +98,7 @@ Examples:
         "status": "Live",
         "location": "0xffffffffc0a03000"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -131,14 +131,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'size', 'used'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -159,27 +152,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            module, size, used, used_by, status, location = line.split()
-            used_by_list = used_by.split(',')[:-1]
-
-            raw_output.append(
-                {
-                    'module': module,
-                    'size': size,
-                    'used': used,
-                    'used_by': used_by_list,
-                    'status': status,
-                    'location': location
-                }
-            )
-
-    return raw_output if raw else _process(raw_output)
+    pass

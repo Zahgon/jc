@@ -44,13 +44,7 @@ class PBPlist(object):
             self.file_type = parser.file_type
 
     def write(self, file_path=None):
-        if file_path is None:
-            file_path = self.file_path
-        serializer = PBSerializer(file_path, self.string_encoding, self.file_type)
-        serializer.write(self.root)
+        pass
 
     def __checkFile(self, file_path):
-        can_access_file = os.path.exists(file_path)
-        if can_access_file is True:
-            self.file_path = file_path
-        return can_access_file
+        pass

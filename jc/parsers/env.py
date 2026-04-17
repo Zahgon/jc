@@ -51,7 +51,7 @@ Examples:
         "name": "HISTSIZE",
         "value": "1000"
       },
-      ...
+      pass
     ]
 
     $ env | jc --env -p -r
@@ -98,14 +98,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    processed = []
-    for k, v in proc_data.items():
-        proc_line = {}
-        proc_line['name'] = k
-        proc_line['value'] = v
-        processed.append(proc_line)
-
-    return processed
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -123,26 +116,5 @@ def parse(data, raw=False, quiet=False):
         Dictionary of raw structured data or (default)
         List of Dictionaries of processed structured data (raw)
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-    key = ''
-    value = None
-
-    if jc.utils.has_data(data):
-        for line in data.splitlines():
-            if VAR_DEF_PATTERN.match(line):
-                if not value is None:
-                    raw_output[key] = value
-                key, value = line.split('=', maxsplit=1)
-                continue
-
-            if not value is None:
-                value = value + '\n' + line
-
-    if not value is None:
-        raw_output[key] = value
-
-    return raw_output if raw else _process(raw_output)
+    pass
 

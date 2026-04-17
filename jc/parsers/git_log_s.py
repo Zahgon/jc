@@ -76,7 +76,7 @@ Examples:
     $ git log | jc --git-log-s
     {"commit":"a730ae18c8e81c5261db132df73cd74f272a0a26","author":"Kelly...}
     {"commit":"930bf439c06c48a952baec05a9896c8d92b7693e","author":"Kelly...}
-    ...
+    pass
 """
 import re
 from typing import List, Dict, Any, Iterable, Union
@@ -118,37 +118,12 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured data to conform to the schema.
     """
-    int_list = {'files_changed', 'insertions', 'deletions', 'lines_changed'}
-
-    if 'date' in proc_data:
-        ts = jc.utils.timestamp(proc_data['date'], format_hint=(1100,))
-        proc_data['epoch'] = ts.naive
-        proc_data['epoch_utc'] = ts.utc
-
-    if 'stats' in proc_data:
-        for key in proc_data['stats']:
-            if key in int_list:
-                proc_data['stats'][key] = jc.utils.convert_to_int(proc_data['stats'][key])
-
-        if 'file_stats' in proc_data['stats']:
-                file_stats = proc_data['stats']['file_stats']
-                for file_entry in file_stats:
-                    for key in file_entry:
-                        if key in int_list:
-                            file_entry[key] = jc.utils.convert_to_int(file_entry[key])
-
-    return proc_data
+    pass
 
 
 def _is_commit_hash(hash_string: str) -> bool:
     # 0c55240e9da30ac4293dc324f1094de2abd3da91
-    if len(hash_string) != 40:
-        return False
-
-    if hash_pattern.match(hash_string):
-        return True
-
-    return False
+    pass
 
 
 @add_jc_meta
@@ -175,142 +150,4 @@ def parse(
 
         Iterable of Dictionaries
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    streaming_input_type_check(data)
-
-    output_line: Dict = {}
-    message_lines: List[str] = []
-    file_list: List[str] = []
-    file_stats_list: List[Dict[str, Any]] = []
-
-    for line in data:
-        try:
-            streaming_line_input_type_check(line)
-
-            if line == '' or line == '\n':
-                continue
-
-            line_list = line.rstrip().split(maxsplit=1)
-
-            # oneline style
-            if not line.startswith(' ') and line_list and _is_commit_hash(line_list[0]):
-                if output_line:
-                    if file_list:
-                        output_line['stats']['files'] = file_list
-
-                    if file_stats_list:
-                        output_line['stats']['file_stats'] = file_stats_list
-
-                    yield output_line if raw else _process(output_line)
-
-                    output_line = {}
-                    message_lines = []
-                    file_list = []
-                    file_stats_list = []
-                output_line = {
-                    'commit': line_list[0],
-                    'message': line_list[1]
-                }
-                continue
-
-            # all other styles
-            if line.startswith('commit '):
-                if output_line:
-                    if message_lines:
-                        output_line['message'] = '\n'.join(message_lines)
-
-                    if file_list:
-                        output_line['stats']['files'] = file_list
-
-                    if file_stats_list:
-                        output_line['stats']['file_stats'] = file_stats_list
-
-                    yield output_line if raw else _process(output_line)
-
-                    output_line = {}
-                    message_lines = []
-                    file_list = []
-                    file_stats_list = []
-                output_line['commit'] = line_list[1]
-                continue
-
-            if line.startswith('Merge: '):
-                output_line['merge'] = line_list[1]
-                continue
-
-            if line.startswith('Author: '):
-                output_line['author'], output_line['author_email'] = _parse_name_email(line_list[1])
-                continue
-
-            if line.startswith('Date: '):
-                output_line['date'] = line_list[1]
-                continue
-
-            if line.startswith('AuthorDate: '):
-                output_line['date'] = line_list[1]
-                continue
-
-            if line.startswith('CommitDate: '):
-                output_line['commit_by_date'] = line_list[1]
-                continue
-
-            if line.startswith('Commit: '):
-                output_line['commit_by'], output_line['commit_by_email'] = _parse_name_email(line_list[1])
-                continue
-
-            if line.startswith('    '):
-                message_lines.append(line.strip())
-                continue
-
-            if line.startswith(' ') and 'changed, ' not in line:
-                # this is a file name
-                file_line_split = line.split('|')
-                file_name = file_line_split[0].strip()
-                file_list.append(file_name)
-
-                if len(file_line_split) > 1:
-                    file_stats = file_line_split[1].strip()
-                    lines_changed_str = file_stats.split(' ')
-                    lines_changed_count_str = lines_changed_str[0].strip()
-
-                file_stat = {}
-                file_stat["name"] = file_name
-                file_stat["lines_changed"] = lines_changed_count_str
-                file_stats_list.append(file_stat)
-                continue
-
-            if line.startswith(' ') and 'changed, ' in line:
-                # this is the stat summary
-                changes = changes_pattern.match(line)
-                if changes:
-                    files = changes['files']
-                    insertions = changes['insertions']
-                    deletions = changes['deletions']
-
-                output_line['stats'] = {
-                    'files_changed': files or '0',
-                    'insertions': insertions or '0',
-                    'deletions':  deletions or '0'
-                }
-                continue
-
-            raise ParseError('Not git_log_s data')
-
-        except Exception as e:
-            yield raise_or_yield(ignore_exceptions, e, line)
-
-    try:
-        if output_line:
-            if message_lines:
-                output_line['message'] = '\n'.join(message_lines)
-
-            if file_list:
-                output_line['stats']['files'] = file_list
-
-            if file_stats_list:
-                output_line['stats']['file_stats'] = file_stats_list
-
-            yield output_line if raw else _process(output_line)
-
-    except Exception as e:
-        yield raise_or_yield(ignore_exceptions, e, line)
+    pass

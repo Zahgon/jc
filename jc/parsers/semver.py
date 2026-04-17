@@ -77,13 +77,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured to conform to the schema.
     """
-    int_list: Set[str] = {'major', 'minor', 'patch'}
-
-    for item in int_list:
-        if item in proc_data:
-            proc_data[item] = int(proc_data[item])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -104,21 +98,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    semver_pattern = re.compile(r'''
-        ^(?P<major>0|[1-9]\d*)\.
-        (?P<minor>0|[1-9]\d*)\.
-        (?P<patch>0|[1-9]\d*)
-        (?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?
-        (?:\+(?P<build>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
-    ''', re.VERBOSE)
-
-    if jc.utils.has_data(data):
-        semver_match = re.match(semver_pattern, data)
-        if semver_match:
-            raw_output = semver_match.groupdict()
-
-    return raw_output if raw else _process(raw_output)
+    pass

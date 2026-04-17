@@ -93,7 +93,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -114,25 +114,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    options: List = []
-
-    if jc.utils.has_data(data):
-
-        split_line = shlex.split(data)
-
-        for item in split_line:
-            if '=' in item:
-                key, val = item.split('=', maxsplit=1)
-                raw_output[key] = val
-
-            else:
-                options.append(item)
-
-    if options:
-        raw_output['_options'] = options
-
-    return raw_output if raw else _process(raw_output)
+    pass

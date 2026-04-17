@@ -69,7 +69,7 @@ Examples:
         "t_carrier": 0,
         "t_compressed": 0
       },
-      ...
+      pass
     ]
 
     $ cat /proc/net/dev | jc --proc-net-dev -p -r
@@ -93,7 +93,7 @@ Examples:
         "t_carrier": "0",
         "t_compressed": "0"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -127,17 +127,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for item in proc_data:
-        if 'interface' in item:
-            item['interface'] = item['interface'][:-1]
-
-        for key, val in item.items():
-            try:
-                item[key] = int(val)
-            except Exception:
-                pass
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -158,17 +148,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        header = 'interface r_bytes r_packets r_errs r_drop r_fifo r_frame r_compressed r_multicast t_bytes t_packets t_errs t_drop t_fifo t_colls t_carrier t_compressed'
-        data_splitlines = data.splitlines()
-        data_splitlines.pop(0)
-        data_splitlines[0] = header
-        raw_output = simple_table_parse(data_splitlines)
-
-    return raw_output if raw else _process(raw_output)
+    pass

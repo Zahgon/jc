@@ -52,7 +52,7 @@ Examples:
         "dmi_g": 0,
         "dmi_address": "01005e000001"
       },
-      ...
+      pass
     ]
 
     $ cat /proc/net/dev_mcast | jc --proc-net-dev-mcast -p -r
@@ -71,7 +71,7 @@ Examples:
         "dmi_g": "0",
         "dmi_address": "01005e000001"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -105,17 +105,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    no_convert = {'interface_name', 'dmi_address'}
-
-    for item in proc_data:
-        for key, val in item.items():
-            if key not in no_convert:
-                try:
-                    item[key] = int(val)
-                except Exception:
-                    pass
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -136,16 +126,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        header = 'index interface dmi_u dmi_g dmi_address\n'
-        data = header + data
-        data_splitlines = data.splitlines()
-        raw_output = simple_table_parse(data_splitlines)
-
-    return raw_output if raw else _process(raw_output)
+    pass

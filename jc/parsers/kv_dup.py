@@ -89,7 +89,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary representing a Key/Value pair document.
     """
-    # This parser is an alias of ini_dup.py
-    ini_dup.info = info  # type: ignore
-    ini_dup.__name__ = __name__
-    return ini_dup.parse(data, raw, quiet)
+    pass

@@ -92,7 +92,7 @@ Examples:
         }
       ]
     }
-    ...
+    pass
 
     $ traceroute google.com  | jc --traceroute-s -p -r
     {
@@ -129,7 +129,7 @@ Examples:
         }
       ]
     }
-    ...
+    pass
 """
 from typing import Optional
 
@@ -184,12 +184,7 @@ SOFTWARE.
 
 
 def _hop_output(hop: _Hop, raw: bool):
-    raw_output = {
-        'type': 'hop',
-        **_serialize_hop(hop),
-    }
-
-    return raw_output if raw else _process(raw_output)
+    pass
 
 
 @add_jc_meta
@@ -210,68 +205,4 @@ def parse(data, raw=False, quiet=False, ignore_exceptions=False):
 
         Iterable of Dictionaries
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    streaming_input_type_check(data)
-
-    # Estimated number of probe packets per hop. See `traceroute -q` on Linux, for example.
-    queries = 0
-    # Accumulated hop across multiple lines
-    hop_cache: Optional[_Hop] = None
-
-    for line in data:  # type: str
-        try:
-            streaming_line_input_type_check(line)
-
-            if RE_HEADER.search(line):
-                tr = _loads(line, quiet)
-                raw_output = {
-                    'type': 'header',
-                    'destination_ip': tr.dest_ip,
-                    'destination_name': tr.dest_name,
-                    'max_hops': tr.max_hops,
-                    'data_bytes': tr.data_bytes
-                }
-
-                yield raw_output if raw else _process(raw_output)
-
-            else:
-                m = RE_HOP.match(line)
-                if not m:
-                    continue
-
-                # A single hop can wrap across multiple lines, e.g.:
-                #
-                #     6  [AS0] 94.142.122.45 (94.142.122.45)  42.790 ms  46.352 ms
-                #        [AS0] 94.142.122.44 (94.142.122.44)  41.479 ms
-                #
-                if not m.group(1):
-                    if not hop_cache:
-                        raise ParseError('No hop index found')
-
-                    # If the hop index is not found, prepend the hop index (6) to the following lines before parsing.
-                    line = f"{hop_cache.idx} {line}"
-                    # Specify quiet=True to suppress the 'No header row found' warning for hop lines
-                    tr = _loads(line, quiet=True)
-                    if not tr.hops:
-                        continue
-
-                    hop_cache.probes.extend(tr.hops[0].probes)
-
-                else:
-                    # if the hop index is found, yield the previous hop
-                    if hop_cache:
-                        yield _hop_output(hop_cache, raw)
-                        hop_cache = None
-
-                    # Specify quiet=True to suppress the 'No header row found' warning for hop lines
-                    tr = _loads(line, quiet=True)
-                    if not tr.hops:
-                        continue
-
-                    hop_cache = tr.hops[0]
-
-        except Exception as e:
-            yield raise_or_yield(ignore_exceptions, e, line)
-
-    if hop_cache:
-        yield _hop_output(hop_cache, raw)
+    pass

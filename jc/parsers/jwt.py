@@ -74,19 +74,12 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def _b2a(byte_string: bytes) -> str:
     """Convert a byte string to a colon-delimited hex ascii string"""
-    # need try/except since separator was only introduced in python 3.8.
-    # provides compatibility for python 3.6 and 3.7.
-    try:
-      return binascii.hexlify(byte_string, ':').decode('utf-8')
-    except TypeError:
-      hex_string = binascii.hexlify(byte_string).decode('utf-8')
-      colon_seperated = ':'.join(hex_string[i:i+2] for i in range(0, len(hex_string), 2))
-      return colon_seperated
+    pass
 
 
 def parse(
@@ -107,27 +100,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-        data = data.strip()
-        header, payload, signature = data.split('.')
-
-        header = urlsafe_b64decode(header + '==').decode('utf-8')
-        payload = urlsafe_b64decode(payload + '==').decode('utf-8')
-        signature_bytes = urlsafe_b64decode(signature + '==')
-
-        header = json.loads(header)
-        payload = json.loads(payload)
-        signature = _b2a(signature_bytes)
-
-        raw_output = {
-            'header': header,
-            'payload': payload,
-            'signature': signature,
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

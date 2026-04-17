@@ -71,8 +71,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    # no changes
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -89,26 +88,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary representing a Key/Value pair document.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    if not jc.utils.has_data(data):
-        return {}
-
-    data = data.rstrip("\n")
-
-    if "\\" in data:
-        path = PureWindowsPath(data)
-    else:
-        path = PurePosixPath(data)
-
-    raw_output = {
-        'path': str(path),
-        'parent': str(path.parent),
-        'filename': path.name,
-        'stem': path.stem,
-        'extension': path.suffix[1:],
-        'path_list': list(path.parts)
-    }
-
-    return raw_output if raw else _process(raw_output)
+    pass

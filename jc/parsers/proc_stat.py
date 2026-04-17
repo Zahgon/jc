@@ -108,7 +108,7 @@ Examples:
         73,
         0,
         0,
-        ...
+        pass
       ],
       "context_switches": 4622716,
       "boot_time": 1662154781,
@@ -160,7 +160,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -181,71 +181,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            if line.startswith('cpu'):
-                split_line = line.split()
-                cpu_num = split_line[0]
-                raw_output[cpu_num] = {
-                    'user': int(split_line[1]),
-                    'nice': int(split_line[2]),
-                    'system': int(split_line[3]),
-                    'idle': int(split_line[4])
-                }
-
-                if len(split_line) > 5:
-                    raw_output[cpu_num]['iowait'] = int(split_line[5])
-
-                if len(split_line) > 6:
-                    raw_output[cpu_num]['irq'] = int(split_line[6])
-                    raw_output[cpu_num]['softirq'] = int(split_line[7])
-
-                if len(split_line) > 8:
-                    raw_output[cpu_num]['steal'] = int(split_line[8])
-
-                if len(split_line) > 9:
-                    raw_output[cpu_num]['guest'] = int(split_line[9])
-
-                if len(split_line) > 10:
-                    raw_output[cpu_num]['guest_nice'] = int(split_line[10])
-
-                continue
-
-            if line.startswith('intr '):
-                split_line = line.split()
-                raw_output['interrupts'] = [int(x) for x in split_line[1:]]
-                continue
-
-            if line.startswith('ctxt '):
-                raw_output['context_switches'] = int(line.split(maxsplit=1)[1])
-                continue
-
-            if line.startswith('btime '):
-                raw_output['boot_time'] = int(line.split(maxsplit=1)[1])
-                continue
-
-            if line.startswith('processes '):
-                raw_output['processes'] = int(line.split(maxsplit=1)[1])
-                continue
-
-            if line.startswith('procs_running '):
-                raw_output['processes_running'] = int(line.split(maxsplit=1)[1])
-                continue
-
-            if line.startswith('procs_blocked '):
-                raw_output['processes_blocked'] = int(line.split(maxsplit=1)[1])
-                continue
-
-            if line.startswith('softirq '):
-                split_line = line.split()
-                raw_output['softirq'] = [int(x) for x in split_line[1:]]
-                continue
-
-    return raw_output if raw else _process(raw_output)
+    pass

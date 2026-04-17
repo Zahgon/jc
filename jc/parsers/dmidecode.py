@@ -73,7 +73,7 @@ Examples:
           "firmware_revision": "0.0"
         }
       },
-      ...
+      pass
     ]
 
     # dmidecode | jc --dmidecode -p -r
@@ -117,7 +117,7 @@ Examples:
           "firmware_revision": "0.0"
         }
       },
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -149,17 +149,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {'type', 'bytes'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-        if not entry['values']:
-            entry['values'] = None
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -176,169 +166,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    item_header = False
-    item_values = False
-    value_list = False
-
-    item = None
-    header = None
-    key = None
-    val = None
-    attribute = None
-    values = None
-    key_data = None
-
-    raw_output = []
-
-    if jc.utils.has_data(data):
-
-        data = data.splitlines()
-
-        # remove header rows
-        for row in data.copy():
-            if row:
-                data.pop(0)
-            else:
-                break
-
-        # main parsing loop
-        for line in data:
-            # new item
-            if not line:
-                item_header = True
-                item_values = False
-                value_list = False
-
-                if item:
-                    if values:
-                        item['values'][attribute] = values
-                    if key_data:
-                        item['values'][f'{key}_data'] = key_data
-                    raw_output.append(item)
-
-                item = {}
-                header = None
-                key = None
-                val = None
-                attribute = None
-                values = []
-                key_data = []
-                continue
-
-            # header
-            if line.startswith('Handle ') and line.endswith('bytes'):
-
-                # Handle 0x0000, DMI type 0, 24 bytes
-                header = line.replace(',', ' ').split()
-                item = {
-                    'handle': header[1],
-                    'type': header[4],
-                    'bytes': header[5]
-                }
-                continue
-
-            # description
-            if item_header:
-                item_header = False
-                item_values = True
-                value_list = False
-
-                item['description'] = line
-                item['values'] = {}
-                continue
-
-            # new item if multiple descriptions in handle
-            if not item_header and not line.startswith('\t'):
-                item_header = False
-                item_values = True
-                value_list = False
-
-                if item:
-                    if values:
-                        item['values'][attribute] = values
-                    if key_data:
-                        item['values'][f'{key}_data'] = key_data
-                    raw_output.append(item)
-
-                item = {
-                    'handle': header[1],
-                    'type': header[4],
-                    'bytes': header[5],
-                    'description': line,
-                    'values': {}
-                }
-
-                key = None
-                val = None
-                attribute = None
-                values = []
-                key_data = []
-                continue
-
-            # keys and values
-            if item_values \
-               and len(line.split(':', maxsplit=1)) == 2 \
-               and line.startswith('\t') \
-               and not line.startswith('\t\t') \
-               and not line.strip().endswith(':'):
-                item_header = False
-                item_values = True
-                value_list = False
-
-                if values:
-                    item['values'][attribute] = values
-                    values = []
-                if key_data:
-                    item['values'][f'{key}_data'] = key_data
-                    key_data = []
-
-                key = line.split(':', maxsplit=1)[0].strip().lower().replace(' ', '_')
-                val = line.split(':', maxsplit=1)[1].strip()
-                item['values'].update({key: val})
-                continue
-
-            # multi-line key
-            if item_values \
-               and line.startswith('\t') \
-               and not line.startswith('\t\t') \
-               and line.strip().endswith(':'):
-                item_header = False
-                item_values = True
-                value_list = True
-
-                if values:
-                    item['values'][attribute] = values
-                    values = []
-                if key_data:
-                    item['values'][f'{key}_data'] = key_data
-                    key_data = []
-
-                attribute = line[:-1].strip().lower().replace(' ', '_')
-                values = []
-                continue
-
-            # multi-line values
-            if value_list \
-               and line.startswith('\t\t'):
-                values.append(line.strip())
-                continue
-
-            # data for hybrid multi-line objects
-            if item_values \
-               and not value_list \
-               and line.startswith('\t\t'):
-                if f'{key}_data' not in item['values']:
-                    item['values'][f'{key}_data'] = []
-                key_data.append(line.strip())
-                continue
-
-        if item:
-            raw_output.append(item)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

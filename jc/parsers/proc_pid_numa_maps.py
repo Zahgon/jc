@@ -67,7 +67,7 @@ Examples:
           "stack"
         ]
       },
-      ...
+      pass
     ]
 
     $ cat /proc/1/numa_maps | jc --proc-pid-numa-maps -p -r
@@ -92,7 +92,7 @@ Examples:
           "stack"
         ]
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -126,14 +126,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for entry in proc_data:
-        for key, val in entry.items():
-            try:
-                entry[key] = int(val)
-            except Exception:
-                pass
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -154,33 +147,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        header = 'address policy details\n'
-        data = header + data
-
-        raw_output = simple_table_parse(data.splitlines())
-
-        for row in raw_output:
-            if 'details' in row:
-                detail_split = row['details'].split()
-
-                options = []
-                for item in detail_split:
-                    if '=' in item:
-                        key, val = item.split('=')
-                        row.update({key: val})
-                    else:
-                        options.append(item)
-
-                if options:
-                    row['options'] = options
-
-                del row['details']
-
-    return raw_output if raw else _process(raw_output)
+    pass

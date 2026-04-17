@@ -66,7 +66,7 @@ Examples:
           "shared_avail": 0
         }
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -99,7 +99,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -120,39 +120,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        cleandata = data.splitlines()[2:]
-
-        for line in filter(None, cleandata):
-
-            line = line.replace(':', ' ')
-            split_line = line.split()
-
-            raw_output.append(
-                {
-                    'name': split_line[0],
-                    'active_objs': int(split_line[1]),
-                    'num_objs': int(split_line[2]),
-                    'obj_size': int(split_line[3]),
-                    'obj_per_slab': int(split_line[4]),
-                    'pages_per_slab': int(split_line[5]),
-                    'tunables': {
-                        'limit': int(split_line[7]),
-                        'batch_count': int(split_line[8]),
-                        'shared_factor': int(split_line[9])
-                    },
-                    'slabdata': {
-                        'active_slabs': int(split_line[11]),
-                        'num_slabs': int(split_line[12]),
-                        'shared_avail': int(split_line[13])
-                    }
-                }
-            )
-
-    return raw_output if raw else _process(raw_output)
+    pass

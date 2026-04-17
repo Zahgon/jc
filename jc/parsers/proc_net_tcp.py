@@ -113,7 +113,7 @@ Examples:
         "sock_ref_count": 3,
         "sock_mem_loc": "ffff8c7a12d31aa0"
       },
-      ...
+      pass
     ]
 
     $ cat /proc/net/tcp | jc --proc -p -r
@@ -159,7 +159,7 @@ Examples:
         "sock_ref_count": "3",
         "sock_mem_loc": "ffff8c7a12d31aa0"
       },
-      ...
+      pass
     ]
 """
 import socket
@@ -184,21 +184,7 @@ __version__ = info.version
 
 
 def hex_to_ip(hexaddr: str) -> str:
-    if len(hexaddr) == 8:
-        addr_long = int(hexaddr, 16)
-        return socket.inet_ntop(socket.AF_INET, struct.pack("<L", addr_long))
-    elif len(hexaddr) == 32:
-        newaddr = ''
-        for chunk in range(0, 32, 8):
-            chunk_a = hexaddr[chunk + 6:chunk + 8]
-            chunk_b = hexaddr[chunk + 4:chunk + 6]
-            chunk_c = hexaddr[chunk + 2:chunk + 4]
-            chunk_d = hexaddr[chunk + 0:chunk + 2]
-            newaddr = newaddr + chunk_a + chunk_b + chunk_c + chunk_d
-        full_addr = ':'.join(newaddr[i:i + 4] for i in range(0, 32, 4))
-        return ipaddress.IPv6Address(full_addr).compressed
-
-    return ''
+    pass
 
 
 def _process(proc_data: List[Dict]) -> List[Dict]:
@@ -213,37 +199,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {
-        'timer_active', 'uid', 'unanswered_0_window_probes', 'inode',
-        'sock_ref_count', 'retransmit_timeout', 'soft_clock_tick',
-        'ack_quick_pingpong', 'sending_congestion_window',
-        'slow_start_size_threshold'
-    }
-
-    for entry in proc_data:
-        if 'local_address' in entry:
-            local_addr = entry['local_address']
-            remote_addr = entry['remote_address']
-
-            entry['local_address'] = hex_to_ip(local_addr)
-            entry['local_port'] = int(entry['local_port'], 16)
-            entry['remote_address'] = hex_to_ip(remote_addr)
-            entry['remote_port'] = int(entry['remote_port'], 16)
-
-            if len(local_addr) == 32:
-                opp_endian_local_addr = ':'.join(local_addr[i:i + 4] for i in range(0, 32, 4))
-                opp_endian_local_addr = ipaddress.IPv6Address(opp_endian_local_addr).compressed
-                opp_endian_remote_addr = ':'.join(remote_addr[i:i + 4] for i in range(0, 32, 4))
-                opp_endian_remote_addr = ipaddress.IPv6Address(opp_endian_remote_addr).compressed
-
-                entry['opposite_endian_local_address'] = opp_endian_local_addr
-                entry['opposite_endian_remote_address'] = opp_endian_remote_addr
-
-        for item in int_list:
-            if item in entry:
-                entry[item] = jc.utils.convert_to_int(entry[item])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -264,54 +220,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        line_data = data.splitlines()[1:]
-
-        for entry in line_data:
-            line = entry.split()
-            output_line = {}
-            output_line['entry'] = line[0][:-1]
-
-            local_ip_port = line[1]
-            local_ip = local_ip_port.split(':')[0]
-            local_port = local_ip_port.split(':')[1]
-
-            output_line['local_address'] = local_ip
-            output_line['local_port'] = local_port
-
-            remote_ip_port = line[2]
-            remote_ip = remote_ip_port.split(':')[0]
-            remote_port = remote_ip_port.split(':')[1]
-
-            output_line['remote_address'] = remote_ip
-            output_line['remote_port'] = remote_port
-
-            output_line['state'] = line[3]
-            output_line['tx_queue'] = line[4][:8]
-            output_line['rx_queue'] = line[4][9:]
-            output_line['timer_active'] = line[5][:2]
-            output_line['jiffies_until_timer_expires'] = line[5][3:]
-            output_line['unrecovered_rto_timeouts'] = line[6]
-            output_line['uid'] = line[7]
-            output_line['unanswered_0_window_probes'] = line[8]
-            output_line['inode'] = line[9]
-            output_line['sock_ref_count'] = line[10]
-            output_line['sock_mem_loc'] = line[11]
-
-            # fields not always included
-            if len(line) > 12:
-                output_line['retransmit_timeout'] = line[12]
-                output_line['soft_clock_tick'] = line[13]
-                output_line['ack_quick_pingpong'] = line[14]
-                output_line['sending_congestion_window'] = line[15]
-                output_line['slow_start_size_threshold'] = line[16]
-
-            raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

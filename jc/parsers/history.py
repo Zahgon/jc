@@ -46,7 +46,7 @@ Examples:
         "line": 121,
         "command": "docker images"
       },
-      ...
+      pass
     ]
 
     $ history | jc --history -p -r
@@ -55,7 +55,7 @@ Examples:
       "119": "ls /bin",
       "120": "echo \"hello\"",
       "121": "docker images",
-      ...
+      pass
     }
 """
 import jc.utils
@@ -87,14 +87,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    processed = []
-    for k, v in proc_data.items():
-        proc_line = {
-            'line': jc.utils.convert_to_int(k),
-            'command': v,
-        }
-        processed.append(proc_line)
-    return processed
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -112,23 +105,4 @@ def parse(data, raw=False, quiet=False):
         Dictionary of raw structured data or
         List of Dictionaries of processed structured data
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    if jc.utils.has_data(data):
-        linedata = data.splitlines()
-
-        for entry in filter(None, linedata):
-            try:
-                number, command = entry.split(maxsplit=1)
-                raw_output[number] = command
-            except ValueError:
-                # need to catch ValueError in case there is weird input from prior commands
-                pass
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

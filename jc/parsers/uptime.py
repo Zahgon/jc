@@ -89,57 +89,7 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    int_list = {'users'}
-    float_list = {'load_1m', 'load_5m', 'load_15m'}
-
-    if 'time' in proc_data:
-        time_list = proc_data['time'].split(':')
-        proc_data['time_hour'] = jc.utils.convert_to_int(time_list[0])
-        proc_data['time_minute'] = jc.utils.convert_to_int(time_list[1])
-        if len(time_list) == 3:
-            proc_data['time_second'] = jc.utils.convert_to_int(time_list[2])
-        else:
-            proc_data['time_second'] = None
-
-    # parse the uptime field. Here are the variations:
-    # 0 min
-    # 3 mins
-    # 3 days,  2:54
-    # 2 days, 19:32
-    # 1 day, 29 min
-    # 16:59
-    if 'uptime' in proc_data:
-        uptime_days = 0
-        uptime_hours = 0
-        uptime_minutes = 0
-        uptime_total_seconds = 0
-
-        if 'min' in proc_data['uptime']:
-            uptime_minutes = jc.utils.convert_to_int(proc_data['uptime'].split()[-2])
-
-        if ':' in proc_data['uptime']:
-            uptime_hours = jc.utils.convert_to_int(proc_data['uptime'].split()[-1].split(':')[-2])
-            uptime_minutes = jc.utils.convert_to_int(proc_data['uptime'].split(':')[-1])
-
-        if 'day' in proc_data['uptime']:
-            uptime_days = jc.utils.convert_to_int(proc_data['uptime'].split()[0])
-
-        proc_data['uptime_days'] = uptime_days
-        proc_data['uptime_hours'] = uptime_hours
-        proc_data['uptime_minutes'] = uptime_minutes
-
-        uptime_total_seconds = (uptime_days * 86400) + (uptime_hours * 3600) + (uptime_minutes * 60)
-        proc_data['uptime_total_seconds'] = uptime_total_seconds
-
-    # integer and float conversions
-    for key in proc_data:
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-        if key in float_list:
-            proc_data[key] = jc.utils.convert_to_float(proc_data[key])
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -156,31 +106,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    if jc.utils.has_data(data):
-        if 'user' in data:
-            # standard uptime output
-            time, _, *uptime, users, _, _, _, load_1m, load_5m, load_15m = data.split()
-
-            raw_output['time'] = time
-            raw_output['uptime'] = ' '.join(uptime).rstrip(',')
-            raw_output['users'] = users
-            raw_output['load_1m'] = load_1m.rstrip(',')
-            raw_output['load_5m'] = load_5m.rstrip(',')
-            raw_output['load_15m'] = load_15m
-
-        else:
-            # users information missing (e.g. busybox)
-            time, _, *uptime, _, _, load_1m, load_5m, load_15m = data.split()
-
-            raw_output['time'] = time
-            raw_output['uptime'] = ' '.join(uptime).rstrip(',')
-            raw_output['load_1m'] = load_1m.rstrip(',')
-            raw_output['load_5m'] = load_5m.rstrip(',')
-            raw_output['load_15m'] = load_15m
-
-    return raw_output if raw else _process(raw_output)
+    pass

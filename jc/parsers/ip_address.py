@@ -556,23 +556,16 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def _b2a(byte_string: bytes) -> str:
     """Convert a byte string to a colon-delimited hex ascii string"""
-    # need try/except since separator was only introduced in python 3.8.
-    # provides compatibility for python 3.6 and 3.7.
-    try:
-      return binascii.hexlify(byte_string, ':').decode('utf-8')
-    except TypeError:
-      hex_string = binascii.hexlify(byte_string).decode('utf-8')
-      colon_seperated = ':'.join(hex_string[i:i+2] for i in range(0, len(hex_string), 2))
-      return colon_seperated
+    pass
 
 
 def _bin_format(ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address], length: int) -> str:
-    return format(int(ip), '0>' + str(length) +'b')
+    pass
 
 
 def parse(
@@ -593,183 +586,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        SCOPE_PATTERN = re.compile(r'%[a-zA-Z0-9]*[^/]')
-
-        # Accept IPs entered as integer notation
-        try:
-          data = int(data)  # type: ignore
-        except Exception:
-          data = data.strip()
-
-        # python versions < 3.9 do not handle the ipv6 scope, so pop it
-        # and use instead of ipaddress.scope_id if parsing fails
-        scope_string = None
-
-        try:
-            interface = ipaddress.ip_interface(data)
-
-        except ValueError:
-            scope_match = re.search(SCOPE_PATTERN, data)
-            if scope_match:
-                scope_string = scope_match.group(0)[1:]
-
-            data = re.sub(SCOPE_PATTERN, '', data)
-            interface = ipaddress.ip_interface(data)
-
-        network_string = str(interface.network).split('/')[0]
-        network_cidr = int(str(interface.with_prefixlen).split('/')[1])
-        network = ipaddress.ip_network(f'{network_string}/{network_cidr}')
-        network_ipobj = ipaddress.ip_address(network_string)
-
-        broadcast_string = str(network.broadcast_address)
-        broadcast_ipobj = ipaddress.ip_address(broadcast_string)
-
-        # older versions of python (e.g. 3.6) don't provide hostmask when a decimal IP is entered
-        try:
-            hostmask_string = str(interface.hostmask)
-        except AttributeError:
-            if interface.version == 4:
-                hostmask_string = '0.0.0.0'
-            if interface.version == 6:
-                hostmask_string = '::'
-
-        hostmask_ipobj = ipaddress.ip_address(hostmask_string)
-
-        # older versions of python (e.g. 3.6) don't provide netmask when a decimal IP is entered
-        try:
-            netmask_string = str(interface.netmask)
-        except AttributeError:
-            if interface.version == 4:
-                netmask_string = '255.255.255.255'
-            if interface.version == 6:
-                netmask_string = 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff'
-
-        netmask_ipobj = ipaddress.ip_address(netmask_string)
-
-        bare_ip_string = str(interface.ip)
-        bare_ip = ipaddress.ip_address(bare_ip_string)
-        ip_ptr = bare_ip.reverse_pointer
-        ip_compressed = bare_ip.compressed
-        ip_exploded = bare_ip.exploded
-
-        if interface.version == 4:
-            ip_split = ip_exploded.split('.')
-
-        else:
-            # regular IPv6
-            if not '.' in ip_exploded:
-                ip_split = ip_exploded.split(':')
-
-            # IPv4 mapped IPv6
-            else:
-                ip_split_v6 = ip_exploded.split(':')[:-1]
-                ip_split_v4_mapped_str = ip_exploded.split(':')[-1]
-                ip_split_v4_mapped = ip_split_v4_mapped_str.split('.')
-                ip_split = ip_split_v6 + ip_split_v4_mapped
-
-        # fix for ipv6-only attributes
-        scope_id = None
-        ipv4_mapped = None
-        sixtofour = None
-        teredo_client = None
-        teredo_server = None
-        if interface.version == 6:
-            # scope_id not available in python version < 3.9
-            try:
-                scope_id = interface.scope_id
-            except AttributeError:
-                scope_id = scope_string
-
-            ipv4_mapped = str(interface.ipv4_mapped) if interface.ipv4_mapped else None
-            sixtofour = str(interface.sixtofour) if interface.sixtofour else None
-            teredo_client = str(interface.teredo[1]) if interface.teredo else None
-            teredo_server = str(interface.teredo[0]) if interface.teredo else None
-
-        # Find first and last host IPs. Fix for /31, /32, /127, /128
-        if any((
-            interface.version == 4 and network_cidr == 31,
-            interface.version == 6 and network_cidr == 127
-        )):
-            first_host = network_string
-            last_host = broadcast_string
-            hosts = 2
-
-        elif any((
-            interface.version == 4 and network_cidr == 32,
-            interface.version == 6 and network_cidr == 128
-        )):
-            first_host = bare_ip_string
-            last_host = bare_ip_string
-            hosts = 1
-
-        else:
-            first_host = str(network_ipobj + 1)
-            last_host = str(broadcast_ipobj - 1)
-            hosts = int(broadcast_ipobj - 1) - int(network_ipobj + 1) + 1
-
-        first_host_ipobj = ipaddress.ip_address(first_host)
-        last_host_ipobj = ipaddress.ip_address(last_host)
-
-        raw_output = {
-            'version': interface.version,
-            'max_prefix_length': interface.max_prefixlen,
-            'ip': bare_ip_string,
-            'ip_compressed': ip_compressed,
-            'ip_exploded': ip_exploded,
-            'ip_split': ip_split,
-            'scope_id': scope_id,
-            'ipv4_mapped': ipv4_mapped,
-            'six_to_four': sixtofour,
-            'teredo_client': teredo_client,
-            'teredo_server': teredo_server,
-            'dns_ptr': ip_ptr,
-            'network': network_string,
-            'broadcast': broadcast_string,
-            'hostmask': hostmask_string,
-            'netmask': netmask_string,
-            'cidr_netmask': network_cidr,
-            'hosts': hosts,
-            'first_host': first_host,
-            'last_host': last_host,
-            'is_multicast': interface.is_multicast,
-            'is_private': interface.is_private,
-            'is_global': interface.is_global,
-            'is_link_local': interface.is_link_local,
-            'is_loopback': interface.is_loopback,
-            'is_reserved': interface.is_reserved,
-            'is_unspecified': interface.is_unspecified,
-            'int': {
-                'ip': int(interface),
-                'network': int(network_ipobj),
-                'broadcast': int(broadcast_ipobj),
-                'first_host': int(first_host_ipobj),
-                'last_host': int(last_host_ipobj)
-            },
-            'hex': {
-                'ip': _b2a(bare_ip.packed),
-                'network': _b2a(network_ipobj.packed),
-                'broadcast': _b2a(broadcast_ipobj.packed),
-                'hostmask': _b2a(hostmask_ipobj.packed),
-                'netmask': _b2a(netmask_ipobj.packed),
-                'first_host': _b2a(first_host_ipobj.packed),
-                'last_host': _b2a(last_host_ipobj.packed)
-            },
-            'bin': {
-                'ip': _bin_format(bare_ip, interface.max_prefixlen),
-                'network': _bin_format(network_ipobj, interface.max_prefixlen),
-                'broadcast': _bin_format(broadcast_ipobj, interface.max_prefixlen),
-                'hostmask': _bin_format(hostmask_ipobj, interface.max_prefixlen),
-                'netmask': _bin_format(netmask_ipobj, interface.max_prefixlen),
-                'first_host': _bin_format(first_host_ipobj, interface.max_prefixlen),
-                'last_host': _bin_format(last_host_ipobj, interface.max_prefixlen)
-            }
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

@@ -29,35 +29,17 @@ class WebPnpIdParser(HTMLParser):
         self.result = {}
 
     def handle_starttag(self, tag, attrs):
-        if tag == "tbody":
-            self._find_table = True
-        elif self._find_table and tag == "tr":
-            self._find_row = True
+        pass
 
     def handle_endtag(self, tag):
-        if tag == "tbody":
-            self._find_table = False
-        elif self._find_table and tag == "tr":
-            self._find_row = False
-            # add table row to result
-            self.result[self._last_field[1]] = (
-                self._last_field[0],
-                self._last_field[-1],
-            )
-            self._last_field.clear()
+        pass
 
     def handle_data(self, data):
         # skip processing until table is found
-        if not self._find_table:
-            return
-
-        if self._find_row:
-            data = data.strip()
-            if data:
-                self._last_field.append(data)
+        pass
 
     def error(self, message):
-        super().close()
+        pass
 
 
 class Registry(dict):
@@ -79,21 +61,7 @@ class Registry(dict):
         Returns:
 
         """
-        url = "https://uefi.org/PNP_ID_List"
-        if filter_by_id:
-            url += "?search={}".format(filter_by_id)
-
-        with request.urlopen(url) as req:
-            parse = WebPnpIdParser()
-            parse.feed(req.read().decode())
-
-            registry = cls()
-            for key, value in parse.result.items():
-                # skip invalid search value
-                if filter_by_id and key != filter_by_id:
-                    continue
-                registry[key] = value[0]
-        return registry
+        pass
 
     @classmethod
     def from_csv(cls, csv_path: str, filter_by_id: str = None):
@@ -108,29 +76,16 @@ class Registry(dict):
         Returns:
 
         """
-        registry = cls()
-        with open(csv_path, "r") as file:
-            reader = csv.reader(file)
-            for line in reader:
-                # filter
-                if filter_by_id and filter_by_id != line[0]:
-                    continue
-                registry[line[0]] = line[1]
-        return registry
+        pass
 
     def to_csv(self, csv_path: str):
         """Dump registry to csv file"""
-        with open(csv_path, "w") as csv_file:
-            writer = csv.writer(csv_file)
-            writer.writerows(self.items())
-        return self
+        pass
 
     def get_company_from_id(self, pnp_id: str) -> str:
         """Convert PNP id to company name"""
-        return self.get(pnp_id, "Unknown")
+        pass
 
     def get_company_from_raw(self, raw: int) -> str:
         """Convert raw edid value to company name"""
-        tmp = [(raw >> 10) & 31, (raw >> 5) & 31, raw & 31]
-        pnp_id = "".join(string.ascii_uppercase[n - 1] for n in tmp)
-        return self.get_company_from_id(pnp_id)
+        pass

@@ -39,7 +39,7 @@ Examples:
           "node":   null
           "error":  "find: './inaccessible': Permission denied"
         }
-        ...
+        pass
     ]
 
     $ find | jc --find -p -r
@@ -47,7 +47,7 @@ Examples:
       "./templates/readme_template",
       "./templates/manpage_template",
       "./.github/workflows/pythonapp.yml",
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -78,34 +78,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    processed = []
-
-    for index in proc_data:
-        path, node, error = "", "", ""
-
-        if index == ".":
-            node = "."
-        elif index.startswith('find: '):
-            error = index
-        else:
-            try:
-                path, node = index.rsplit('/', maxsplit=1)
-            except ValueError:
-                pass
-
-        proc_line = {
-            'path': path if path else None,
-            'node': node if node else None
-        }
-
-        if error:
-            proc_line.update(
-                {'error': error}
-            )
-
-        processed.append(proc_line)
-
-    return processed
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -123,15 +96,4 @@ def parse(data, raw=False, quiet=False):
         List of raw strings or
         List of Dictionaries of processed structured data
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    if jc.utils.has_data(data):
-        raw_output = data.splitlines()
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

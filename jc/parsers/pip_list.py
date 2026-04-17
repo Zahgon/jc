@@ -39,7 +39,7 @@ Examples:
         "package": "asn1crypto",
         "version": "0.24.0"
       },
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -72,8 +72,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    # no further processing
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -90,35 +89,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    # Clear any blank lines
-    cleandata = list(filter(None, data.splitlines()))
-
-    if jc.utils.has_data(data):
-
-        # detect legacy output type
-        if ' (' in cleandata[0]:
-            for row in cleandata:
-                raw_output.append({'package': row.split(' (')[0],
-                                   'version': row.split(' (')[1].rstrip(')')})
-
-        # otherwise normal table output
-        else:
-            # clear separator line
-            for i, line in reversed(list(enumerate(cleandata))):
-                if '---' in line:
-                    cleandata.pop(i)
-
-            cleandata[0] = cleandata[0].lower()
-
-            if cleandata:
-                raw_output = jc.parsers.universal.simple_table_parse(cleandata)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

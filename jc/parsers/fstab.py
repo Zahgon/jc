@@ -108,14 +108,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {'fs_freq', 'fs_passno'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -132,41 +125,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-    cleandata = data.splitlines()
-
-    # Clear any blank lines
-    cleandata = list(filter(None, cleandata))
-
-    if jc.utils.has_data(data):
-
-        for line in cleandata:
-            output_line = {}
-            # ignore commented lines
-            if line.strip().startswith('#'):
-                continue
-
-            line_list = line.split(maxsplit=6)
-            fs_spec = line_list[0]
-            fs_file = line_list[1]
-            fs_vfstype = line_list[2]
-            fs_mntops = line_list[3]
-            fs_freq = line_list[4]
-            fs_passno = line_list[5]
-
-            output_line['fs_spec'] = fs_spec
-            output_line['fs_file'] = fs_file
-            output_line['fs_vfstype'] = fs_vfstype
-            output_line['fs_mntops'] = fs_mntops
-            output_line['fs_freq'] = fs_freq
-            output_line['fs_passno'] = fs_passno
-
-            raw_output.append(output_line)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

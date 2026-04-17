@@ -49,7 +49,7 @@ Examples:
         "num_blocks": 56868,
         "name": "loop1"
       },
-      ...
+      pass
     ]
 
     $ cat /proc/partitions | jc --proc-partitions -p -r
@@ -66,7 +66,7 @@ Examples:
         "num_blocks": "56868",
         "name": "loop1"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -100,14 +100,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for entry in proc_data:
-        for key in entry:
-            try:
-                entry[key] = int(entry[key])
-            except Exception:
-                pass
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -128,15 +121,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        cleandata = list(filter(None, data.splitlines()))
-        cleandata[0] = cleandata[0].replace('#', 'num_')
-        raw_output = simple_table_parse(cleandata)
-
-    return raw_output if raw else _process(raw_output)
+    pass

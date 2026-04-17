@@ -68,7 +68,7 @@ Examples:
           "i8042"
         ]
       },
-      ...
+      pass
     ]
 
     $ cat /proc/interrupts | jc --proc-interrupts -p -r
@@ -99,7 +99,7 @@ Examples:
           "i8042"
         ]
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -132,10 +132,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for entry in proc_data:
-        entry['interrupts'] = [int(x) for x in entry['interrupts']]
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -156,53 +153,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-        data_lines = data.splitlines()
-
-        # get the number of cpus
-        cpu_num = len(data_lines[0].split())
-
-        for line in filter(None, data_lines):
-
-            # skip non-data lines
-            if not ':' in line:
-                continue
-
-            # process data lines
-            split_line = line.split()
-            irq = split_line.pop(0)[:-1]
-
-            interrupts = []
-            if irq == 'ERR' or irq == 'MIS':
-                interrupts.extend(split_line)
-
-            elif irq.isdigit():
-                for _ in range(cpu_num):
-                    interrupts.append(split_line.pop(0))
-
-                interrupt_type = split_line.pop(0)
-                device = split_line
-
-            else:
-                for _ in range(cpu_num):
-                    interrupts.append(split_line.pop(0))
-
-                interrupt_type = ' '.join(split_line)
-                device = []
-
-            raw_output.append(
-                {
-                    'irq': irq,
-                    'cpu_num': cpu_num,
-                    'interrupts': interrupts,
-                    'type': interrupt_type,
-                    'device': device or None
-                }
-            )
-
-    return raw_output if raw else _process(raw_output)
+    pass

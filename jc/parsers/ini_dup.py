@@ -139,23 +139,7 @@ def _process(proc_data):
 
         Dictionary representing the INI file.
     """
-    # remove quotation marks from beginning and end of values
-    for k, v in proc_data.items():
-        if isinstance(v, dict):
-            for key, value in v.items():
-                if isinstance(value, list):
-                    v[key] = [jc.utils.remove_quotes(x) for x in value]
-                else:
-                    v[key] = jc.utils.remove_quotes(value)
-            continue
-
-        elif isinstance(v, list):
-            proc_data[k] = [jc.utils.remove_quotes(x) for x in v]
-
-        else:
-            proc_data[k] = jc.utils.remove_quotes(v)
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -172,44 +156,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary representing the INI file.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    if jc.utils.has_data(data):
-
-        ini_parser = configparser.ConfigParser(
-            dict_type = MultiDict,
-            allow_no_value=True,
-            interpolation=None,
-            default_section=None,
-            empty_lines_in_values=False,
-            strict=False
-        )
-
-        # don't convert keys to lower-case:
-        ini_parser.optionxform = lambda option: option
-
-        try:
-            ini_parser.read_string(data)
-            raw_output = {s: dict(ini_parser.items(s)) for s in ini_parser.sections()}
-
-        except configparser.MissingSectionHeaderError:
-            # find a top-level section name that will not collide with any existing ones
-            while True:
-                my_uuid = str(uuid.uuid4())
-                if my_uuid not in data:
-                    break
-
-            data = f'[{my_uuid}]\n' + data
-            ini_parser.read_string(data)
-            temp_dict = {s: dict(ini_parser.items(s)) for s in ini_parser.sections()}
-
-            # move items under fake top-level sections to the root
-            raw_output = temp_dict.pop(my_uuid)
-
-            # get the rest of the sections
-            raw_output.update(temp_dict)
-
-    return raw_output if raw else _process(raw_output)
+    pass

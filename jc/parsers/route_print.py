@@ -106,7 +106,7 @@ Examples:
             "metric": 16,
             "metric_set_to_default": false
           },
-          ...
+          pass
           {
             "network_destination": "255.255.255.255",
             "netmask": "255.255.255.255",
@@ -131,7 +131,7 @@ Examples:
             "metric": 1,
             "metric_set_to_default": false
           },
-          ...
+          pass
         ]
       },
       "ipv6_route_table": {
@@ -150,7 +150,7 @@ Examples:
             "gateway": "fe80::1",
             "metric_set_to_default": false
           },
-          ...
+          pass
           {
             "interface": 12,
             "metric": 271,
@@ -204,29 +204,7 @@ def parse(data, raw=False, quiet=False):
 
         Parsed dictionary. The raw and processed data structures are the same.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-    if jc.utils.has_data(data):
-        raw_data = {
-                "interface_list": [],
-                "ipv4_route_table": {
-                    "active_routes": [],
-                    "persistent_routes": []
-                },
-                "ipv6_route_table": {
-                    "active_routes": [],
-                    "persistent_routes": []
-                }
-            }
-
-        lines = data.splitlines()
-        _parse_interface_list(raw_data, _PushbackIterator(iter(lines)))
-        _parse_ipv4_route_table(raw_data, _PushbackIterator(iter(lines)))
-        _parse_ipv6_route_table(raw_data, _PushbackIterator(iter(lines)))
-        raw_output = raw_data
-    return raw_output if raw else _process(raw_output)
+    pass
 
 def _process(proc_data):
     """
@@ -240,56 +218,7 @@ def _process(proc_data):
 
         Processed Dictionary. Structured data to conform to the schema.
     """
-    if not proc_data:
-        return {}
-
-    for interface in proc_data['interface_list']:
-        if interface["mac_address"] == '' or interface["mac_address"] == '00 00 00 00 00 00 00 e0':  # Placeholder MAC address for virtual adapters
-            mac_address = None
-        else:
-            mac_address = interface["mac_address"].replace(" ", ":")
-
-        interface["mac_address"] = mac_address
-
-        interface["interface_index"] = jc.utils.convert_to_int(interface["interface_index"])
-
-    for ipv4_active_route in proc_data['ipv4_route_table']['active_routes']:
-        if ipv4_active_route["metric"] != "Default":
-            ipv4_active_route["metric"] = jc.utils.convert_to_int(ipv4_active_route["metric"])
-            ipv4_active_route["metric_set_to_default"] = False
-        else:
-            ipv4_active_route["metric"] = None
-            ipv4_active_route["metric_set_to_default"] = True
-
-    for ipv4_persistent_route in proc_data['ipv4_route_table']['persistent_routes']:
-        if ipv4_persistent_route["metric"] != "Default":
-            ipv4_persistent_route["metric"] = jc.utils.convert_to_int(ipv4_persistent_route["metric"])
-            ipv4_persistent_route["metric_set_to_default"] = False
-        else:
-            ipv4_persistent_route["metric"] = None
-            ipv4_persistent_route["metric_set_to_default"] = True
-
-    for ipv6_active_route in proc_data['ipv6_route_table']['active_routes']:
-        ipv6_active_route["interface"] = jc.utils.convert_to_int(ipv6_active_route["interface"])
-
-        if ipv6_active_route["metric"] != "Default":
-            ipv6_active_route["metric"] = jc.utils.convert_to_int(ipv6_active_route["metric"])
-            ipv6_active_route["metric_set_to_default"] = False
-        else:
-            ipv6_active_route["metric"] = None
-            ipv6_active_route["metric_set_to_default"] = True
-
-    for ipv6_persistent_route in proc_data['ipv6_route_table']['persistent_routes']:
-        ipv6_persistent_route["interface"] = jc.utils.convert_to_int(ipv6_persistent_route["interface"])
-
-        if ipv6_persistent_route["metric"] != "Default":
-            ipv6_persistent_route["metric"] = jc.utils.convert_to_int(ipv6_persistent_route["metric"])
-            ipv6_persistent_route["metric_set_to_default"] = False
-        else:
-            ipv6_persistent_route["metric"] = None
-            ipv6_persistent_route["metric_set_to_default"] = True
-
-    return proc_data
+    pass
 
 
 class _PushbackIterator:
@@ -310,146 +239,20 @@ class _PushbackIterator:
             return next(self.iterator)
 
     def pushback(self, value):
-        self.pushback_stack.append(value)
+        pass
 
     def contains(self, pattern):
-        iter_lines = list(self.iterator)
-        list_lines = self.pushback_stack.copy()
-        list_lines.extend(iter_lines)
-        self.iterator = iter(list_lines)
-        self.pushback_stack = []
-
-        # Check the pushback stack first
-        for line in list_lines:
-            if re.match(pattern, line):
-                return True
-        return False
+        pass
 
     def skip_until(self, pattern):
-        for line in self:
-            if re.match(pattern, line):
-                return line
-        return None
+        pass
 
 
 def _parse_interface_list(data, lines_iter):
-    start_of_interface_list_pattern = r'^Interface List'
-    if lines_iter.contains(start_of_interface_list_pattern):
-        line = lines_iter.skip_until(start_of_interface_list_pattern)
-        for line in lines_iter:
-            if re.match(r'^=+$', line):
-                break  # End of interface list
-            interface_index = line[:5].replace(".", "").strip()
-            mac_address = line[5:30].replace(".","").strip()
-            description = line[30:].strip()
-            data['interface_list'].append({
-                "interface_index": interface_index,
-                "mac_address": mac_address,
-                "description": description
-            })
+    pass
 
 def _parse_ipv4_route_table(data, lines_iter):
-    def _parse_ipv4_active_routes(data, lines_iter):
-        line = lines_iter.skip_until(r'^Active Routes')
-        line = next(lines_iter, '') # Skip the header line
-        if line.strip() == 'None':
-            return
-        for line in lines_iter:
-            if re.match(r'^=+$', line):
-                break  # End of interface list
-            if 'Default Gateway' in line:
-                continue
-            lines_split = line.split()
-            network_destination = lines_split[0]
-            netmask = lines_split[1]
-            gateway = lines_split[2]
-            interface = lines_split[3]
-            metric = lines_split[4]
-            data['ipv4_route_table']["active_routes"].append({
-                "network_destination": network_destination,
-                "netmask": netmask,
-                "gateway": gateway,
-                "interface": interface,
-                "metric": metric
-            })
-
-    def _parse_ipv4_persistent_routes(data, lines_iter):
-        line = lines_iter.skip_until(r'^Persistent Routes')
-        line = next(lines_iter, '') # line is either "None" and we abort parsing this section or we skip header line
-        if line.strip() == 'None':
-            return
-        for line in lines_iter:
-            if re.match(r'^=+$', line):
-                break 
-            lines_split = line.split()
-            network_address = lines_split[0]
-            netmask = lines_split[1]
-            gateway_address = lines_split[2]
-            metric = lines_split[3]
-            data['ipv4_route_table']["persistent_routes"].append({
-                "network_address": network_address,
-                "netmask": netmask,
-                "gateway_address": gateway_address,
-                "metric": metric
-            })
-
-    start_of_ipv4_route_table_pattern = r'^IPv4 Route Table'
-    if lines_iter.contains(start_of_ipv4_route_table_pattern):
-        line = lines_iter.skip_until(start_of_ipv4_route_table_pattern)
-        line = next(lines_iter, '') # Skip the separator line
-        _parse_ipv4_active_routes(data, lines_iter)
-        _parse_ipv4_persistent_routes(data, lines_iter)
+    pass
 
 def _parse_ipv6_route_table(data, lines_iter):
-    def _parse_ipv6_active_routes(data, lines_iter):
-        line = lines_iter.skip_until(r'^Active Routes')
-        line = next(lines_iter, '') # line is either "None" and we abort parsing this section or we skip header line
-        if line.strip() == 'None':
-            return
-        for line in lines_iter:
-            if re.match(r'^=+$', line):
-                break
-            split_line = line.split()
-            interface = split_line[0]
-            metric = split_line[1]
-            network_destination = split_line[2]
-            if len(split_line) > 3:
-                gateway = split_line[3]
-            else:
-                gateway = next(lines_iter, '').strip()
-            data['ipv6_route_table']["active_routes"].append({
-                "interface": interface,
-                "metric": metric,
-                "network_destination": network_destination,
-                "gateway": gateway
-            })
-
-    def _parse_ipv6_persistent_routes(data, lines_iter):
-        line = lines_iter.skip_until(r'^Persistent Routes')
-        line = next(lines_iter, '') # line is either "None" and we abort parsing this section or we skip header line
-        if line.strip() == 'None':
-            return
-        for line in lines_iter:
-            if re.match(r'^=+$', line):
-                break
-            split_line = line.split()
-            interface = split_line[0]
-            metric = split_line[1]
-            network_destination = split_line[2]
-            if len(split_line) > 3:
-                gateway = split_line[3]
-            else:
-                gateway = next(lines_iter, '').strip()
-            data['ipv6_route_table']["persistent_routes"].append({
-                "interface": interface,
-                "metric": metric,
-                "network_destination": network_destination,
-                "gateway": gateway
-            })
-
-    start_of_ipv6_route_table_pattern = r'^IPv6 Route Table'
-    if lines_iter.contains(start_of_ipv6_route_table_pattern):
-        line = lines_iter.skip_until(start_of_ipv6_route_table_pattern)
-        line = next(lines_iter, '') # Skip the separator line
-        _parse_ipv6_active_routes(data, lines_iter)
-        _parse_ipv6_persistent_routes(data, lines_iter)
+    pass

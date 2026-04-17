@@ -178,7 +178,7 @@ class CMSAttribute(Sequence):
     _oid_specs = {}
 
     def _values_spec(self):
-        return self._oid_specs.get(self['type'].native, SetOfAny)
+        pass
 
     _spec_callbacks = {
         'values': _values_spec
@@ -436,7 +436,7 @@ class AttCertAttribute(Sequence):
     }
 
     def _values_spec(self):
-        return self._oid_specs.get(self['type'].native, SetOfAny)
+        pass
 
     _spec_callbacks = {
         'values': _values_spec
@@ -507,11 +507,7 @@ class CertificateChoices(Choice):
         :raises:
             ValueError - when value is not a valid alternative
         """
-
-        super(CertificateChoices, self).validate(class_, tag, contents)
-        if self._choice == 2:
-            if AttCertVersion.load(Sequence.load(contents)[0].dump()).native == 'v2':
-                self._choice = 3
+        pass
 
 
 class CertificateSet(SetOf):
@@ -634,13 +630,7 @@ class SignedData(Sequence):
         # Octet String tag.
 
         # If the version is greater than 1, it is definite CMS
-        if self['version'].native != 'v1':
-            return EncapsulatedContentInfo
-
-        # Otherwise, the ContentInfo spec from PKCS#7 will be compatible with
-        # CMS v1 (which only allows Data, an Octet String) and PKCS#7, which
-        # allows Any
-        return ContentInfo
+        pass
 
     _spec_callbacks = {
         'encap_content_info': _encap_content_info_spec
@@ -849,13 +839,7 @@ class DigestedData(Sequence):
         # Octet String tag.
 
         # If the version is greater than 1, it is definite CMS
-        if self['version'].native != 'v1':
-            return EncapsulatedContentInfo
-
-        # Otherwise, the ContentInfo spec from PKCS#7 will be compatible with
-        # CMS v1 (which only allows Data, an Octet String) and PKCS#7, which
-        # allows Any
-        return ContentInfo
+        pass
 
     _spec_callbacks = {
         'encap_content_info': _encap_content_info_spec
@@ -922,11 +906,7 @@ class CompressedData(Sequence):
 
     @property
     def decompressed(self):
-        if self._decompressed is None:
-            if zlib is None:
-                raise SystemError('The zlib module is not available')
-            self._decompressed = zlib.decompress(self['encap_content_info']['content'].native)
-        return self._decompressed
+        pass
 
 
 class RecipientKeyIdentifier(Sequence):

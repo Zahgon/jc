@@ -124,39 +124,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    output: List = []
-
-    cleandata = list(filter(None, data.splitlines()))
-
-    if not jc.utils.has_data(data):
-        return output
-
-    for line in cleandata:
-        # -R flag returns the output in the format:
-        # Folder:
-        #   attributes file_in_folder
-        if line.endswith(':'):
-            continue
-
-        # lsattr: Operation not supported ....
-        if line.startswith(ERROR_PREFIX):
-            continue
-
-        line_output: Dict = {}
-
-        # attributes file
-        # --------------e----- /etc/passwd
-        attributes, file = line.split()
-        line_output['file'] = file
-        for attribute in list(attributes):
-            attribute_key = ATTRIBUTES.get(attribute)
-            if attribute_key:
-                line_output[attribute_key] = True
-
-        if line_output:
-            output.append(line_output)
-
-    return output
+    pass

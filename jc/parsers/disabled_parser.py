@@ -23,4 +23,4 @@ def parse(
     quiet: bool = False
 ) -> dict:
     """Main text parsing function"""
-    raise ParseError('This parser is disabled.')
+    pass

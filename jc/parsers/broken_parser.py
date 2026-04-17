@@ -20,4 +20,4 @@ def parse(
     quiet: bool = False
 ) -> dict:
     """Main text parsing function"""
-    return {}
+    pass

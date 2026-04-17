@@ -97,9 +97,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-
-    # no additional processing needed
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -116,43 +114,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    # Clear any blank lines
-    cleandata = list(filter(None, data.splitlines()))
-
-    if jc.utils.has_data(data):
-
-        for line in cleandata:
-            output_line = {}
-            # ignore commented lines
-            if line.strip().startswith('#'):
-                continue
-
-            line_list = line.split(maxsplit=1)
-            ip = line_list[0]
-            hosts = line_list[1]
-            hosts_list = hosts.split()
-
-            comment_found = False
-            for i, item in enumerate(hosts_list):
-                if '#' in item:
-                    comment_found = True
-                    comment_item = i
-                    break
-
-            if comment_found:
-                hosts_list = hosts_list[:comment_item]
-
-            output_line['ip'] = ip
-            output_line['hostname'] = hosts_list
-
-            raw_output.append(output_line)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

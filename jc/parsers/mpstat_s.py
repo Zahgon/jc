@@ -82,13 +82,13 @@ Examples:
     {"cpu":"all","percent_usr":0.22,"percent_nice":0.0,"percent_sys":...}
     {"cpu":"0","percent_usr":0.22,"percent_nice":0.0,"percent_sys":0....}
     {"cpu":"all","intr_s":37.61,"type":"interrupts","time":"03:15:06 PM"}
-    ...
+    pass
 
     $ mpstat -A | jc --mpstat-s -r
     {"cpu":"all","percent_usr":"0.22","percent_nice":"0.00","percent_...}
     {"cpu":"0","percent_usr":"0.22","percent_nice":"0.00","percent_sy...}
     {"cpu":"all","intr_s":"37.61","type":"interrupts","time":"03:15:06 PM"}
-    ...
+    pass
 """
 from typing import Dict, Iterable, Union
 import jc.utils
@@ -125,20 +125,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured data to conform to the schema.
     """
-    float_list = {
-        "percent_usr", "percent_nice", "percent_sys", "percent_iowait", "percent_irq",
-        "percent_soft", "percent_steal", "percent_guest", "percent_gnice", "percent_idle", "intr_s",
-        "nmi_s", "loc_s", "spu_s", "pmi_s", "iwi_s", "rtr_s", "res_s", "cal_s", "tlb_s", "trm_s",
-        "thr_s", "dfr_s", "mce_s", "mcp_s", "err_s", "mis_s", "pin_s", "npi_s", "piw_s", "hi_s",
-        "timer_s", "net_tx_s", "net_rx_s", "block_s", "irq_poll_s", "block_iopoll_s", "tasklet_s",
-        "sched_s", "hrtimer_s", "rcu_s"
-    }
-
-    for key in proc_data:
-        if (key in float_list or (key[0].isdigit() and key.endswith('_s'))):
-            proc_data[key] = jc.utils.convert_to_float(proc_data[key])
-
-    return proc_data
+    pass
 
 
 @add_jc_meta
@@ -164,52 +151,4 @@ def parse(
 
         Iterable of Dictionaries
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    streaming_input_type_check(data)
-
-    header_found: bool = False
-
-    for line in data:
-        try:
-            streaming_line_input_type_check(line)
-
-            # skip blank lines
-            if not line.strip():
-                continue
-
-            output_line: Dict = {}
-
-            # check for header, normalize it, and fix the time column
-            if ' CPU ' in line or ' NODE ' in line:
-                header_found = True
-                if '%usr' in line:
-                    stat_type = 'cpu'
-                else:
-                    stat_type = 'interrupts'
-
-                header_text: str = line.replace('/', '_')\
-                                       .replace('%', 'percent_')\
-                                       .lower()
-                header_start = line.find('CPU ')
-
-                if header_start == -1:
-                    header_start = line.find('NODE ')
-
-                header_text = header_text[header_start:]
-                continue
-
-            # data line - pull time from beginning and then parse as a table
-            if header_found:
-                output_line = simple_table_parse([header_text, line[header_start:]])[0]
-                output_line['type'] = stat_type
-                item_time = line[:header_start].strip()
-                if 'Average:' not in item_time:
-                    output_line['time'] = line[:header_start].strip()
-                else:
-                    output_line['average'] = True
-
-            if output_line:
-                yield output_line if raw else _process(output_line)
-
-        except Exception as e:
-            yield raise_or_yield(ignore_exceptions, e, line)
+    pass

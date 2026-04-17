@@ -59,13 +59,13 @@ Examples:
     {"filename":"2to3-","flags":"-rwxr-xr-x","links":4,"owner":"root","...}
     {"filename":"2to3-2.7","link_to":"../../System/Library/Frameworks/P...}
     {"filename":"AssetCacheLocatorUtil","flags":"-rwxr-xr-x","links":1,...}
-    ...
+    pass
 
     $ ls -l /usr/bin | jc --ls-s -r
     {"filename":"2to3-","flags":"-rwxr-xr-x","links":"4","owner":"roo"..."}
     {"filename":"2to3-2.7","link_to":"../../System/Library/Frameworks/P...}
     {"filename":"AssetCacheLocatorUtil","flags":"-rwxr-xr-x","links":"1...}
-    ...
+    pass
 """
 import re
 import jc.utils
@@ -101,20 +101,7 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    int_list = {'links', 'size'}
-
-    for key in proc_data:
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-    if 'date' in proc_data:
-        # to speed up processing only try to convert the date if it's not the default format
-        if not re.match(r'[a-zA-Z]{3}\s{1,2}\d{1,2}\s{1,2}[0-9:]{4,5}', proc_data['date']):
-            ts = jc.utils.timestamp(proc_data['date'], format_hint=(7200,))
-            proc_data['epoch'] = ts.naive
-            proc_data['epoch_utc'] = ts.utc
-
-    return proc_data
+    pass
 
 
 @add_jc_meta
@@ -135,59 +122,4 @@ def parse(data, raw=False, quiet=False, ignore_exceptions=False):
 
         Iterable of Dictionaries
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    streaming_input_type_check(data)
-
-    parent = ''
-
-    for line in data:
-        try:
-            streaming_line_input_type_check(line)
-
-            # skip line if it starts with 'total 1234'
-            if re.match(r'total [0-9]+', line):
-                continue
-
-            # skip blank lines
-            if not line.strip():
-                continue
-
-            # Look for parent line if glob or -R is used
-            if not re.match(r'[-dclpsbDCMnP?]([-r][-w][-xsS]){2}([-r][-w][-xtT])[+]?', line) \
-                and line.strip().endswith(':'):
-                parent = line.strip()[:-1]
-                continue
-
-            if not re.match(r'[-dclpsbDCMnP?]([-r][-w][-xsS]){2}([-r][-w][-xtT])[+]?', line):
-                raise ParseError('Not ls -l data')
-
-            parsed_line = line.strip().split(maxsplit=8)
-            output_line = {}
-
-            # split filenames and links
-            if len(parsed_line) == 9:
-                filename_field = parsed_line[8].split(' -> ')
-            else:
-                # in case of filenames starting with a newline character
-                filename_field = ['']
-
-            # create output object
-            output_line['filename'] = filename_field[0]
-
-            if len(filename_field) > 1:
-                output_line['link_to'] = filename_field[1]
-
-            if parent:
-                output_line['parent'] = parent
-
-            output_line['flags'] = parsed_line[0]
-            output_line['links'] = parsed_line[1]
-            output_line['owner'] = parsed_line[2]
-            output_line['group'] = parsed_line[3]
-            output_line['size'] = parsed_line[4]
-            output_line['date'] = ' '.join(parsed_line[5:8])
-
-            yield output_line if raw else _process(output_line)
-
-        except Exception as e:
-            yield raise_or_yield(ignore_exceptions, e, line)
+    pass

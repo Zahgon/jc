@@ -162,14 +162,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured to conform to the schema.
     """
-    if 'certificates' in proc_data:
-        for cert in proc_data['certificates']:
-            if 'expiration_date' in cert:
-                dt = jc.utils.timestamp(cert['expiration_date'], format_hint=(1760,))
-                cert['expiration_date_epoch'] = dt.naive
-                cert['expiration_date_epoch_utc'] = dt.utc
-                cert['expiration_date_iso'] = dt.iso
-    return proc_data
+    pass
 
 
 def parse(
@@ -190,74 +183,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    cert_list: List = []
-    cert_dict: Dict = {}
-    acct_dict: Dict = {}
-    cmd_option = ''
-
-    if jc.utils.has_data(data):
-
-        cert_pattern = re.compile(r'^Found the following certs:\r?$', re.MULTILINE)
-
-        if re.search(cert_pattern, data):
-            cmd_option = 'certificates'
-        else:
-            cmd_option = 'account'
-
-        for line in filter(None, data.splitlines()):
-
-            if cmd_option == 'certificates':
-                if line.startswith('  Certificate Name:'):
-                    if cert_dict:
-                        cert_list.append(cert_dict)
-                        cert_dict = {}
-
-                    cert_dict['name'] = line.split()[-1]
-
-                if line.startswith('    Serial Number:'):
-                    cert_dict['serial_number'] = line.split()[-1]
-
-                if line.startswith('    Key Type:'):
-                    cert_dict['key_type'] = line.split(': ', maxsplit=1)[1]
-
-                if line.startswith('    Domains:'):
-                    splitline = line.split(': ', maxsplit=1)[1]
-                    cert_dict['domains'] = splitline.split()
-
-                if line.startswith('    Expiry Date:'):
-                    splitline = line.split(': ', maxsplit=1)[1]
-                    cert_datetime = splitline.split('(')[0]
-                    validity = splitline.split('(')[1]
-                    cert_dict['expiration_date'] = cert_datetime.strip()
-                    cert_dict['validity'] = validity[:-1].replace('VALID: ', '')
-
-                if line.startswith('    Certificate Path:'):
-                    cert_dict['certificate_path'] = line.split(': ', maxsplit=1)[1]
-
-                if line.startswith('    Private Key Path:'):
-                    cert_dict['private_key_path'] = line.split(': ', maxsplit=1)[1]
-
-            if cmd_option == 'account':
-                if line.startswith('Account details for server'):
-                    acct_dict['server'] = line.split()[-1][:-1]
-
-                if line.startswith('  Account URL:'):
-                    acct_dict['url'] = line.split()[-1]
-
-                if line.startswith('  Email contact:'):
-                    acct_dict['email'] = line.split()[-1]
-
-    if acct_dict:
-        raw_output['account'] = acct_dict
-
-    if cert_dict:
-        cert_list.append(cert_dict)
-
-    if cert_list:
-        raw_output['certificates'] = cert_list
-
-    return raw_output if raw else _process(raw_output)
+    pass

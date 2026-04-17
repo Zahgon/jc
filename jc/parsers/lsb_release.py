@@ -67,7 +67,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    # This parser is an alias of ini.py
-    ini.info = info  # type: ignore
-    ini.__name__ = __name__
-    return ini.parse(data, raw, quiet)
+    pass

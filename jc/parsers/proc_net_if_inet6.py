@@ -88,7 +88,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -109,15 +109,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        header = 'address index prefix scope flags name\n'
-        data = header + data
-        raw_output = simple_table_parse(data.splitlines())
-
-    return raw_output if raw else _process(raw_output)
+    pass

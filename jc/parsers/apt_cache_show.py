@@ -115,7 +115,7 @@ Examples:
         "sha256": "2035450655ad02faa0f75dc952128b503e51df5795c67273c0f6...",
         "description": "system and service manager  systemd is a system..."
       },
-      ...
+      pass
     ]
 
     $ apt-cache show | jc --apt-cache-show -p -r
@@ -142,7 +142,7 @@ Examples:
         "sha256": "2035450655ad02faa0f75dc952128b503e51df5795c67273c0f6...",
         "description": "system and service manager  systemd is a system..."
       },
-      ...
+      pass
     ]
 """
 from typing import List
@@ -183,7 +183,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    # This parser is an alias of rpm_qi.py
-    rpm_qi.info = info  # type: ignore
-    rpm_qi.__name__ = __name__
-    return rpm_qi.parse(data, raw, quiet)
+    pass

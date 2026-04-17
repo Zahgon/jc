@@ -104,14 +104,7 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    int_list = {'agrctlrssi', 'agrextrssi', 'agrctlnoise', 'agrextnoise',
-                'lasttxrate', 'maxrate', 'lastassocstatus', 'mcs'}
-
-    for key in proc_data:
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -128,20 +121,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            linedata = line.split(':', maxsplit=1)
-            key = linedata[0].strip().lower().replace(' ', '_').replace('.', '_')
-            value = linedata[1].strip()
-            raw_output[key] = value
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

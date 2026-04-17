@@ -145,22 +145,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {
-        'part_entry_number', 'part_entry_offset', 'part_entry_size', 'id_part_entry_number',
-        'id_part_entry_offset', 'id_part_entry_size', 'minimum_io_size', 'physical_sector_size',
-        'logical_sector_size', 'id_iolimit_minimum_io_size', 'id_iolimit_physical_sector_size',
-        'id_iolimit_logical_sector_size'
-    }
-
-    for entry in proc_data:
-        if 'devname' in entry:
-            entry['device'] = entry.pop('devname')
-
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -177,49 +162,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    if jc.utils.has_data(data):
-
-        # if the first field is a device, use normal parsing:
-        if data.split(maxsplit=1)[0][-1] == ':':
-            linedata = data.splitlines()
-
-            for line in linedata:
-                output_line = {}
-                entries = shlex.split(line)
-                output_line['device'] = entries.pop(0)[:-1]
-
-                for entry in entries:
-                    key = entry.split('=', maxsplit=1)[0].lower()
-                    value = entry.split('=', maxsplit=1)[1]
-                    output_line[key] = value
-
-                raw_output.append(output_line)
-
-        # else use key/value per line parsing
-        else:
-            linedata = data.splitlines()
-            output_line = {}
-            for line in linedata:
-                if line == '':
-                    if output_line:
-                        raw_output.append(output_line)
-                        output_line = {}
-                        continue
-                    continue
-
-                key = line.split('=', maxsplit=1)[0].lower()
-                value = line.split('=', maxsplit=1)[1]
-                output_line[key] = value
-
-            if output_line:
-                raw_output.append(output_line)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

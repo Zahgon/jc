@@ -46,13 +46,13 @@ Examples:
     142, 160, 28, 10, 5, 3,  60, 0.28,  3167
     175, 180, 18,  8, 4, 1,  12, 0.43,  4033
     129, 132, 13,  6, 3, 1,  41, 0.33,  1471
-    ...
+    pass
 
     $ cat homes.csv | jc --csv-s
     {"Sell":"142","List":"160","Living":"28","Rooms":"10","Beds":"5"...}
     {"Sell":"175","List":"180","Living":"18","Rooms":"8","Beds":"4"...}
     {"Sell":"129","List":"132","Living":"13","Rooms":"6","Beds":"3"...}
-    ...
+    pass
 """
 import itertools
 import csv
@@ -89,8 +89,7 @@ def _process(proc_data):
         List of Dictionaries. Each Dictionary represents a row in the csv
         file.
     """
-    # No further processing
-    return proc_data
+    pass
 
 
 @add_jc_meta
@@ -111,46 +110,4 @@ def parse(data, raw=False, quiet=False, ignore_exceptions=False):
 
         Iterable of Dictionaries
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    streaming_input_type_check(data)
-
-    # convert data to an iterable in case a sequence like a list is used as input.
-    # this allows the exhaustion of the input so we don't double-process later.
-    data = iter(data)
-    temp_list = []
-
-    # first, load the first 100 lines into a list to detect the CSV dialect
-    for line in itertools.islice(data, 100):
-        temp_list.append(line.rstrip())
-
-    # check for Python bug that does not split on `\r` newlines from sys.stdin correctly
-    # https://bugs.python.org/issue45617
-    if len(temp_list) == 1:
-        raise ParseError('Unable to detect line endings. Please try the non-streaming CSV parser instead.')
-
-    # remove BOM bytes from first row, if present
-    if temp_list:
-        if isinstance(temp_list[0], str):
-            temp_list[0] = temp_list[0].encode('utf-8')
-
-        temp_list[0] = temp_list[0].decode('utf-8-sig')
-
-    sniffdata = '\r\n'.join(temp_list)[:1024]
-    dialect = 'excel'  # default in csv module
-
-    try:
-        dialect = csv.Sniffer().sniff(sniffdata)
-        if '""' in sniffdata:
-            dialect.doublequote = True
-    except Exception:
-        pass
-
-    # chain `temp_list` and `data` together to lazy load the rest of the CSV data
-    new_data = itertools.chain(temp_list, data)
-    reader = csv.DictReader(new_data, dialect=dialect)
-
-    for row in reader:
-        try:
-            yield row if raw else _process(row)
-        except Exception as e:
-            yield raise_or_yield(ignore_exceptions, e, str(row))
+    pass

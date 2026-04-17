@@ -62,7 +62,7 @@ Examples:
         "idle_days": 0,
         "total_idle_minutes": 0
       },
-      ...
+      pass
     ]
 
     $ finger | jc --finger -p -r
@@ -82,7 +82,7 @@ Examples:
         "login_time": "Apr  5 15:33",
         "details": "(192.168.1.22)"
       },
-      ...
+      pass
     ]
 """
 import re
@@ -116,40 +116,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    for entry in proc_data:
-        if 'tty' in entry:
-            entry['tty_writeable'] = True
-            if '*' in entry['tty']:
-                entry['tty'] = entry['tty'].replace('*', '')
-                entry['tty_writeable'] = False
-
-        if 'idle' in entry:
-            entry['idle_minutes'] = 0
-            entry['idle_hours'] = 0
-            entry['idle_days'] = 0
-
-            if entry['idle'] == '-':
-                entry['idle'] = None
-
-            if entry['idle'] and entry['idle'].isnumeric():
-                entry['idle_minutes'] = int(entry['idle'])
-
-            if entry['idle'] and ':' in entry['idle']:
-                entry['idle_hours'] = int(entry['idle'].split(':')[0])
-                entry['idle_minutes'] = int(entry['idle'].split(':')[1])
-
-            if entry['idle'] and 'd' in entry['idle']:
-                entry['idle_days'] = int(entry['idle'].replace('d', ''))
-
-            entry['total_idle_minutes'] = (entry['idle_days'] * 1440) + \
-                                          (entry['idle_hours'] * 60) + \
-                                          entry['idle_minutes']
-
-        if 'details' in entry:
-            if not entry['details']:
-                del entry['details']
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -166,48 +133,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    if jc.utils.has_data(data):
-        # Finger output is an abomination that is nearly unparsable. But there
-        # is a way:
-        # First find the location of the last character of 'Idle' in the table
-        # and cut all lines at that spot. Data before that spot can use the
-        # unviversal.sparse_table_parse function. All data after that spot can
-        # be run through regex to find the login datetime and possibly other fields.
-
-        data_lines = list(filter(None, data.splitlines()))
-        sep_col = data_lines[0].find('Idle') + 4
-        first_half = []
-        second_half = []
-
-        for line in data_lines:
-            first_half.append(line[:sep_col])
-            second_half.append(line[sep_col:])
-
-        first_half[0] = first_half[0].lower()
-
-        # parse the first half
-        raw_output =  jc.parsers.universal.sparse_table_parse(first_half)
-
-        # use regex to get login datetime and 'other' data
-        pattern = re.compile(r'([A-Z][a-z]{2}\s+\d{1,2}\s+)(\d\d:\d\d|\d{4})(\s?.+)?$')
-
-        # remove header row from list
-        second_half.pop(0)
-
-        for index, line in enumerate(second_half):
-            dt = re.search(pattern, line)
-            if dt:
-                if dt.group(1) and dt.group(2):
-                    raw_output[index]['login_time'] = dt.group(1).strip() + ' ' + dt.group(2).strip()
-                if dt.group(3):
-                    raw_output[index]['details'] = dt.group(3).strip()
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

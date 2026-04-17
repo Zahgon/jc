@@ -83,14 +83,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'priority'}
-
-    for item in proc_data:
-        for key in item:
-                if key in int_list:
-                    item[key] = jc.utils.convert_to_int(item[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -111,65 +104,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    syslog_dict = {}
-
-    # inspired by https://gist.github.com/miticojo/b16bb13e78572c2d2fac82d9516d5c32
-    syslog = re.compile(r'''
-        (?P<priority><\d{1,3}>)?
-        (?P<header>
-            (?P<date>[A-Z][a-z][a-z]\s{1,2}\d{1,2}\s\d{2}?:\d{2}:\d{2})?\s
-            (?P<host>[\w][\w\d\.:@-]*)?\s
-        )
-        (?P<msg>
-            (?P<tag>\w+)?
-            (?P<content>.*)
-        )
-        ''', re.VERBOSE
-    )
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            syslog_match = syslog.match(line)
-            if syslog_match:
-                priority = None
-                if syslog_match.group('priority'):
-                    priority = syslog_match.group('priority')[1:-1]
-
-                # check for missing tag
-                hostname = syslog_match.group('host')
-                tag = syslog_match.group('tag')
-                content = syslog_match.group('content')
-                if hostname:
-                    if hostname.endswith(':'):
-                        content = tag + content
-                        tag = None
-                        hostname = hostname[:-1]
-
-                syslog_dict = {
-                    'priority': priority,
-                    'date': syslog_match.group('date'),
-                    'hostname': hostname,
-                    # 'raw_msg': syslog_match.group('msg'),
-                    'tag': tag,
-                    'content': content.lstrip(' :').rstrip()
-                }
-
-            else:
-                syslog_dict = {
-                    'unparsable': line
-                }
-
-                if not quiet:
-                    jc.utils.warning_message(
-                        [f'Unparsable line found: {line}']
-                    )
-
-            if syslog_dict:
-                raw_output.append(syslog_dict)
-
-    return raw_output if raw else _process(raw_output)
+    pass

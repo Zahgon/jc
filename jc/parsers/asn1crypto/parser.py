@@ -46,29 +46,7 @@ def emit(class_, method, tag, contents):
     :return:
         A byte string of the ASN.1 DER value (header and contents)
     """
-
-    if not isinstance(class_, int):
-        raise TypeError('class_ must be an integer, not %s' % type_name(class_))
-
-    if class_ < 0 or class_ > 3:
-        raise ValueError('class_ must be one of 0, 1, 2 or 3, not %s' % class_)
-
-    if not isinstance(method, int):
-        raise TypeError('method must be an integer, not %s' % type_name(method))
-
-    if method < 0 or method > 1:
-        raise ValueError('method must be 0 or 1, not %s' % method)
-
-    if not isinstance(tag, int):
-        raise TypeError('tag must be an integer, not %s' % type_name(tag))
-
-    if tag < 0:
-        raise ValueError('tag must be greater than zero, not %s' % tag)
-
-    if not isinstance(contents, bytes):
-        raise TypeError('contents must be a byte string, not %s' % type_name(contents))
-
-    return _dump_header(class_, method, tag, contents) + contents
+    pass
 
 
 def parse(contents, strict=False):
@@ -99,15 +77,7 @@ def parse(contents, strict=False):
          - 4: byte string content
          - 5: byte string trailer
     """
-
-    if not isinstance(contents, bytes):
-        raise TypeError('contents must be a byte string, not %s' % type_name(contents))
-
-    contents_len = len(contents)
-    info, consumed = _parse(contents, contents_len)
-    if strict and consumed != contents_len:
-        raise ValueError('Extra data - %d bytes of trailing data were provided' % (contents_len - consumed))
-    return info
+    pass
 
 
 def peek(contents):
@@ -128,12 +98,7 @@ def peek(contents):
     :return:
         An integer with the number of bytes occupied by the ASN.1 value
     """
-
-    if not isinstance(contents, bytes):
-        raise TypeError('contents must be a byte string, not %s' % type_name(contents))
-
-    info, consumed = _parse(contents, len(contents))
-    return consumed
+    pass
 
 
 def _parse(encoded_data, data_len, pointer=0, lengths_only=False, depth=0):
@@ -162,84 +127,7 @@ def _parse(encoded_data, data_len, pointer=0, lengths_only=False, depth=0):
          - 0: A tuple of (class_, method, tag, header, content, trailer)
          - 1: An integer indicating how many bytes were consumed
     """
-
-    if depth > _MAX_DEPTH:
-        raise ValueError('Indefinite-length recursion limit exceeded')
-
-    start = pointer
-
-    if data_len < pointer + 1:
-        raise ValueError(_INSUFFICIENT_DATA_MESSAGE % (1, data_len - pointer))
-    first_octet = encoded_data[pointer]
-
-    pointer += 1
-
-    tag = first_octet & 31
-    constructed = (first_octet >> 5) & 1
-    # Base 128 length using 8th bit as continuation indicator
-    if tag == 31:
-        tag = 0
-        while True:
-            if data_len < pointer + 1:
-                raise ValueError(_INSUFFICIENT_DATA_MESSAGE % (1, data_len - pointer))
-            num = encoded_data[pointer]
-            pointer += 1
-            if num == 0x80 and tag == 0:
-                raise ValueError('Non-minimal tag encoding')
-            tag *= 128
-            tag += num & 127
-            if num >> 7 == 0:
-                break
-        if tag < 31:
-            raise ValueError('Non-minimal tag encoding')
-
-    if data_len < pointer + 1:
-        raise ValueError(_INSUFFICIENT_DATA_MESSAGE % (1, data_len - pointer))
-    length_octet = encoded_data[pointer]
-    pointer += 1
-    trailer = b''
-
-    if length_octet >> 7 == 0:
-        contents_end = pointer + (length_octet & 127)
-
-    else:
-        length_octets = length_octet & 127
-        if length_octets:
-            if data_len < pointer + length_octets:
-                raise ValueError(_INSUFFICIENT_DATA_MESSAGE % (length_octets, data_len - pointer))
-            pointer += length_octets
-            contents_end = pointer + int_from_bytes(encoded_data[pointer - length_octets:pointer], signed=False)
-
-        else:
-            # To properly parse indefinite length values, we need to scan forward
-            # parsing headers until we find a value with a length of zero. If we
-            # just scanned looking for \x00\x00, nested indefinite length values
-            # would not work.
-            if not constructed:
-                raise ValueError('Indefinite-length element must be constructed')
-            contents_end = pointer
-            while data_len < contents_end + 2 or encoded_data[contents_end:contents_end+2] != b'\x00\x00':
-                _, contents_end = _parse(encoded_data, data_len, contents_end, lengths_only=True, depth=depth+1)
-            contents_end += 2
-            trailer = b'\x00\x00'
-
-    if contents_end > data_len:
-        raise ValueError(_INSUFFICIENT_DATA_MESSAGE % (contents_end - pointer, data_len - pointer))
-
-    if lengths_only:
-        return (pointer, contents_end)
-
-    return (
-        (
-            first_octet >> 6,
-            constructed,
-            tag,
-            encoded_data[start:pointer],
-            encoded_data[pointer:contents_end-len(trailer)],
-            trailer
-        ),
-        contents_end
-    )
+    pass
 
 
 def _dump_header(class_, method, tag, contents):
@@ -262,30 +150,4 @@ def _dump_header(class_, method, tag, contents):
     :return:
         A byte string of the ASN.1 DER header
     """
-
-    header = b''
-
-    id_num = 0
-    id_num |= class_ << 6
-    id_num |= method << 5
-
-    if tag >= 31:
-        cont_bit = 0
-        while tag > 0:
-            header = chr_cls(cont_bit | (tag & 0x7f)) + header
-            if not cont_bit:
-                cont_bit = 0x80
-            tag = tag >> 7
-        header = chr_cls(id_num | 31) + header
-    else:
-        header += chr_cls(id_num | tag)
-
-    length = len(contents)
-    if length <= 127:
-        header += chr_cls(length)
-    else:
-        length_bytes = int_to_bytes(length)
-        header += chr_cls(0x80 | len(length_bytes))
-        header += length_bytes
-
-    return header
+    pass

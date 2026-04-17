@@ -91,7 +91,7 @@ Examples:
         "type": "part",
         "mountpoint": "/boot"
       },
-      ...
+      pass
     ]
 
     $ lsblk -o +KNAME,FSTYPE,LABEL,UUID,PARTLABEL,PARTUUID,RA,MODEL,SERIAL,\\
@@ -191,7 +191,7 @@ Examples:
         "rev": null,
         "vendor": null
       },
-      ...
+      pass
     ]
 
     $ lsblk -o +KNAME,FSTYPE,LABEL,UUID,PARTLABEL,PARTUUID,RA,MODEL,SERIAL,\\
@@ -291,7 +291,7 @@ Examples:
         "rev": null,
         "vendor": null
       },
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -324,25 +324,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    bool_list = {'rm', 'ro', 'rota', 'disc_zero', 'rand'}
-
-    int_list = {'ra', 'alignment', 'min_io', 'opt_io', 'phy_sec', 'log_sec',
-                'rq_size', 'disc_aln'}
-
-    size_list = {'size', 'disc_gran', 'disc_max', 'wsame'}
-
-    for entry in proc_data:
-        for key in entry.copy():
-            if key in bool_list:
-                entry[key] = jc.utils.convert_to_bool(entry[key])
-
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-            if key in size_list:
-                entry[key + '_bytes'] = jc.utils.convert_size_to_int(entry[key], posix_mode=True)
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -359,41 +341,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    # Clear any blank lines
-    cleandata = list(filter(None, data.splitlines()))
-    raw_output = []
-    new_list = []
-
-    if jc.utils.has_data(data):
-
-        cleandata = data.splitlines()
-
-        cleandata[0] = cleandata[0].lower()
-        cleandata[0] = cleandata[0].replace(':', '_')
-        cleandata[0] = cleandata[0].replace('-', '_')
-
-        raw_output = jc.parsers.universal.sparse_table_parse(cleandata)
-
-        # find multiple mount points and add to a single entry
-        for entry in raw_output:
-            if entry['name']:
-                if 'mountpoints' in entry:
-                    if entry['mountpoints']:
-                        entry['mountpoints'] = [entry['mountpoints']]
-                    else:
-                        entry['mountpoints'] = []
-                new_list.append(entry)
-            elif 'mountpoints' in entry and entry['mountpoints']:
-                new_list[-1]['mountpoints'].append(entry['mountpoints'])
-
-        # clean up tree characters, if any
-        for entry in new_list:
-            tree_chars = ['`-', '|-', '├─', '└─']
-            for chars in tree_chars:
-                if entry['name'][0:2] == chars:
-                    entry['name'] = entry['name'][2:]
-
-    return new_list if raw else _process(new_list)
+    pass

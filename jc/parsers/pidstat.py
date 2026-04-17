@@ -155,34 +155,11 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {
-        'time', 'uid', 'pid', 'cpu', 'vsz', 'rss', 'stksize', 'stkref',
-        'usr_ms', 'system_ms', 'guest_ms'
-    }
-
-    float_list = {
-        'percent_usr', 'percent_system', 'percent_guest', 'percent_cpu',
-        'minflt_s', 'majflt_s', 'percent_mem', 'kb_rd_s', 'kb_wr_s',
-        'kb_ccwr_s', 'cswch_s', 'nvcswch_s', 'percent_wait'
-    }
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-            if key in float_list:
-                entry[key] = jc.utils.convert_to_float(entry[key])
-
-    return proc_data
+    pass
 
 
 def normalize_header(header: str) -> str:
-    return header.replace('#', ' ')\
-                 .replace('-', '_')\
-                 .replace('/', '_')\
-                 .replace('%', 'percent_')\
-                 .lower()
+    pass
 
 
 def parse(
@@ -203,32 +180,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    table_list: List = []
-    header_found = False
-
-    if jc.utils.has_data(data):
-
-        data_list = list(filter(None, data.splitlines()))
-
-        for line in data_list:
-            if line.startswith('#'):
-                header_found = True
-                if len(table_list) > 1:
-                    raw_output.extend(simple_table_parse(table_list))
-                table_list = [normalize_header(line)]
-                continue
-
-            if header_found:
-                table_list.append(line)
-
-        if len(table_list) > 1:
-            raw_output.extend(simple_table_parse(table_list))
-
-        if not header_found:
-            raise ParseError('Could not parse pidstat output. Make sure to use "pidstat -h".')
-
-    return raw_output if raw else _process(raw_output)
+    pass

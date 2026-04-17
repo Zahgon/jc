@@ -198,17 +198,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    op_map = {
-        'Conf': 'configure',
-        'Remv': 'remove',
-        'Inst': 'unpack'
-    }
-
-    for item in proc_data:
-        if 'operation' in item and item['operation']:
-            item['operation'] = op_map[item['operation']]
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -229,51 +219,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-
-    if jc.utils.has_data(data):
-
-        # Inst dpkg [1.19.7] (1.19.8 Debian:10.13/oldstable, Debian-Security:10/oldstable [amd64])
-        #  |    |     |                       |                        |                    \architecture
-        #  |    |     |                       |                         \existing_pkg_ver (optional)
-        #  |    |     |                        \proposed_pkg_ver
-        #  |    |      \broken (optional)
-        #  |     \package
-        #   \operation (configure, remove, or unpack)
-
-        line_re = re.compile(r'(?P<operation>Inst|Conf|Remv)\s(?P<package>\S+)(?P<broken>\s+\[\S*?\])?\s\((?P<packages_pe>.*?)\[(?P<architecture>\w*)\]\)')
-
-        for line in filter(None, data.splitlines()):
-            broken_val = None
-            packages_pe = None
-            proposed_pkg_ver = None
-            existing_pkg_ver = None
-            parsed_line = line_re.match(line)
-
-            if parsed_line:
-                parsed_dict = parsed_line.groupdict()
-
-                if parsed_dict['broken']:
-                    broken_val = parsed_dict['broken'].strip()[1:-1]
-
-                if parsed_dict['packages_pe']:
-                    packages_pe = parsed_dict['packages_pe'].split(',')
-                    proposed_pkg_ver = packages_pe[0].strip()
-                    if len(packages_pe) == 2:
-                        existing_pkg_ver = packages_pe[1].strip()
-
-                output_line = {
-                    'operation': parsed_dict['operation'],
-                    'package': parsed_dict['package'],
-                    'broken': broken_val,
-                    'proposed_pkg_ver': proposed_pkg_ver,
-                    'existing_pkg_ver': existing_pkg_ver,
-                    'architecture': parsed_dict['architecture']
-                }
-
-                raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

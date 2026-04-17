@@ -72,15 +72,7 @@ class _ForceNullParameters(object):
     ])
 
     def _parameters_spec(self):
-        if self._oid_pair == ('algorithm', 'parameters'):
-            algo = self['algorithm'].native
-            if algo in self._oid_specs:
-                return self._oid_specs[algo]
-
-        if self['algorithm'].dotted in self._null_algos:
-            return Null
-
-        return None
+        pass
 
     _spec_callbacks = {
         'parameters': _parameters_spec
@@ -312,45 +304,7 @@ class SignedDigestAlgorithm(_ForceNullParameters, Sequence):
             A unicode string of "rsassa_pkcs1v15", "rsassa_pss", "dsa",
             "ecdsa", "ed25519" or "ed448"
         """
-
-        algorithm = self['algorithm'].native
-
-        algo_map = {
-            'md2_rsa': 'rsassa_pkcs1v15',
-            'md5_rsa': 'rsassa_pkcs1v15',
-            'sha1_rsa': 'rsassa_pkcs1v15',
-            'sha224_rsa': 'rsassa_pkcs1v15',
-            'sha256_rsa': 'rsassa_pkcs1v15',
-            'sha384_rsa': 'rsassa_pkcs1v15',
-            'sha512_rsa': 'rsassa_pkcs1v15',
-            'rsassa_pkcs1v15': 'rsassa_pkcs1v15',
-            'rsassa_pss': 'rsassa_pss',
-            'sha1_dsa': 'dsa',
-            'sha224_dsa': 'dsa',
-            'sha256_dsa': 'dsa',
-            'dsa': 'dsa',
-            'sha1_ecdsa': 'ecdsa',
-            'sha224_ecdsa': 'ecdsa',
-            'sha256_ecdsa': 'ecdsa',
-            'sha384_ecdsa': 'ecdsa',
-            'sha512_ecdsa': 'ecdsa',
-            'sha3_224_ecdsa': 'ecdsa',
-            'sha3_256_ecdsa': 'ecdsa',
-            'sha3_384_ecdsa': 'ecdsa',
-            'sha3_512_ecdsa': 'ecdsa',
-            'ecdsa': 'ecdsa',
-            'ed25519': 'ed25519',
-            'ed448': 'ed448',
-        }
-        if algorithm in algo_map:
-            return algo_map[algorithm]
-
-        raise ValueError(unwrap(
-            '''
-            Signature algorithm not known for %s
-            ''',
-            algorithm
-        ))
+        pass
 
     @property
     def hash_algo(self):
@@ -359,40 +313,7 @@ class SignedDigestAlgorithm(_ForceNullParameters, Sequence):
             A unicode string of "md2", "md5", "sha1", "sha224", "sha256",
             "sha384", "sha512", "sha512_224", "sha512_256" or "shake256"
         """
-
-        algorithm = self['algorithm'].native
-
-        algo_map = {
-            'md2_rsa': 'md2',
-            'md5_rsa': 'md5',
-            'sha1_rsa': 'sha1',
-            'sha224_rsa': 'sha224',
-            'sha256_rsa': 'sha256',
-            'sha384_rsa': 'sha384',
-            'sha512_rsa': 'sha512',
-            'sha1_dsa': 'sha1',
-            'sha224_dsa': 'sha224',
-            'sha256_dsa': 'sha256',
-            'sha1_ecdsa': 'sha1',
-            'sha224_ecdsa': 'sha224',
-            'sha256_ecdsa': 'sha256',
-            'sha384_ecdsa': 'sha384',
-            'sha512_ecdsa': 'sha512',
-            'ed25519': 'sha512',
-            'ed448': 'shake256',
-        }
-        if algorithm in algo_map:
-            return algo_map[algorithm]
-
-        if algorithm == 'rsassa_pss':
-            return self['parameters']['hash_algorithm']['algorithm'].native
-
-        raise ValueError(unwrap(
-            '''
-            Hash algorithm not known for %s
-            ''',
-            algorithm
-        ))
+        pass
 
 
 class Pbkdf2Salt(Choice):
@@ -576,10 +497,7 @@ class DSASignature(Sequence):
         :return:
             A DSASignature object
         """
-
-        r = int_from_bytes(data[0:len(data) // 2])
-        s = int_from_bytes(data[len(data) // 2:])
-        return cls({'r': r, 's': s})
+        pass
 
     def to_p1363(self):
         """
@@ -589,15 +507,7 @@ class DSASignature(Sequence):
         :return:
             A byte string compatible with BCryptVerifySignature()
         """
-
-        r_bytes = int_to_bytes(self['r'].native)
-        s_bytes = int_to_bytes(self['s'].native)
-
-        int_byte_length = max(len(r_bytes), len(s_bytes))
-        r_bytes = fill_width(r_bytes, int_byte_length)
-        s_bytes = fill_width(s_bytes, int_byte_length)
-
-        return r_bytes + s_bytes
+        pass
 
 
 class EncryptionAlgorithmId(ObjectIdentifier):
@@ -702,37 +612,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
             A unicode from of one of the following: "pbkdf1", "pbkdf2",
             "pkcs12_kdf"
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo == 'pbes2':
-            return self['parameters']['key_derivation_func']['algorithm'].native
-
-        if encryption_algo.find('.') == -1:
-            if encryption_algo.find('_') != -1:
-                encryption_algo, _ = encryption_algo.split('_', 1)
-
-                if encryption_algo == 'pbes1':
-                    return 'pbkdf1'
-
-                if encryption_algo == 'pkcs12':
-                    return 'pkcs12_kdf'
-
-            raise ValueError(unwrap(
-                '''
-                Encryption algorithm "%s" does not have a registered key
-                derivation function
-                ''',
-                encryption_algo
-            ))
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s", can not determine key
-            derivation function
-            ''',
-            encryption_algo
-        ))
+        pass
 
     @property
     def kdf_hmac(self):
@@ -743,32 +623,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
             A unicode string of one of the following: "md2", "md5", "sha1",
             "sha224", "sha256", "sha384", "sha512"
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo == 'pbes2':
-            return self['parameters']['key_derivation_func']['parameters']['prf']['algorithm'].native
-
-        if encryption_algo.find('.') == -1:
-            if encryption_algo.find('_') != -1:
-                _, hmac_algo, _ = encryption_algo.split('_', 2)
-                return hmac_algo
-
-            raise ValueError(unwrap(
-                '''
-                Encryption algorithm "%s" does not have a registered key
-                derivation function
-                ''',
-                encryption_algo
-            ))
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s", can not determine key
-            derivation hmac algorithm
-            ''',
-            encryption_algo
-        ))
+        pass
 
     @property
     def kdf_salt(self):
@@ -778,42 +633,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
         :return:
             A byte string
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo == 'pbes2':
-            salt = self['parameters']['key_derivation_func']['parameters']['salt']
-
-            if salt.name == 'other_source':
-                raise ValueError(unwrap(
-                    '''
-                    Can not determine key derivation salt - the
-                    reserved-for-future-use other source salt choice was
-                    specified in the PBKDF2 params structure
-                    '''
-                ))
-
-            return salt.native
-
-        if encryption_algo.find('.') == -1:
-            if encryption_algo.find('_') != -1:
-                return self['parameters']['salt'].native
-
-            raise ValueError(unwrap(
-                '''
-                Encryption algorithm "%s" does not have a registered key
-                derivation function
-                ''',
-                encryption_algo
-            ))
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s", can not determine key
-            derivation salt
-            ''',
-            encryption_algo
-        ))
+        pass
 
     @property
     def kdf_iterations(self):
@@ -823,31 +643,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
         :return:
             An integer
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo == 'pbes2':
-            return self['parameters']['key_derivation_func']['parameters']['iteration_count'].native
-
-        if encryption_algo.find('.') == -1:
-            if encryption_algo.find('_') != -1:
-                return self['parameters']['iterations'].native
-
-            raise ValueError(unwrap(
-                '''
-                Encryption algorithm "%s" does not have a registered key
-                derivation function
-                ''',
-                encryption_algo
-            ))
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s", can not determine key
-            derivation iterations
-            ''',
-            encryption_algo
-        ))
+        pass
 
     @property
     def key_length(self):
@@ -864,85 +660,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
         :return:
             An integer representing the length in bytes
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo[0:3] == 'aes':
-            return {
-                'aes128_': 16,
-                'aes192_': 24,
-                'aes256_': 32,
-            }[encryption_algo[0:7]]
-
-        cipher_lengths = {
-            'des': 8,
-            'tripledes_3key': 24,
-        }
-
-        if encryption_algo in cipher_lengths:
-            return cipher_lengths[encryption_algo]
-
-        if encryption_algo == 'rc2':
-            rc2_parameter_version = self['parameters']['rc2_parameter_version'].native
-
-            # See page 24 of
-            # http://www.emc.com/collateral/white-papers/h11302-pkcs5v2-1-password-based-cryptography-standard-wp.pdf
-            encoded_key_bits_map = {
-                160: 5,   # 40-bit
-                120: 8,   # 64-bit
-                58: 16,   # 128-bit
-            }
-
-            if rc2_parameter_version in encoded_key_bits_map:
-                return encoded_key_bits_map[rc2_parameter_version]
-
-            if rc2_parameter_version >= 256:
-                return rc2_parameter_version
-
-            if rc2_parameter_version is None:
-                return 4  # 32-bit default
-
-            raise ValueError(unwrap(
-                '''
-                Invalid RC2 parameter version found in EncryptionAlgorithm
-                parameters
-                '''
-            ))
-
-        if encryption_algo == 'pbes2':
-            key_length = self['parameters']['key_derivation_func']['parameters']['key_length'].native
-            if key_length is not None:
-                return key_length
-
-            # If the KDF params don't specify the key size, we can infer it from
-            # the encryption scheme for all schemes except for RC5. However, in
-            # practical terms, neither OpenSSL or OS X support RC5 for PKCS#8
-            # so it is unlikely to be an issue that is run into.
-
-            return self['parameters']['encryption_scheme'].key_length
-
-        if encryption_algo.find('.') == -1:
-            return {
-                'pbes1_md2_des': 8,
-                'pbes1_md5_des': 8,
-                'pbes1_md2_rc2': 8,
-                'pbes1_md5_rc2': 8,
-                'pbes1_sha1_des': 8,
-                'pbes1_sha1_rc2': 8,
-                'pkcs12_sha1_rc4_128': 16,
-                'pkcs12_sha1_rc4_40': 5,
-                'pkcs12_sha1_tripledes_3key': 24,
-                'pkcs12_sha1_tripledes_2key': 16,
-                'pkcs12_sha1_rc2_128': 16,
-                'pkcs12_sha1_rc2_40': 5,
-            }[encryption_algo]
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s"
-            ''',
-            encryption_algo
-        ))
+        pass
 
     @property
     def encryption_mode(self):
@@ -953,30 +671,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
             A unicode string from one of the following: "cbc", "ecb", "ofb",
             "cfb", "wrap", "gcm", "ccm", "wrap_pad"
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo[0:7] in set(['aes128_', 'aes192_', 'aes256_']):
-            return encryption_algo[7:]
-
-        if encryption_algo[0:6] == 'pbes1_':
-            return 'cbc'
-
-        if encryption_algo[0:7] == 'pkcs12_':
-            return 'cbc'
-
-        if encryption_algo in set(['des', 'tripledes_3key', 'rc2', 'rc5']):
-            return 'cbc'
-
-        if encryption_algo == 'pbes2':
-            return self['parameters']['encryption_scheme'].encryption_mode
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s"
-            ''',
-            encryption_algo
-        ))
+        pass
 
     @property
     def encryption_cipher(self):
@@ -989,43 +684,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
             A unicode string from one of the following: "rc2", "rc5", "des",
             "tripledes", "aes"
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo[0:7] in set(['aes128_', 'aes192_', 'aes256_']):
-            return 'aes'
-
-        if encryption_algo in set(['des', 'rc2', 'rc5']):
-            return encryption_algo
-
-        if encryption_algo == 'tripledes_3key':
-            return 'tripledes'
-
-        if encryption_algo == 'pbes2':
-            return self['parameters']['encryption_scheme'].encryption_cipher
-
-        if encryption_algo.find('.') == -1:
-            return {
-                'pbes1_md2_des': 'des',
-                'pbes1_md5_des': 'des',
-                'pbes1_md2_rc2': 'rc2',
-                'pbes1_md5_rc2': 'rc2',
-                'pbes1_sha1_des': 'des',
-                'pbes1_sha1_rc2': 'rc2',
-                'pkcs12_sha1_rc4_128': 'rc4',
-                'pkcs12_sha1_rc4_40': 'rc4',
-                'pkcs12_sha1_tripledes_3key': 'tripledes',
-                'pkcs12_sha1_tripledes_2key': 'tripledes',
-                'pkcs12_sha1_rc2_128': 'rc2',
-                'pkcs12_sha1_rc2_40': 'rc2',
-            }[encryption_algo]
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s"
-            ''',
-            encryption_algo
-        ))
+        pass
 
     @property
     def encryption_block_size(self):
@@ -1035,48 +694,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
         :return:
             An integer that is the block size in bytes
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo[0:7] in set(['aes128_', 'aes192_', 'aes256_']):
-            return 16
-
-        cipher_map = {
-            'des': 8,
-            'tripledes_3key': 8,
-            'rc2': 8,
-        }
-        if encryption_algo in cipher_map:
-            return cipher_map[encryption_algo]
-
-        if encryption_algo == 'rc5':
-            return self['parameters']['block_size_in_bits'].native // 8
-
-        if encryption_algo == 'pbes2':
-            return self['parameters']['encryption_scheme'].encryption_block_size
-
-        if encryption_algo.find('.') == -1:
-            return {
-                'pbes1_md2_des': 8,
-                'pbes1_md5_des': 8,
-                'pbes1_md2_rc2': 8,
-                'pbes1_md5_rc2': 8,
-                'pbes1_sha1_des': 8,
-                'pbes1_sha1_rc2': 8,
-                'pkcs12_sha1_rc4_128': 0,
-                'pkcs12_sha1_rc4_40': 0,
-                'pkcs12_sha1_tripledes_3key': 8,
-                'pkcs12_sha1_tripledes_2key': 8,
-                'pkcs12_sha1_rc2_128': 8,
-                'pkcs12_sha1_rc2_40': 8,
-            }[encryption_algo]
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s"
-            ''',
-            encryption_algo
-        ))
+        pass
 
     @property
     def encryption_iv(self):
@@ -1088,43 +706,7 @@ class EncryptionAlgorithm(_ForceNullParameters, Sequence):
         :return:
             A byte string or None
         """
-
-        encryption_algo = self['algorithm'].native
-
-        if encryption_algo in set(['rc2', 'rc5']):
-            return self['parameters']['iv'].native
-
-        # For DES/Triple DES and AES the IV is the entirety of the parameters
-        octet_string_iv_oids = set([
-            'des',
-            'tripledes_3key',
-            'aes128_cbc',
-            'aes192_cbc',
-            'aes256_cbc',
-            'aes128_ofb',
-            'aes192_ofb',
-            'aes256_ofb',
-        ])
-        if encryption_algo in octet_string_iv_oids:
-            return self['parameters'].native
-
-        if encryption_algo == 'pbes2':
-            return self['parameters']['encryption_scheme'].encryption_iv
-
-        # All of the PBES1 algos use their KDF to create the IV. For the pbkdf1,
-        # the KDF is told to generate a key that is an extra 8 bytes long, and
-        # that is used for the IV. For the PKCS#12 KDF, it is called with an id
-        # of 2 to generate the IV. In either case, we can't return the IV
-        # without knowing the user's password.
-        if encryption_algo.find('.') == -1:
-            return None
-
-        raise ValueError(unwrap(
-            '''
-            Unrecognized encryption algorithm "%s"
-            ''',
-            encryption_algo
-        ))
+        pass
 
 
 class Pbes2Params(Sequence):
@@ -1166,10 +748,7 @@ class AnyAlgorithmId(ObjectIdentifier):
     _map = {}
 
     def _setup(self):
-        _map = self.__class__._map
-        for other_cls in (EncryptionAlgorithmId, SignedDigestAlgorithmId, DigestAlgorithmId):
-            for oid, name in other_cls._map.items():
-                _map[oid] = name
+        pass
 
 
 class AnyAlgorithmIdentifier(_ForceNullParameters, Sequence):
@@ -1182,8 +761,4 @@ class AnyAlgorithmIdentifier(_ForceNullParameters, Sequence):
     _oid_specs = {}
 
     def _setup(self):
-        Sequence._setup(self)
-        specs = self.__class__._oid_specs
-        for other_cls in (EncryptionAlgorithm, SignedDigestAlgorithm):
-            for oid, spec in other_cls._oid_specs.items():
-                specs[oid] = spec
+        pass

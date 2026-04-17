@@ -363,160 +363,23 @@ class _Line:
     @classmethod
     def categorize(cls, line: str) -> "_Line":
         """Iterate through line char by char to see what type of line it is. Apply regexes for more distinctness. Save the regexes and return them for later processing."""
-        i = 0
-        tab_count = 0
-        while True:
-            try:
-                c = line[i]
-            except:
-                # Really shouldn't be getting to the end of the line
-                raise Exception(f"Reached end of line unexpectedly: '{line}'")
-
-            if not c.isspace():
-                if tab_count == 0:
-                    screen_match = re.match(_screen_pattern, line)
-                    if screen_match:
-                        return cls(line, LineType.Screen, screen_match)
-
-                    device_match = re.match(_device_pattern, line)
-                    if device_match:
-                        return cls(line, LineType.Device, device_match)
-                    else:
-                        break
-                elif tab_count == 1:
-                    match = re.match(_prop_key_pattern, line)
-                    if match:
-                        return cls(line, LineType.PropKey, match)
-                    else:
-                        break
-                else:
-                    match = re.match(r"\s+(.*)\s+", line)
-                    if match:
-                        return cls(line, LineType.PropValue, match)
-                    else:
-                        break
-            else:
-                if c == " ":
-                    match = re.match(_resolution_mode_pattern, line)
-                    if match:
-                        return cls(line, LineType.ResolutionMode, match)
-                    else:
-                        break
-                elif c == "\t":
-                    tab_count += 1
-            i += 1
-        raise Exception(f"Line could not be categorized: '{line}'")
+        pass
 
 
 def _parse_screen(line: _Line) -> Screen:
-    d = line.m.groupdict()
-
-    screen: Screen = {"devices": []}  # type: ignore # Will be populated, but not immediately.
-    for k, v in d.items():
-        screen[k] = int(v)
-
-    return screen
+    pass
 
 
 def _parse_device(line: _Line) -> Device:
-    matches = line.m.groupdict()
-
-    device: Device = {
-        "props": defaultdict(list),
-        "resolution_modes": [],
-        "is_connected": matches["is_connected"] == "connected",
-        "is_primary": matches["is_primary"] is not None
-        and len(matches["is_primary"]) > 0,
-        "device_name": matches["device_name"],
-        "rotation": matches["rotation"] or "normal",
-        "reflection": matches["reflection"] or "normal",
-    }
-    for k, v in matches.items():
-        if k not in {
-            "is_connected",
-            "is_primary",
-            "device_name",
-            "rotation",
-            "reflection",
-        }:
-            try:
-                if v:
-                    device[k] = int(v)
-            except ValueError:
-                raise Exception([f"{line.s} : {k} - {v} is not int-able"])
-
-    return device
+    pass
 
 
 def _parse_resolution_mode(line: _Line) -> ResolutionMode:
-    frequencies: List[Frequency] = []
-
-    d = line.m.groupdict()
-    resolution_width = int(d["resolution_width"])
-    resolution_height = int(d["resolution_height"])
-    is_high_resolution = d["is_high_resolution"] is not None
-
-    mode: ResolutionMode = {
-        "resolution_width": resolution_width,
-        "resolution_height": resolution_height,
-        "is_high_resolution": is_high_resolution,
-        "frequencies": frequencies,
-    }
-
-    result = re.finditer(_frequencies_pattern, d["rest"])
-    if not result:
-        return mode
-
-    for match in result:
-        d = match.groupdict()
-        frequency = float(d["frequency"])
-        is_current = len(d["star"].strip()) > 0
-        is_preferred = len(d["plus"].strip()) > 0
-        f: Frequency = {
-            "frequency": frequency,
-            "is_current": is_current,
-            "is_preferred": is_preferred,
-        }
-        mode["frequencies"].append(f)
-    return mode
+    pass
 
 
 def _parse_props(index: int, line: _Line, lines: List[str]) -> Tuple[int, Props]:
-    tmp_props: Dict[str, List[str]] = {}
-    key = ""
-    while index <= len(lines):
-        if line.t == LineType.PropKey:
-            d = line.m.groupdict()
-            # See _prop_key_pattern
-            key = d["key"]
-            maybe_value = d["maybe_value"]
-            if not maybe_value:
-                tmp_props[key] = []
-            else:
-                tmp_props[key] = [maybe_value]
-        elif line.t == LineType.PropValue:
-            tmp_props[key].append(line.s.strip())
-        else:
-            # We've gone past our props and need to ascend
-            index = index - 1
-            break
-        index += 1
-        try:
-            line = _Line.categorize(lines[index])
-        except:
-            pass
-
-    props: Props = {}
-    if "EDID" in tmp_props:
-        edid = Edid(EdidHelper.hex2bytes("".join(tmp_props["EDID"])))
-        model: EdidModel = {
-            "name": edid.name or "Generic",
-            "product_id": str(edid.product),
-            "serial_number": str(edid.serial),
-        }
-        props["EdidModel"] = model
-
-    return index, {**tmp_props, **props}
+    pass
 
 
 def parse(data: str, raw: bool = False, quiet: bool = False) -> Response:
@@ -533,47 +396,4 @@ def parse(data: str, raw: bool = False, quiet: bool = False) -> Response:
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    index = 0
-    lines = data.splitlines()
-    screen, device = None, None
-
-    # temporary fix to ignore specific unhandled lines
-    ignore_pattern = re.compile(r'^\s+(h|v):\s+(height|width)\s+\d+\s+start\s+\d+\s+end')
-
-    result: Response = {"screens": []}
-    if jc.utils.has_data(data):
-        while index < len(lines):
-
-            # temporary fix to ignore specific unhandled lines
-            ignore_re = ignore_pattern.match(lines[index])
-            if ignore_re:
-                index += 1
-                continue
-
-            line = _Line.categorize(lines[index])
-            if line.t == LineType.Screen:
-                screen = _parse_screen(line)
-                result["screens"].append(screen)
-            elif line.t == LineType.Device:
-                device = _parse_device(line)
-                if not screen:
-                    raise Exception("There should be an identifiable screen")
-                screen["devices"].append(device)
-            elif line.t == LineType.ResolutionMode:
-                resolution_mode = _parse_resolution_mode(line)
-                if not device:
-                    raise Exception("Undefined device")
-                device["resolution_modes"].append(resolution_mode)
-            elif line.t == LineType.PropKey:
-                # Props needs to be state aware, it owns the index.
-                ix, props = _parse_props(index, line, lines)
-                index = ix
-                if not device:
-                    raise Exception("Undefined device")
-                device["props"] = props
-            index += 1
-
-    return result
+    pass

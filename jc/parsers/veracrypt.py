@@ -143,75 +143,7 @@ _volume_verbose_pattern = (
 )
 
 def _parse_volume(next_lines: List[str]) -> Optional[Volume]:
-    next_line = next_lines.pop()
-    result = re.match(_volume_line_pattern, next_line)
-
-    # Parse and return the volume given as a single line (veracrypt -t --list)
-    if result:
-        matches = result.groupdict()
-        volume: Volume = {  # type: ignore
-            "slot": int(matches["slot"]),
-            "path": matches["path"],
-            "device": matches["device"],
-            "mountpoint": matches["mountpoint"],
-        }
-
-        return volume
-    else:
-        next_lines.append(next_line)
-
-    # Otherwise parse the volume given in multiple lines (veracrypt -t --list -v)
-    volume: Volume = {}  # type: ignore
-
-    while next_lines:
-        next_line = next_lines.pop()
-
-        # Return when encounter an empty line
-        if not next_line:
-            return volume
-
-        result = re.match(_volume_verbose_pattern, next_line)
-
-        # Skip to the next line in case of an unknown field line
-        if not result:
-            continue
-
-        matches = result.groupdict()
-
-        if matches["slot"]:
-            volume["slot"] = int(matches["slot"])
-        elif matches["path"]:
-            volume["path"] = matches["path"]
-        elif matches["device"]:
-            volume["device"] = matches["device"]
-        elif matches["mountpoint"]:
-            volume["mountpoint"] = matches["mountpoint"]
-        elif matches["size"]:
-            volume["size"] = matches["size"]
-        elif matches["type"]:
-            volume["type"] = matches["type"]
-        elif matches["readonly"]:
-            volume["readonly"] = matches["readonly"]
-        elif matches["hidden_protected"]:
-            volume["hidden_protected"] = matches["hidden_protected"]
-        elif matches["encryption_algo"]:
-            volume["encryption_algo"] = matches["encryption_algo"]
-        elif matches["pk_size"]:
-            volume["pk_size"] = matches["pk_size"]
-        elif matches["sk_size"]:
-            volume["sk_size"] = matches["sk_size"]
-        elif matches["block_size"]:
-            volume["block_size"] = matches["block_size"]
-        elif matches["mode"]:
-            volume["mode"] = matches["mode"]
-        elif matches["prf"]:
-            volume["prf"] = matches["prf"]
-        elif matches["format_version"]:
-            volume["format_version"] = int(matches["format_version"])
-        elif matches["backup_header"]:
-            volume["backup_header"] = matches["backup_header"]
-
-    return volume
+    pass
 
 def parse(data: str, raw: bool = False, quiet: bool = False) -> List[JSONDictType]:
     """
@@ -227,29 +159,4 @@ def parse(data: str, raw: bool = False, quiet: bool = False) -> List[JSONDictTyp
 
         List of Dictionaries. Raw or processed structured data.
     """
-    result: List = []
-
-    if jc.utils.has_data(data):
-        jc.utils.compatibility(__name__, info.compatible, quiet)
-        jc.utils.input_type_check(data)
-
-        linedata = data.splitlines()
-
-        first_line = linedata[0]
-        line_mode = re.search(_volume_line_pattern, first_line)
-        verbose_mode = re.search(_volume_verbose_pattern, first_line)
-
-        if not line_mode and not verbose_mode:
-            return []
-
-        linedata.reverse()
-
-        while linedata:
-            volume = _parse_volume(linedata)
-
-            if volume:
-                result.append(volume)
-            else:
-                break
-
-    return result
+    pass

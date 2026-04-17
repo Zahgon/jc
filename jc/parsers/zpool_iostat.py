@@ -65,7 +65,7 @@ Examples:
         "bw_read_unit": "K",
         "bw_write_unit": "K"
       },
-      ...
+      pass
     ]
 
     $ zpool iostat -v | jc --zpool-iostat -p -r
@@ -89,7 +89,7 @@ Examples:
         "bw_read": "349K",
         "bw_write": "448K"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -123,19 +123,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    unit_values = {'cap_alloc', 'cap_free', 'bw_read', 'bw_write'}
-    int_list = {'ops_read', 'ops_write'}
-
-    for obj in proc_data:
-        for k, v in obj.copy().items():
-            if k in unit_values:
-                obj[k + '_unit'] = v[-1]
-                obj[k] = jc.utils.convert_to_float(v[:-1])
-
-            if k in int_list:
-                obj[k] = jc.utils.convert_to_int(v)
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -156,47 +144,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-    output_line: Dict = {}
-    pool_parent = ''
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            # skip non-data lines
-            if '---' in line or \
-                line.strip().endswith('bandwidth') or \
-                line.strip().endswith('write'):
-                continue
-
-            # data lines
-            line_list = line.strip().split()
-            if line.startswith(' '):
-                output_line = {
-                    "pool": line_list[0],
-                    "parent": pool_parent
-                }
-
-            else:
-                pool_parent = line_list[0]
-                output_line = {
-                    "pool": pool_parent
-                }
-
-            output_line.update(
-                {
-                    'cap_alloc': line_list[1],
-                    'cap_free': line_list[2],
-                    'ops_read': line_list[3],
-                    'ops_write': line_list[4],
-                    'bw_read': line_list[5],
-                    'bw_write': line_list[6]
-                }
-            )
-            raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

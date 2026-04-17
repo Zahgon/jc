@@ -296,14 +296,7 @@ __version__ = info.version
 
 
 def _remove_extra_chars(data: str, verbose: bool) -> str:
-    if data.startswith('> ') or data.startswith('< '):
-        return data[2:]
-    elif data.startswith('* '):
-        return ''
-    elif verbose:
-        return ''
-    else:
-        return data
+    pass
 
 
 def parse(
@@ -324,22 +317,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-    curl_verbose = False
-
-    if jc.utils.has_data(data):
-        data_list = data.splitlines()
-
-        if data_list[0].startswith('* '):
-            curl_verbose = True
-
-        data_list = [_remove_extra_chars(x, verbose=curl_verbose) for x in data_list]
-        data_str = '\n'.join(data_list)
-
-        headers_parser.info = info  # type: ignore
-        raw_output = headers_parser.parse(data_str, raw, quiet)
-
-    return raw_output
+    pass

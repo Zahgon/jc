@@ -66,13 +66,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured to conform to the schema.
     """
-    # check for EFI partition@boot-manager and split/add fields
-    if 'partition' in proc_data and '@' in proc_data['partition']:
-        new_part, efi_bootmgr = proc_data['partition'].split('@', maxsplit=1)
-        proc_data['partition'] = new_part
-        proc_data['efi_bootmgr'] = efi_bootmgr
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -93,27 +87,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        # /dev/sda1:Windows NT/2000/XP:WinNT:chain
-        #  ^-------^ ^----------------^ ^---^ ^---^
-        #    part.    OS name for boot  short May change: type of boot loader
-        #             loader's pretty   name  required. Usually there is only
-        #             output                  a 'linux' style bootloader or
-        #                                     a chain one for other partitions
-        #                                     with their own boot sectors.
-
-        partition, name, short_name, type_ = data.split(':')
-        raw_output = {
-            'partition': partition.strip(),
-            'name': name.strip(),
-            'short_name': short_name.strip(),
-            'type': type_.strip()
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

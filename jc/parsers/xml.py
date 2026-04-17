@@ -45,7 +45,7 @@ Examples:
         <PRICE>9.90</PRICE>
         <YEAR>1988</YEAR>
       </CD>
-      ...
+      pass
 
     $ cat cd_catalog.xml | jc --xml -p
     {
@@ -67,7 +67,7 @@ Examples:
             "PRICE": "9.90",
             "YEAR": "1988"
           },
-      ...
+      pass
     }
 """
 import jc.utils
@@ -100,21 +100,7 @@ def _process(proc_data, has_data=False, xml_mod=None):
 
         Dictionary representing an XML document.
     """
-    if not xml_mod:
-        raise LibraryNotInstalled('The xmltodict library is not installed.')
-
-    proc_output = []
-
-    if has_data:
-        # standard output with @ prefix for attributes
-        try:
-            proc_output = xml_mod.parse(proc_data,
-                                          dict_constructor=dict,
-                                          process_comments=True)
-        except (ValueError, TypeError):
-            proc_output = xml_mod.parse(proc_data, dict_constructor=dict)
-
-    return proc_output
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -131,33 +117,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data.
     """
-    xmltodict = None
-    try:
-        import xmltodict
-    except Exception:
-        raise LibraryNotInstalled('The xmltodict library is not installed.')
-
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-    has_data = False
-
-    if jc.utils.has_data(data):
-        has_data = True
-
-    if raw and has_data:
-        # modified output with _ prefix for attributes
-        try:
-            raw_output = xmltodict.parse(data,
-                                         dict_constructor=dict,
-                                         process_comments=True,
-                                         attr_prefix='_')
-        except (ValueError, TypeError):
-            raw_output = xmltodict.parse(data,
-                                         dict_constructor=dict,
-                                         attr_prefix='_')
-
-        return raw_output
-
-    return _process(data, has_data, xml_mod=xmltodict)
+    pass

@@ -107,33 +107,7 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    bool_list = {'ntp_enabled', 'ntp_synchronized', 'rtc_in_local_tz', 'dst_active',
-                 'system_clock_synchronized', 'systemd-timesyncd.service_active'}
-    int_list = {'version', 'stratum', 'packet_count'}
-    float_list = {'offset', 'delay', 'jitter', 'frequency'}
-
-    for key in ['offset', 'delay', 'jitter']:
-        if key in proc_data:
-            proc_data[key + '_unit'] = proc_data[key][-2:]
-
-    if 'frequency' in proc_data:
-        proc_data['frequency_unit'] = proc_data['frequency'][-3:]
-
-    for key in proc_data:
-        if key in bool_list:
-            proc_data[key] = jc.utils.convert_to_bool(proc_data[key])
-
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-        if key in float_list:
-            proc_data[key] = jc.utils.convert_to_float(proc_data[key])
-
-    if 'universal_time' in proc_data:
-        ts = jc.utils.timestamp(proc_data['universal_time'], format_hint=(7300,))
-        proc_data['epoch_utc'] = ts.utc
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -150,31 +124,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-    valid_fields = {
-        'local time', 'universal time', 'rtc time', 'time zone', 'ntp enabled',
-        'ntp synchronized', 'rtc in local tz', 'dst active',
-        'system clock synchronized', 'ntp service',
-        'systemd-timesyncd.service active', 'server', 'poll interval', 'leap',
-        'version', 'stratum', 'reference', 'precision', 'root distance',
-        'offset', 'delay', 'jitter', 'packet count', 'frequency'
-    }
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            try:
-                key, val = line.split(':', maxsplit=1)
-                key = key.lower().strip()
-                val = val.strip()
-            except ValueError:
-                continue
-
-            if key in valid_fields:
-                keyname = key.replace(' ', '_')
-                raw_output[keyname] = val
-
-    return raw_output if raw else _process(raw_output)
+    pass

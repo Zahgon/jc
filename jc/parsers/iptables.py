@@ -102,7 +102,7 @@ Examples:
           }
         ]
       },
-      ...
+      pass
     ]
 
     $ sudo iptables --line-numbers -v -L -t nat | jc --iptables -p -r
@@ -164,7 +164,7 @@ Examples:
           }
         ]
       },
-      ...
+      pass
     ]
 """
 import re
@@ -208,32 +208,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    for entry in proc_data:
-
-        if 'default_packets' in entry:
-            entry['default_packets'] = jc.utils.convert_to_int(entry['default_packets'])
-
-        if 'default_bytes' in entry:
-            entry['default_bytes'] = jc.utils.convert_size_to_int(entry['default_bytes'])
-
-        for rule in entry['rules']:
-            int_list = ['num', 'pkts']
-            for key in rule:
-                if key in int_list:
-                    rule[key] = jc.utils.convert_to_int(rule[key])
-
-            if 'bytes' in rule:
-                rule['bytes'] = jc.utils.convert_size_to_int(rule['bytes'])
-
-            if 'opt' in rule:
-                if rule['opt'] == '--':
-                    rule['opt'] = None
-
-            if 'target' in rule:
-                if rule['target'] == '':
-                    rule['target'] = None
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -250,61 +225,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-    chain = {}
-    headers = []
-
-    if jc.utils.has_data(data):
-
-        for line in list(filter(None, data.splitlines())):
-
-            if line.startswith('Chain'):
-                if chain:
-                    raw_output.append(chain)
-
-                chain = {}
-                headers = []
-
-                parsed_line = line.split()
-
-                chain['chain'] = parsed_line[1]
-
-                stats_match = re.search(chain_pkt_byt_pattern, line)
-                if stats_match:
-                    stats = stats_match.groupdict()
-                    chain['default_policy'] = stats['policy_name']
-                    chain['default_packets'] = stats['packets']
-                    chain['default_bytes'] = stats['bytes']
-
-                chain['rules'] = []
-
-                continue
-
-            elif line.startswith('target') or \
-                 (line.find('pkts') >= 1 and line.find('pkts') <= 5) or \
-                 line.startswith('num'):
-
-                headers = [h for h in ' '.join(line.lower().strip().split()).split() if h]
-                headers.append("options")
-
-                continue
-
-            else:
-                # sometimes the "target" column is blank. Stuff in a dummy character
-                if headers[0] == 'target' and line.startswith(' '):
-                    line = '\u2063' + line
-
-                rule = line.split(maxsplit=len(headers) - 1)
-                temp_rule = dict(zip(headers, rule))
-                if temp_rule:
-                    if temp_rule.get('target') == '\u2063':
-                        temp_rule['target'] = ''
-                    chain['rules'].append(temp_rule)
-
-        if chain:
-            raw_output.append(chain)
-
-    return raw_output if raw else _process(raw_output)
+    pass

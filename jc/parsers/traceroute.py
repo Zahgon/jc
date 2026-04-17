@@ -80,7 +80,7 @@ Examples:
             }
           ]
         },
-        ...
+        pass
       ]
     }
 
@@ -117,7 +117,7 @@ Examples:
             }
           ]
         },
-        ...
+        pass
       ]
     }
 """
@@ -191,7 +191,7 @@ class _Traceroute(object):
         self.hops = []
 
     def add_hop(self, hop):
-        self.hops.append(hop)
+        pass
 
     def __str__(self):
         text = "Traceroute for %s (%s)\n\n" % (self.dest_name, self.dest_ip)
@@ -207,12 +207,7 @@ class _Hop(object):
 
     def add_probe(self, probe):
         """Adds a Probe instance to this hop's results."""
-        if self.probes:
-            probe_last = self.probes[-1]
-            if not probe.ip:
-                probe.ip = probe_last.ip
-                probe.name = probe_last.name
-        self.probes.append(probe)
+        pass
 
     def __str__(self):
         text = "{:>3d} ".format(self.idx)
@@ -250,138 +245,15 @@ class _Probe(object):
 
 
 def _get_probes(hop_string: str):
-    probes = []
-    probe_asn_match = [ (match, "ASN") for match in RE_PROBE_ASN.finditer(hop_string)]
-    probe_name_ip_match = [(match, "NAME_IP") for match in RE_PROBE_NAME_IP.finditer(hop_string)]
-    probe_ip_only_match = [(match, "IP_ONLY") for match in RE_PROBE_IP_ONLY.finditer(hop_string)]
-    probe_bsd_ipv6_match = [(match, "IP_IPV6") for match in RE_PROBE_BSD_IPV6.finditer(hop_string)]
-    probe_ipv6_only_match = [(match, "IP_IPV6_ONLY") for match in RE_PROBE_IPV6_ONLY.finditer(hop_string)]
-    probe_rtt_annotations = [(match, "RTT") for match in  RE_PROBE_RTT_ANNOTATION.finditer(hop_string)]
-
-    matches = sorted(probe_asn_match + probe_name_ip_match + probe_ip_only_match + probe_bsd_ipv6_match + probe_ipv6_only_match + probe_rtt_annotations, key=lambda x: x[0].start(0))
-    probe, is_last_match_rtt = _Probe(), False
-    for match, match_type in matches:
-        if match_type == "ASN":
-            probe.asn = int(match.group(1))
-        elif match_type == "NAME_IP":
-            probe.name = match.group(1)
-            probe.ip = match.group(2)
-        elif match_type == "IP_ONLY":
-            probe.ip = match.group(1)
-        elif match_type == "IP_IPV6":
-            probe.ip = match.group(0)
-        elif match_type == "IP_IPV6_ONLY":
-            probe.ip = match.group(1)
-        elif match_type == "RTT":
-            if match.groups()[0]:
-                probe_rtt = Decimal(match.groups()[0])
-            elif match.groups()[1]:
-                probe_rtt = None
-            else:
-                message = f"Expected probe RTT or *. Got: '{match.group(0)}'"
-                raise ParseError(message)
-
-            # If the last match is a RTT, then copy all probe values and replace RTT field
-            if is_last_match_rtt:
-                probe = deepcopy(last_probe)  # type: ignore
-            # Set RTT values
-            probe.rtt = probe_rtt
-            probe.annotation = match.groups()[2] or None
-            # RTT is the last value shown for a hop
-            if any([probe.ip, probe.asn, probe.annotation, probe.rtt, probe.name]):
-                probes.append(probe)
-            last_probe = probe
-            probe = _Probe()
-
-        if match_type == "RTT":
-            is_last_match_rtt = True
-        else:
-            is_last_match_rtt = False
-
-    return probes
+    pass
 
 
 def _loads(data: str, quiet: bool):
-    lines = []
-
-    # remove any warning lines
-    for data_line in data.splitlines():
-        if 'traceroute: Warning: ' not in data_line and 'traceroute6: Warning: ' not in data_line:
-            lines.append(data_line)
-        else:
-            continue
-
-    # check if header row exists, otherwise add a dummy header
-    if not lines[0].startswith('traceroute to ') and not lines[0].startswith('traceroute6 to '):
-        lines[:0] = ['traceroute to <<_>>  (<<_>>), ? hops max, ? byte packets']
-
-        # print warning to STDERR
-        if not quiet:
-            jc.utils.warning_message(['No header row found. For destination info redirect STDERR to STDOUT'])
-
-    # Get headers
-    match_dest = RE_HEADER.search(lines[0])
-    dest_name, dest_ip = None, None
-    if match_dest:
-        dest_name = match_dest.group(1)
-        dest_ip = match_dest.group(2)
-
-    m = RE_HEADER_HOPS_BYTES.search(lines[0])
-    max_hops = None
-    data_bytes = None
-    if m:
-        max_hops = m.group(1)
-        data_bytes = m.group(2)
-
-    # The Traceroute node is the root of the tree
-    traceroute = _Traceroute(dest_name, dest_ip, max_hops, data_bytes)
-
-    # Parse the remaining lines, they should be only hops/probes
-    for line in lines[1:]:
-        # Skip empty lines
-        if not line:
-            continue
-
-        hop_match = RE_HOP.match(line)
-
-        if hop_match:
-            if hop_match.group(1):
-                hop_index = int(hop_match.group(1))
-            else:
-                hop_index = None
-
-            if hop_index is not None:
-                hop = _Hop(hop_index)
-                traceroute.add_hop(hop)
-
-            hop_string = hop_match.group(2)
-
-        probes = _get_probes(hop_string)
-        for probe in probes:
-            hop.add_probe(probe)
-
-    return traceroute
+    pass
 
 
 def _serialize_hop(hop: _Hop):
-    hop_obj = {}
-    hop_obj['hop'] = str(hop.idx)
-    probe_list = []
-
-    if hop.probes:
-        for probe in hop.probes:
-            probe_obj = {
-                'annotation': probe.annotation,
-                'asn': None if probe.asn is None else str(probe.asn),
-                'ip': probe.ip,
-                'name': probe.name,
-                'rtt': None if probe.rtt is None else str(probe.rtt)
-            }
-            probe_list.append(probe_obj)
-
-    hop_obj['probes'] = probe_list
-
-    return hop_obj
+    pass
 
 
 def _process(proc_data):
@@ -396,22 +268,7 @@ def _process(proc_data):
 
         Dictionary. Structured to conform to the schema.
     """
-    int_list = {'hop', 'asn', 'max_hops', 'data_bytes'}
-    float_list = {'rtt'}
-
-    for entry in proc_data.get('hops', []):
-        _process(entry)
-    for entry in proc_data.get('probes', []):
-        _process(entry)
-
-    for key in proc_data:
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-        if key in float_list:
-            proc_data[key] = jc.utils.convert_to_float(proc_data[key])
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -428,24 +285,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    if jc.utils.has_data(data):
-        tr = _loads(data, quiet)
-        hops_list = []
-
-        for hop in tr.hops:
-            hops_list.append(_serialize_hop(hop))
-
-        raw_output = {
-            'destination_ip': tr.dest_ip,
-            'destination_name': tr.dest_name,
-            'max_hops': tr.max_hops,
-            'data_bytes': tr.data_bytes,
-            'hops': hops_list
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

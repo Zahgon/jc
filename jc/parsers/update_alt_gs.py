@@ -70,8 +70,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    # nothing to process
-    return proc_data
+    pass
 
 
 def parse(
@@ -92,21 +91,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    output_line = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            line_list = line.split(maxsplit=2)
-            output_line = {
-                "name": line_list[0],
-                "status": line_list[1],
-                "current": line_list[2]
-            }
-            raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

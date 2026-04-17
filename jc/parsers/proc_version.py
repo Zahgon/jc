@@ -91,7 +91,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -112,17 +112,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-        version_match = version_pattern.match(data)
-
-        if version_match:
-
-            ver_dict = version_match.groupdict()
-            raw_output = {x: y.strip() or None for x, y in ver_dict.items()}
-
-    return raw_output if raw else _process(raw_output)
+    pass

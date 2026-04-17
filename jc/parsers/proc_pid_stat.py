@@ -226,32 +226,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    state_map = {
-        'R': 'Running',
-        'S': 'Sleeping in an interruptible wait',
-        'D': 'Waiting in uninterruptible disk sleep',
-        'Z': 'Zombie',
-        'T': 'Stopped (on a signal) or trace stopped',
-        't': 'Tracing stop',
-        'W': 'Paging',
-        'X': 'Dead',
-        'x': 'Dead',
-        'K': 'Wakekill',
-        'W': 'Waking',
-        'P': 'Parked',
-        'I': 'Idle'
-    }
-
-    if 'state' in proc_data:
-        proc_data['state_pretty'] = state_map[proc_data['state']]
-
-    for key, val in proc_data.items():
-        try:
-            proc_data[key] = int(val)
-        except Exception:
-            pass
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -272,72 +247,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        line_re = re.compile(r'''
-            ^(?P<pid>\d+)\s
-            \((?P<comm>.+)\)\s
-            (?P<state>\S)\s
-            (?P<ppid>\d+)\s
-            (?P<pgrp>\d+)\s
-            (?P<session>\d+)\s
-            (?P<tty_nr>\d+)\s
-            (?P<tpg_id>-?\d+)\s
-            (?P<flags>\d+)\s
-            (?P<minflt>\d+)\s
-            (?P<cminflt>\d+)\s
-            (?P<majflt>\d+)\s
-            (?P<cmajflt>\d+)\s
-            (?P<utime>\d+)\s
-            (?P<stime>\d+)\s
-            (?P<cutime>\d+)\s
-            (?P<cstime>\d+)\s
-            (?P<priority>\d+)\s
-            (?P<nice>\d+)\s
-            (?P<num_threads>\d+)\s
-            (?P<itrealvalue>\d+)\s
-            (?P<starttime>\d+)\s
-            (?P<vsize>\d+)\s
-            (?P<rss>\d+)\s
-            (?P<rsslim>\d+)\s
-            (?P<startcode>\d+)\s
-            (?P<endcode>\d+)\s
-            (?P<startstack>\d+)\s
-            (?P<kstkeep>\d+)\s
-            (?P<kstkeip>\d+)\s
-            (?P<signal>\d+)\s
-            (?P<blocked>\d+)\s
-            (?P<sigignore>\d+)\s
-            (?P<sigcatch>\d+)\s
-            (?P<wchan>\d+)\s
-            (?P<nswap>\d+)\s
-            (?P<cnswap>\d+)\s
-            (?P<exit_signal>\d+)\s
-            (?P<processor>\d+)\s
-            (?P<rt_priority>\d+)\s
-            (?P<policy>\d+)\s
-            (?P<delayacct_blkio_ticks>\d+)\s
-            (?P<guest_time>\d+)\s
-            (?P<cguest_time>\d+)\s
-            (?P<start_data>\d+)\s
-            (?P<end_data>\d+)\s
-            (?P<start_brk>\d+)\s
-            (?P<arg_start>\d+)\s
-            (?P<arg_end>\d+)\s
-            (?P<env_start>\d+)\s
-            (?P<env_end>\d+)\s
-            (?P<exit_code>\d+)
-        ''', re.VERBOSE | re.DOTALL
-        )
-
-        line_match = line_re.search(data)
-
-        if line_match:
-            raw_output = line_match.groupdict()
-
-    return raw_output if raw else _process(raw_output)
+    pass

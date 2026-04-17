@@ -78,7 +78,7 @@ Examples:
         "minimum": "300"
       },
       {
-        ...
+        pass
       }
     ]
 """
@@ -112,15 +112,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured to conform to the schema.
     """
-
-    int_list = {'serial', 'refresh', 'retry', 'expire', 'minimum'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(data: str, raw: bool = False, quiet: bool = False):
@@ -137,107 +129,4 @@ def parse(data: str, raw: bool = False, quiet: bool = False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-
-    warned = False
-
-    if jc.utils.has_data(data):
-
-        addresses = []
-        v6addresses = []
-        mail = []
-        text = []
-        rrdata = {}
-        soaparse = False
-
-        for line in filter(None, data.splitlines()):
-            line = line.strip()
-
-            # default
-            if ' has address ' in line:
-                linedata = line.split(' ', maxsplit=3)
-                hostname = linedata[0]
-                address = linedata[3]
-                addresses.append(address)
-                rrdata.update({'hostname': hostname})
-                rrdata.update({'address': addresses})
-                continue
-
-            if ' has IPv6 address ' in line:
-                linedata = line.split(' ', maxsplit=4)
-                hostname = linedata[0]
-                v6address = linedata[4]
-                v6addresses.append(v6address)
-                rrdata.update({'hostname': hostname})
-                rrdata.update({'v6-address': v6addresses})
-                continue
-
-            if ' mail is handled by ' in line:
-                linedata = line.split(' ', maxsplit=6)
-                hostname = linedata[0]
-                mx = linedata[6]
-                mail.append(mx)
-                rrdata.update({'hostname': hostname})
-                rrdata.update({'mail': mail})
-                continue
-
-
-            # TXT parsing
-            if ' descriptive text ' in line:
-                linedata = line.split('descriptive text "', maxsplit=1)
-                hostname = linedata[0]
-                txt = linedata[1].strip('"')
-                text.append(txt)
-                rrdata.update({'hostname': hostname})
-                rrdata.update({'text': text})
-                continue
-
-
-            # -C / SOA parsing
-            if line.startswith('Nameserver '):
-                soaparse = True
-                rrdata = {}
-                linedata = line.split(' ', maxsplit=1)
-                nameserverip = linedata[1].rstrip(':')
-                rrdata.update({'nameserver': nameserverip})
-                continue
-
-            if ' has SOA record ' in line:
-                linedata = line.split(' ', maxsplit=10)
-
-                zone = linedata[0]
-                mname = linedata[4]
-                rname = linedata[5]
-                serial = linedata[6]
-                refresh = linedata[7]
-                retry = linedata[8]
-                expire = linedata[9]
-                minimum = linedata[10]
-
-                try:
-                    rrdata.update(
-                        {
-                            'zone': zone,
-                            'mname': mname,
-                            'rname': rname,
-                            'serial': serial,
-                            'refresh': refresh,
-                            'retry': retry,
-                            'expire': expire,
-                            'minimum': minimum 
-                        },
-                    )
-                    raw_output.append(rrdata)
-
-                except IndexError:
-                    if not warned:
-                        jc.utils.warning_message(['Unknown format detected.'])
-                        warned = True
-
-        if not soaparse:
-            raw_output.append(rrdata)
-
-    return raw_output if raw else _process(raw_output)
+    pass

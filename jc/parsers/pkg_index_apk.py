@@ -146,21 +146,7 @@ def _value(key: str, value: str) -> Union[str, int, List[str], Dict[str, str]]:
 
         Converted value
     """
-    if key in ['S', 'I', 't', 'k']:
-        return int(value)
-
-    if key in ['D', 'p', 'i']:
-        splitted = value.split(' ')
-        return splitted
-
-    if key == "m":
-        m = re.match(r'(.*) <(.*)>', value)
-        if m:
-            return {'name': m.group(1), 'email': m.group(2)}
-        else:
-            return {'name': value}
-
-    return value
+    pass
 
 
 def _process(proc_data: List[Dict]) -> List[Dict]:
@@ -175,7 +161,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return [{_KEY.get(k, k): _value(k, v) for k, v in d.items()} for d in proc_data]
+    pass
 
 
 def parse(data: str, raw: bool = False, quiet: bool = False) -> List[Dict]:
@@ -192,29 +178,4 @@ def parse(data: str, raw: bool = False, quiet: bool = False) -> List[Dict]:
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[dict] = []
-
-    package: Dict = {}
-    if jc.utils.has_data(data):
-        lines = iter(data.splitlines())
-        for line in lines:
-            line = line.strip()
-            if not line:
-                if package:
-                    raw_output.append(package)
-                    package = {}
-
-                continue
-
-            key = line[0]
-            value = line[2:].strip()
-            assert key not in package
-            package[key] = value
-
-    if package:
-        raw_output.append(package)
-
-    return raw_output if raw else _process(raw_output)
+    pass

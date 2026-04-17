@@ -120,8 +120,7 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    # no further processing
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -138,51 +137,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    if jc.utils.has_data(data):
-
-        data = data[0:10]
-        dt = datetime.fromtimestamp(int(data))
-        dt_utc = datetime.fromtimestamp(int(data), tz=timezone.utc)
-
-        raw_output = {
-            'naive': {
-                'year': dt.year,
-                'month': dt.strftime('%b'),
-                'month_num': dt.month,
-                'day': dt.day,
-                'weekday': dt.strftime('%a'),
-                'weekday_num': dt.isoweekday(),
-                'hour': int(dt.strftime('%I')),
-                'hour_24': dt.hour,
-                'minute': dt.minute,
-                'second': dt.second,
-                'period': dt.strftime('%p').upper(),
-                'day_of_year': int(dt.strftime('%j')),
-                'week_of_year': int(dt.strftime('%W')),
-                'iso': dt.isoformat()
-            },
-            'utc': {
-                'year': dt_utc.year,
-                'month': dt_utc.strftime('%b'),
-                'month_num': dt_utc.month,
-                'day': dt_utc.day,
-                'weekday': dt_utc.strftime('%a'),
-                'weekday_num': dt_utc.isoweekday(),
-                'hour': int(dt_utc.strftime('%I')),
-                'hour_24': dt_utc.hour,
-                'minute': dt_utc.minute,
-                'second': dt_utc.second,
-                'period': dt_utc.strftime('%p').upper(),
-                'utc_offset': dt_utc.strftime('%z') or None,
-                'day_of_year': int(dt_utc.strftime('%j')),
-                'week_of_year': int(dt_utc.strftime('%W')),
-                'iso': dt_utc.isoformat()
-            }
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

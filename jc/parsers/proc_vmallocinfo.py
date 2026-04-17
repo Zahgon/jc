@@ -67,7 +67,7 @@ Examples:
         ],
         "phys": "0x00000000bfeff000"
       },
-      ...
+      pass
     ]
 
     $ cat /proc/vmallocinfo | jc --proc-vmallocinfo -p -r
@@ -92,7 +92,7 @@ Examples:
         ],
         "phys": "0x00000000bfeff000"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -125,15 +125,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for entry in proc_data:
-        for key in entry:
-            if isinstance(entry[key], str):
-                try:
-                    entry[key] = int(entry[key])
-                except Exception:
-                    pass
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -154,42 +146,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    output_line: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            area, size, details = line.split(maxsplit=2)
-            start, end = area.split('-', maxsplit=1)
-            detail_split = details.split()
-            caller = ''
-            options: List = []
-
-            if details == 'unpurged vm_area':
-                caller = 'unpurged vm_area'
-
-            else:
-                caller = detail_split[0]
-                for item in detail_split[1:]:
-                    if '=' in item:
-                        key, val = item.split('=')
-                        output_line.update({key: val})
-                    else:
-                        options.append(item)
-
-            output_line = {
-                'start': start,
-                'end': end,
-                'size': size,
-                'caller': caller or None,
-                'options': options
-            }
-
-            if output_line:
-                raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

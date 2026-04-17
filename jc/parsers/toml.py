@@ -83,7 +83,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def _fix_objects(obj: Any) -> JSONDictType:
@@ -91,33 +91,7 @@ def _fix_objects(obj: Any) -> JSONDictType:
     Recursively traverse the nested dictionary or list and convert objects
     into JSON serializable types.
     """
-    if isinstance(obj, dict):
-        for k, v in obj.copy().items():
-
-            if isinstance(v, datetime):
-                iso = v.isoformat()
-                v = int(round(v.timestamp()))
-                obj.update({k: v, f'{k}_iso': iso})
-                continue
-
-            if isinstance(v, dict):
-                obj.update({k: _fix_objects(v)})
-                continue
-
-            if isinstance(v, list):
-                newlist = []
-                for i in v:
-                    newlist.append(_fix_objects(i))
-                obj.update({k: newlist})
-                continue
-
-    if isinstance(obj, list):
-        new_list = []
-        for i in obj:
-            new_list.append(_fix_objects(i))
-        obj = new_list
-
-    return obj
+    pass
 
 
 def parse(
@@ -138,12 +112,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: JSONDictType = {}
-
-    if jc.utils.has_data(data):
-        raw_output = _fix_objects(tomli.loads(data))
-
-    return raw_output if raw else _process(raw_output)
+    pass

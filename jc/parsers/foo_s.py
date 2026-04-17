@@ -34,11 +34,11 @@ Examples:
 
     $ foo | jc --foo-s
     {example output}
-    ...
+    pass
 
     $ foo | jc --foo-s -r
     {example output}
-    ...
+    pass
 """
 from typing import Dict, Iterable
 import jc.utils
@@ -86,13 +86,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured data to conform to the schema.
     """
-
-    # process the data here
-    # rebuild output for added semantic information
-    # use helper functions in jc.utils for int, float,
-    # bool conversions and timestamps
-
-    return proc_data
+    pass
 
 
 @add_jc_meta
@@ -119,26 +113,4 @@ def parse(
 
         Iterable of Dictionaries
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    streaming_input_type_check(data)
-
-    for line in data:
-        try:
-            streaming_line_input_type_check(line)
-            output_line: Dict = {}
-
-            # skip blank lines
-            if not line.strip():
-                continue
-
-            # parse the content here
-            # check out helper functions in jc.utils
-            # and jc.parsers.universal
-
-            if output_line:
-                yield output_line if raw else _process(output_line)
-            else:
-                raise ParseError('Not foo data')
-
-        except Exception as e:
-            yield raise_or_yield(ignore_exceptions, e, line)
+    pass

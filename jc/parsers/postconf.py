@@ -115,31 +115,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    keys = ['private', 'unprivileged', 'chroot', 'wake_up_time', 'process_limit']
-    bools = ['private', 'unprivileged', 'chroot']
-    integers = ['wake_up_time', 'process_limit']
-
-    for item in proc_data:
-        if item['wake_up_time'].endswith('?'):
-            item['no_wake_up_before_first_use'] = True
-        elif item['wake_up_time'] == '-':
-            item['no_wake_up_before_first_use'] = None
-        else:
-            item['no_wake_up_before_first_use'] = False
-
-        for key in keys:
-            if item[key] == '-':
-                item[key] = None
-
-        for key in bools:
-            if item[key] is not None:
-                item[key] = jc.utils.convert_to_bool(item[key])
-
-        for key in integers:
-            if item[key] is not None:
-                item[key] = jc.utils.convert_to_int(item[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -160,15 +136,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-        table = ['service_name service_type private unprivileged chroot wake_up_time process_limit command']
-        data_list = list(filter(None, data.splitlines()))
-        table.extend(data_list)
-        raw_output = simple_table_parse(table)
-
-    return raw_output if raw else _process(raw_output)
+    pass

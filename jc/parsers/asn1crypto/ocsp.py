@@ -97,18 +97,7 @@ class Request(Sequence):
         Sets common named extensions to private attributes and creates a list
         of critical extensions
         """
-
-        self._critical_extensions = set()
-
-        for extension in self['single_request_extensions']:
-            name = extension['extn_id'].native
-            attribute_name = '_%s_value' % name
-            if hasattr(self, attribute_name):
-                setattr(self, attribute_name, extension['extn_value'].parsed)
-            if extension['critical'].native:
-                self._critical_extensions.add(name)
-
-        self._processed_extensions = True
+        pass
 
     @property
     def critical_extensions(self):
@@ -119,10 +108,7 @@ class Request(Sequence):
         :return:
             A set of unicode strings
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._critical_extensions
+        pass
 
     @property
     def service_locator_value(self):
@@ -133,10 +119,7 @@ class Request(Sequence):
         :return:
             None or a ServiceLocator object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._service_locator_value
+        pass
 
 
 class Requests(SequenceOf):
@@ -229,18 +212,7 @@ class OCSPRequest(Sequence):
         Sets common named extensions to private attributes and creates a list
         of critical extensions
         """
-
-        self._critical_extensions = set()
-
-        for extension in self['tbs_request']['request_extensions']:
-            name = extension['extn_id'].native
-            attribute_name = '_%s_value' % name
-            if hasattr(self, attribute_name):
-                setattr(self, attribute_name, extension['extn_value'].parsed)
-            if extension['critical'].native:
-                self._critical_extensions.add(name)
-
-        self._processed_extensions = True
+        pass
 
     @property
     def critical_extensions(self):
@@ -251,10 +223,7 @@ class OCSPRequest(Sequence):
         :return:
             A set of unicode strings
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._critical_extensions
+        pass
 
     @property
     def nonce_value(self):
@@ -265,10 +234,7 @@ class OCSPRequest(Sequence):
         :return:
             None or an OctetString object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._nonce_value
+        pass
 
     @property
     def acceptable_responses_value(self):
@@ -280,10 +246,7 @@ class OCSPRequest(Sequence):
         :return:
             None or an AcceptableResponses object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._acceptable_responses_value
+        pass
 
     @property
     def preferred_signature_algorithms_value(self):
@@ -296,10 +259,7 @@ class OCSPRequest(Sequence):
         :return:
             None or a PreferredSignatureAlgorithms object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._preferred_signature_algorithms_value
+        pass
 
 
 class OCSPResponseStatus(Enumerated):
@@ -329,20 +289,11 @@ class StatusGood(Null):
         :param value:
             None or 'good'
         """
-
-        if value is not None and value != 'good' and not isinstance(value, Null):
-            raise ValueError(unwrap(
-                '''
-                value must be one of None, "good", not %s
-                ''',
-                repr(value)
-            ))
-
-        self.contents = b''
+        pass
 
     @property
     def native(self):
-        return 'good'
+        pass
 
 
 # Custom class to return a meaningful .native attribute from CertStatus()
@@ -354,20 +305,11 @@ class StatusUnknown(Null):
         :param value:
             None or 'unknown'
         """
-
-        if value is not None and value != 'unknown' and not isinstance(value, Null):
-            raise ValueError(unwrap(
-                '''
-                value must be one of None, "unknown", not %s
-                ''',
-                repr(value)
-            ))
-
-        self.contents = b''
+        pass
 
     @property
     def native(self):
-        return 'unknown'
+        pass
 
 
 class RevokedInfo(Sequence):
@@ -451,18 +393,7 @@ class SingleResponse(Sequence):
         Sets common named extensions to private attributes and creates a list
         of critical extensions
         """
-
-        self._critical_extensions = set()
-
-        for extension in self['single_extensions']:
-            name = extension['extn_id'].native
-            attribute_name = '_%s_value' % name
-            if hasattr(self, attribute_name):
-                setattr(self, attribute_name, extension['extn_value'].parsed)
-            if extension['critical'].native:
-                self._critical_extensions.add(name)
-
-        self._processed_extensions = True
+        pass
 
     @property
     def critical_extensions(self):
@@ -473,10 +404,7 @@ class SingleResponse(Sequence):
         :return:
             A set of unicode strings
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._critical_extensions
+        pass
 
     @property
     def crl_value(self):
@@ -487,10 +415,7 @@ class SingleResponse(Sequence):
         :return:
             None or a CrlId object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._crl_value
+        pass
 
     @property
     def archive_cutoff_value(self):
@@ -501,10 +426,7 @@ class SingleResponse(Sequence):
         :return:
             None or a GeneralizedTime object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._archive_cutoff_value
+        pass
 
     @property
     def crl_reason_value(self):
@@ -514,10 +436,7 @@ class SingleResponse(Sequence):
         :return:
             None or a CRLReason object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._crl_reason_value
+        pass
 
     @property
     def invalidity_date_value(self):
@@ -530,10 +449,7 @@ class SingleResponse(Sequence):
         :return:
             None or a GeneralizedTime object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._invalidity_date_value
+        pass
 
     @property
     def certificate_issuer_value(self):
@@ -543,10 +459,7 @@ class SingleResponse(Sequence):
         :return:
             None or an x509.GeneralNames object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._certificate_issuer_value
+        pass
 
 
 class Responses(SequenceOf):
@@ -625,18 +538,7 @@ class OCSPResponse(Sequence):
         Sets common named extensions to private attributes and creates a list
         of critical extensions
         """
-
-        self._critical_extensions = set()
-
-        for extension in self['response_bytes']['response'].parsed['tbs_response_data']['response_extensions']:
-            name = extension['extn_id'].native
-            attribute_name = '_%s_value' % name
-            if hasattr(self, attribute_name):
-                setattr(self, attribute_name, extension['extn_value'].parsed)
-            if extension['critical'].native:
-                self._critical_extensions.add(name)
-
-        self._processed_extensions = True
+        pass
 
     @property
     def critical_extensions(self):
@@ -647,10 +549,7 @@ class OCSPResponse(Sequence):
         :return:
             A set of unicode strings
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._critical_extensions
+        pass
 
     @property
     def nonce_value(self):
@@ -661,10 +560,7 @@ class OCSPResponse(Sequence):
         :return:
             None or an OctetString object
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._nonce_value
+        pass
 
     @property
     def extended_revoke_value(self):
@@ -675,10 +571,7 @@ class OCSPResponse(Sequence):
         :return:
             None or a Null object (if present)
         """
-
-        if self._processed_extensions is False:
-            self._set_extensions()
-        return self._extended_revoke_value
+        pass
 
     @property
     def basic_ocsp_response(self):
@@ -688,8 +581,7 @@ class OCSPResponse(Sequence):
         :return:
             None or an asn1crypto.ocsp.BasicOCSPResponse object
         """
-
-        return self['response_bytes']['response'].parsed
+        pass
 
     @property
     def response_data(self):
@@ -699,5 +591,4 @@ class OCSPResponse(Sequence):
         :return:
             None or an asn1crypto.ocsp.ResponseData object
         """
-
-        return self['response_bytes']['response'].parsed['tbs_response_data']
+        pass

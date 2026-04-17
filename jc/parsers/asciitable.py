@@ -148,91 +148,30 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    # normalize keys: convert to lowercase
-    for item in proc_data:
-        for key in item.copy():
-            k_new = key.lower()
-            item[k_new] = item.pop(key)
-
-    return proc_data
+    pass
 
 
 def _remove_ansi(string: str) -> str:
-    ansi_escape = re.compile(r'(\x9B|\x1B\[)[0-?]*[ -\/]*[@-~]')
-    return ansi_escape.sub('', string)
+    pass
 
 
 def _lstrip(string: str) -> str:
     """find the leftmost non-whitespace character and lstrip to that index"""
-    lstrip_list = [x for x in string.splitlines() if not len(x.strip()) == 0]
-    start_points = (len(x) - len(x.lstrip()) for x in lstrip_list)
-    min_point = min(start_points)
-    new_lstrip_list = (x[min_point:] for x in lstrip_list)
-    return '\n'.join(new_lstrip_list)
+    pass
 
 
 def _rstrip(string: str) -> str:
     """find the rightmost non-whitespace character and rstrip and pad to that index"""
-    rstrip_list = [x for x in string.splitlines() if not len(x.strip()) == 0]
-    end_points = (len(x.rstrip()) for x in rstrip_list)
-    max_point = max(end_points)
-    new_rstrip_list = ((x + ' ' * max_point)[:max_point] for x in rstrip_list)
-    return '\n'.join(new_rstrip_list)
+    pass
 
 
 def _strip(string: str) -> str:
-    string = _lstrip(string)
-    string = _rstrip(string)
-    return string
+    pass
 
 @lru_cache(maxsize=32)
 def _is_separator(line: str) -> bool:
     """returns true if a table separator line is found"""
-    # This function is cacheable since tables have identical separators
-    strip_line = line.strip()
-    if any((
-        strip_line.startswith('|-') and strip_line.endswith('-|'),
-        strip_line.startswith('━━') and strip_line.endswith('━━'),
-        strip_line.startswith('──') and strip_line.endswith('──'),
-        strip_line.startswith('┄┄') and strip_line.endswith('┄┄'),
-        strip_line.startswith('┅┅') and strip_line.endswith('┅┅'),
-        strip_line.startswith('┈┈') and strip_line.endswith('┈┈'),
-        strip_line.startswith('┉┉') and strip_line.endswith('┉┉'),
-        strip_line.startswith('══') and strip_line.endswith('══'),
-        strip_line.startswith('--') and strip_line.endswith('--'),
-        strip_line.startswith('==') and strip_line.endswith('=='),
-        strip_line.startswith('+=') and strip_line.endswith('=+'),
-        strip_line.startswith('+-') and strip_line.endswith('-+'),
-        strip_line.startswith('╒') and strip_line.endswith('╕'),
-        strip_line.startswith('╞') and strip_line.endswith('╡'),
-        strip_line.startswith('╘') and strip_line.endswith('╛'),
-        strip_line.startswith('┏') and strip_line.endswith('┓'),
-        strip_line.startswith('┣') and strip_line.endswith('┫'),
-        strip_line.startswith('┗') and strip_line.endswith('┛'),
-        strip_line.startswith('┡') and strip_line.endswith('┩'),
-        strip_line.startswith('┢') and strip_line.endswith('┪'),
-        strip_line.startswith('┟') and strip_line.endswith('┧'),
-        strip_line.startswith('┞') and strip_line.endswith('┦'),
-        strip_line.startswith('┠') and strip_line.endswith('┨'),
-        strip_line.startswith('┝') and strip_line.endswith('┥'),
-        strip_line.startswith('┍') and strip_line.endswith('┑'),
-        strip_line.startswith('┕') and strip_line.endswith('┙'),
-        strip_line.startswith('┎') and strip_line.endswith('┒'),
-        strip_line.startswith('┖') and strip_line.endswith('┚'),
-        strip_line.startswith('╓') and strip_line.endswith('╖'),
-        strip_line.startswith('╟') and strip_line.endswith('╢'),
-        strip_line.startswith('╙') and strip_line.endswith('╜'),
-        strip_line.startswith('╔') and strip_line.endswith('╗'),
-        strip_line.startswith('╠') and strip_line.endswith('╣'),
-        strip_line.startswith('╚') and strip_line.endswith('╝'),
-        strip_line.startswith('┌') and strip_line.endswith('┐'),
-        strip_line.startswith('├') and strip_line.endswith('┤'),
-        strip_line.startswith('└') and strip_line.endswith('┘'),
-        strip_line.startswith('╭') and strip_line.endswith('╮'),
-        strip_line.startswith('╰') and strip_line.endswith('╯')
-    )):
-        return True
-    return False
+    pass
 
 
 def _snake_case(line: str) -> str:
@@ -240,86 +179,19 @@ def _snake_case(line: str) -> str:
     Replace spaces between words and special characters with an underscore.
     Ignore the replacement char (�) used for header padding.
     """
-    line = re.sub(r'[^a-zA-Z0-9� ]', '_', line)  # special characters
-    line = re.sub(r'\b \b', '_', line)           # spaces between words
-    return line
+    pass
 
 
 def _normalize_rows(table: str) -> List[str]:
     """
     returns a List of row strings. Header is snake-cased
     """
-    result: List[str] = []
-    for line in table.splitlines():
-        # skip blank lines
-        if not line.strip():
-            continue
-
-        # skip separators
-        if _is_separator(line):
-            continue
-
-        # header or data row found - remove column separators
-        if not result:  # this is the header row
-            # normalize the separator
-            line = line.replace('│', '|')\
-                       .replace('┃', '|')\
-                       .replace('┆', '|')\
-                       .replace('┇', '|')\
-                       .replace('┊', '|')\
-                       .replace('┋', '|')\
-                       .replace('╎', '|')\
-                       .replace('╏', '|')\
-                       .replace('║', '|')
-
-            # find the number of chars to pad in front of headers that are too
-            # far away from the separator. Replace spaces with unicode char: �
-            # we will remove this char from headers after sparse_table_parse
-            problem_header_pattern = re.compile(r'(?:\| )( +)([^|]+)')
-            problem_headers = problem_header_pattern.findall(line)
-            if problem_headers:
-                for p_header in problem_headers:
-                    old_header = p_header[0] + p_header[1]
-                    sub_chars = '�' * len(p_header[0])
-                    new_header = sub_chars + p_header[1]
-                    line = line.replace(old_header, new_header)
-
-            line = line.replace('|', ' ')
-            result.append(_snake_case(line))
-            continue
-
-        # this is a data row
-        line = line.replace('|', ' ')\
-                   .replace('│', ' ')\
-                   .replace('┃', ' ')\
-                   .replace('┆', ' ')\
-                   .replace('┇', ' ')\
-                   .replace('┊', ' ')\
-                   .replace('┋', ' ')\
-                   .replace('╎', ' ')\
-                   .replace('╏', ' ')\
-                   .replace('║', ' ')
-        result.append(line)
-
-    return result
+    pass
 
 
 def _fixup_headers(table: List[Dict]) -> List[Dict]:
     """remove consecutive underscores and any trailing underscores"""
-    new_table = []
-    for row in table:
-        new_row = row.copy()
-        for k in row:
-            # remove replacement character
-            k_new = k.replace('�', '')
-            # remove consecutive underscores
-            k_new = re.sub(r'__+', '_', k_new)
-            # remove trailing underscores
-            k_new = re.sub(r'_+$', '', k_new)
-            new_row[k_new] = new_row.pop(k)
-        new_table.append(new_row)
-
-    return new_table
+    pass
 
 
 def parse(
@@ -340,16 +212,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-        data = _remove_ansi(data)
-        data = _strip(data)
-        data_list = _normalize_rows(data)
-        raw_table = sparse_table_parse(data_list)
-        raw_output = _fixup_headers(raw_table)
-
-    return raw_output if raw else _process(raw_output)
+    pass

@@ -41,10 +41,4 @@ class Switch(object):
 
     def match(self, *args):
         """Indicate whether or not to enter a case suite"""
-        result = False
-        if self.fall or not args:
-            result = True
-        elif self.value in args: # changed for v1.5, see below
-            self.fall = True
-            result = True
-        return result
+        pass

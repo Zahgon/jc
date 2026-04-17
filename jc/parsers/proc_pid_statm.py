@@ -77,7 +77,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -98,23 +98,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        size, resident, shared, text, lib, data_, dt = data.split()
-
-        raw_output = {
-            'size': int(size),
-            'resident': int(resident),
-            'shared': int(shared),
-            'text': int(text),
-            'lib': int(lib),
-            'data': int(data_),
-            'dt': int(dt)
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

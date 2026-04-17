@@ -143,10 +143,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    if 'L' in proc_data:
-        proc_data['L'] = int(proc_data['L'])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -167,38 +164,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    s_list: List = []
-    e_list: List = []
-
-    if jc.utils.has_data(data):
-        for line in filter(None, data.splitlines()):
-            prefix, value = line.split(maxsplit=1)
-
-            if prefix == 'P:':
-                raw_output['P'] = value
-                continue
-
-            if prefix == 'S:':
-                s_list.append(value)
-                continue
-
-            if prefix == 'E:':
-                e_list.append(value)
-                continue
-
-            raw_output[prefix[:-1]] = value
-
-    if s_list:
-        raw_output['S'] = s_list
-
-    if e_list:
-        raw_output['E'] = {}
-        for item in e_list:
-            k, v = item.split('=')
-            raw_output['E'][k] = v
-
-    return raw_output if raw else _process(raw_output)
+    pass

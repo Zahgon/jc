@@ -235,30 +235,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured to conform to the schema.
     """
-    int_list = {'inode_count', 'block_count', 'reserved_block_count', 'free_blocks',
-                'free_inodes', 'first_block', 'block_size', 'fragment_size',
-                'group_descriptor_size', 'reserved_gdt_blocks', 'blocks_per_group',
-                'fragments_per_group', 'inodes_per_group', 'inode_blocks_per_group',
-                'flex_block_group_size', 'mount_count', 'maximum_mount_count',
-                'first_inode', 'inode_size', 'required_extra_isize', 'desired_extra_isize',
-                'journal_inode', 'overhead_clusters'}
-
-    datetime_list = {'filesystem_created', 'last_mount_time', 'last_write_time', 'last_checked'}
-
-    for key in proc_data:
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-    for key in proc_data.copy():
-        if key in datetime_list:
-            dt = jc.utils.timestamp(proc_data[key], (1000,))
-            proc_data[key + '_epoch'] = dt.naive
-            proc_data[key + '_epoch_utc'] = dt.utc
-
-    if 'filesystem_features' in proc_data:
-        proc_data['filesystem_features'] = proc_data['filesystem_features'].split()
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -279,22 +256,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            if line.startswith('tune2fs '):
-                raw_output['version'] = line.split(maxsplit=1)[1]
-                continue
-
-            linesplit = line.split(':', maxsplit=1)
-            key = linesplit[0].lower().replace(' ', '_').replace('#', 'number')
-            val = linesplit[1].strip()
-            raw_output[key] = val
-
-    return raw_output if raw else _process(raw_output)
+    pass

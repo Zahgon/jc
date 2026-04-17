@@ -112,73 +112,7 @@ class Edid:
 
     def _parse_edid(self, edid: bytes):
         """Convert edid byte string to edid object"""
-        if struct.calcsize(self._STRUCT_FORMAT) != 128:
-            raise ValueError("Wrong edid size.")
-
-        if sum(map(int, edid)) % 256 != 0:
-            raise ValueError("Checksum mismatch.")
-
-        unpacked = struct.unpack(self._STRUCT_FORMAT, edid)
-        raw_edid = self._RawEdid(*unpacked)
-
-        if raw_edid.header != b"\x00\xff\xff\xff\xff\xff\xff\x00":
-            raise ValueError("Invalid header.")
-
-        self.raw = edid
-        self.manufacturer_id = raw_edid.manu_id
-        self.product = raw_edid.prod_id
-        self.year = raw_edid.manu_year + 1990
-        self.edid_version = "{:d}.{:d}".format(
-            raw_edid.edid_version, raw_edid.edid_revision
-        )
-        self.type = "digital" if (raw_edid.input_type & 0xFF) else "analog"
-        self.width = float(raw_edid.width)
-        self.height = float(raw_edid.height)
-        self.gamma = (raw_edid.gamma + 100) / 100
-        self.dpms_standby = bool(raw_edid.features & 0xFF)
-        self.dpms_suspend = bool(raw_edid.features & 0x7F)
-        self.dpms_activeoff = bool(raw_edid.features & 0x3F)
-
-        self.resolutions = []
-        for i in range(16):
-            bit = raw_edid.timings_supported & (1 << i)
-            if bit:
-                self.resolutions.append(self._TIMINGS[i])
-
-        for i in range(8):
-            bytes_data = raw_edid.timings_edid[2 * i : 2 * i + 2]
-            if bytes_data == b"\x01\x01":
-                continue
-            byte1, byte2 = bytes_data
-            x_res = 8 * (int(byte1) + 31)
-            aspect_ratio = self._ASPECT_RATIOS[(byte2 >> 6) & 0b11]
-            y_res = int(x_res * aspect_ratio[1] / aspect_ratio[0])
-            rate = (int(byte2) & 0b00111111) + 60.0
-            self.resolutions.append((x_res, y_res, rate))
-
-        self.name = None
-        self.serial = None
-
-        for timing_bytes in (
-            raw_edid.timing_1,
-            raw_edid.timing_2,
-            raw_edid.timing_3,
-            raw_edid.timing_4,
-        ):
-            # "other" descriptor
-            if timing_bytes[0:2] == b"\x00\x00":
-                timing_type = timing_bytes[3]
-                if timing_type in (0xFF, 0xFE, 0xFC):
-                    buffer = timing_bytes[5:]
-                    buffer = buffer.partition(b"\x0a")[0]
-                    text = buffer.decode("cp437")
-                    if timing_type == 0xFF:
-                        self.serial = text
-                    elif timing_type == 0xFC:
-                        self.name = text
-
-        if not self.serial:
-            self.serial = raw_edid.serial_no
+        pass
 
     def __repr__(self):
         clsname = self.__class__.__name__

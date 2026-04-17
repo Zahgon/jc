@@ -347,82 +347,17 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {'id', 'query_num', 'answer_num', 'authority_num', 'additional_num',
-                    'rcvd', 'query_size', 'query_time'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-        if 'axfr' in entry:
-            for ax in entry['axfr']:
-                ax['ttl'] = jc.utils.convert_to_int(ax['ttl'])
-
-        if 'opt_pseudosection' in entry:
-            if 'edns' in entry['opt_pseudosection']:
-                if 'version' in entry['opt_pseudosection']['edns']:
-                    val = jc.utils.convert_to_int(entry['opt_pseudosection']['edns']['version'])
-                    entry['opt_pseudosection']['edns']['version'] = val
-
-                if 'udp' in entry['opt_pseudosection']['edns']:
-                    val = jc.utils.convert_to_int(entry['opt_pseudosection']['edns']['udp'])
-                    entry['opt_pseudosection']['edns']['udp'] = val
-
-        if 'answer' in entry:
-            for ans in entry['answer']:
-                ans['ttl'] = jc.utils.convert_to_int(ans['ttl'])
-
-        if 'additional' in entry:
-            for add in entry['additional']:
-                add['ttl'] = jc.utils.convert_to_int(add['ttl'])
-
-        if 'authority' in entry:
-            for auth in entry['authority']:
-                auth['ttl'] = jc.utils.convert_to_int(auth['ttl'])
-
-        if 'when' in entry:
-            ts = jc.utils.timestamp(entry['when'], format_hint=(1000, 7000))
-            entry['when_epoch'] = ts.naive
-            entry['when_epoch_utc'] = ts.utc
-
-    return proc_data
+    pass
 
 
 def _parse_header(header):
     # ;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 6140
-    header = header.split()
-    opcode = header[3].rstrip(',')
-    status = header[5].rstrip(',')
-    header_id = header[7]
-
-    return {'id': header_id,
-            'opcode': opcode,
-            'status': status}
+    pass
 
 
 def _parse_flags_line(flagsline):
     # ;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1
-    flagsline = flagsline.split(';')
-    flags = flagsline.pop(0)
-    flags = flagsline.pop(0)
-    flags = flagsline.pop(0).split(':')
-    flags = flags[1].lstrip()
-    flags = flags.split()
-
-    restline = flagsline[0].replace(',', ' ').replace(':', ' ')
-    restlist = restline.split()
-
-    query_num = restlist[1]
-    answer_num = restlist[3]
-    authority_num = restlist[5]
-    additional_num = restlist[7]
-
-    return {'flags': flags,
-            'query_num': query_num,
-            'answer_num': answer_num,
-            'authority_num': authority_num,
-            'additional_num': additional_num}
+    pass
 
 
 def _parse_opt_pseudosection(optline):
@@ -430,64 +365,17 @@ def _parse_opt_pseudosection(optline):
     # ; EDNS: version: 0, flags:; udp: 4096
     # ; NSID: 67 70 64 6e 73 2d 73 66 6f ("gpdns-sfo")
     # ; COOKIE: 1cbc06703eaef210
-    if optline.startswith('; EDNS:'):
-        optline_list = optline.replace(',', ' ').split(';')
-        optline_first = optline_list[1]
-        optline_rest = optline_list[2]
-        _, _, ver, _, *flags = optline_first.split()
-        udp = optline_rest.split()[-1]
-
-        return {
-            'edns': {
-                'version': ver,
-                'flags': flags,
-                'udp': udp
-            }
-        }
-
-    if optline.startswith('; COOKIE:'):
-        return {
-            'cookie': optline.split()[2]
-        }
-
-    if optline.startswith('; NSID:'):
-        return {
-            'nsid': optline.split('("')[-1].rstrip('")')
-        }
-
-    return {}
+    pass
 
 
 def _parse_question(question):
     # ;www.cnn.com.           IN  A
-    question = question.split()
-    dns_name = question[0].lstrip(';')
-    dns_class = question[1]
-    dns_type = question[2]
-
-    return {'name': dns_name,
-            'class': dns_class,
-            'type': dns_type}
+    pass
 
 
 def _parse_answer(answer):
     # www.cnn.com.        5   IN  CNAME   turner-tls.map.fastly.net.
-    answer = answer.split(maxsplit=4)
-    answer_name = answer[0]
-    answer_class = answer[2]
-    answer_type = answer[3]
-    answer_ttl = answer[1]
-    answer_data = answer[4]
-
-    # remove surrounding quotation marks from answer_data if they exist
-    if answer_data.startswith('"') and answer_data.endswith('"'):
-        answer_data = answer_data[1:-1]
-
-    return {'name': answer_name,
-            'class': answer_class,
-            'type': answer_type,
-            'ttl': answer_ttl,
-            'data': answer_data}
+    pass
 
 
 def _parse_axfr(axfr):
@@ -495,40 +383,13 @@ def _parse_axfr(axfr):
     # ; (1 server found)
     # ;; global options: +cmd
     # zonetransfer.me. 7200 IN A 5.196.105.14
-    axfr = axfr.split(maxsplit=4)
-    axfr_name = axfr[0]
-    axfr_ttl = axfr[1]
-    axfr_class = axfr[2]
-    axfr_type = axfr[3]
-    axfr_data = axfr[4]
-
-    return {'name': axfr_name,
-            'ttl': axfr_ttl,
-            'class': axfr_class,
-            'type': axfr_type,
-            'data': axfr_data}
+    pass
 
 
 def _parse_footer(footer):
     # footer consists of 4 lines
     # footer line 1
-    if footer.startswith(';; Query time:'):
-        return {'query_time': footer.split(':')[1].lstrip()}
-
-    # footer line 2
-    if footer.startswith(';; SERVER:'):
-        return {'server': footer.split(':', maxsplit=1)[1].lstrip()}
-
-    # footer line 3
-    if footer.startswith(';; WHEN:'):
-        return {'when': footer.split(':', maxsplit=1)[1].lstrip()}
-
-    # footer line 4 (last line)
-    if footer.startswith(';; MSG SIZE  rcvd:'):
-        return {'rcvd': footer.split(':')[1].lstrip()}
-
-    elif footer.startswith(';; XFR size:'):
-        return {'size': footer.split(':')[1].lstrip()}
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -545,124 +406,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-    cleandata = data.splitlines()
-    # remove blank lines
-    cleandata = list(filter(None, cleandata))
-
-    # section can be: header, flags, question, authority, answer, axfr, additional, opt_pseudosection, footer
-    section = ''
-    output_entry = {}
-    answer_list = []
-
-    if jc.utils.has_data(data):
-        for line in cleandata:
-
-            # identify sections
-            if line.startswith(';; Got answer:'):
-                section = ''
-                continue
-
-            if line.startswith('; <<>> ') and ' axfr ' in line.lower():
-                section = 'axfr'
-                axfr_list = []
-                continue
-
-            if line.startswith(';; ->>HEADER<<-'):
-                section = 'header'
-                if output_entry:
-                    raw_output.append(output_entry)
-                output_entry = {}
-                output_entry.update(_parse_header(line))
-                continue
-
-            if line.startswith(';; flags:'):
-                section = 'flags'
-                output_entry.update(_parse_flags_line(line))
-                continue
-
-            if line.startswith(';; OPT PSEUDOSECTION:'):
-                section = 'opt_pseudosection'
-                continue
-
-            if line.startswith(';; QUESTION SECTION:'):
-                section = 'question'
-                continue
-
-            if line.startswith(';; AUTHORITY SECTION:'):
-                section = 'authority'
-                authority_list = []
-                continue
-
-            if line.startswith(';; ANSWER SECTION:'):
-                section = 'answer'
-                answer_list = []
-                continue
-
-            if line.startswith(';; ADDITIONAL SECTION:'):
-                section = 'additional'
-                additional_list = []
-                continue
-
-            if line.startswith(';; Query time:'):
-                section = 'footer'
-                output_entry.update(_parse_footer(line))
-                continue
-
-            # parse sections
-
-            if line.startswith(';; QUERY SIZE:'):
-                output_entry.update({'query_size': line.split(': ', maxsplit=1)[1]})
-                continue
-
-            if not line.startswith(';') and section == 'axfr':
-                axfr_list.append(_parse_axfr(line))
-                output_entry.update({'axfr': axfr_list})
-                continue
-
-            if section == 'opt_pseudosection':
-                if 'opt_pseudosection' not in output_entry:
-                    output_entry['opt_pseudosection'] = {}
-                output_entry['opt_pseudosection'].update(_parse_opt_pseudosection(line))
-                continue
-
-            if section == 'question':
-                output_entry['question'] = _parse_question(line)
-                continue
-
-            if not line.startswith(';') and section == 'authority':
-                authority_list.append(_parse_answer(line))
-                output_entry.update({'authority': authority_list})
-                continue
-
-            # https://github.com/kellyjonbrazil/jc/issues/133
-            # to allow parsing of output that only has the answer section - e.g:
-            # dig +noall +answer example.com
-            # we allow section to be 'answer' (normal output) or
-            # '', which means +noall +answer was used.
-            if not line.startswith(';') and (section == 'answer' or section == ''):
-                answer_list.append(_parse_answer(line))
-                output_entry.update({'answer': answer_list})
-                continue
-
-            if not line.startswith(';') and section == 'additional':
-                additional_list.append(_parse_answer(line))
-                output_entry.update({'additional': additional_list})
-                continue
-
-            if section == 'footer':
-                output_entry.update(_parse_footer(line))
-                continue
-
-        if output_entry:
-            raw_output.append(output_entry)
-
-        raw_output = list(filter(None, raw_output))
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

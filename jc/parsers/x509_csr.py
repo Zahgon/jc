@@ -287,28 +287,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc_global.quiet = quiet  # to inject quiet setting into asn1crypto library
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-        # convert to bytes, if not already, for PEM detection since that's
-        # what pem.detect() needs. (cli.py will auto-convert to UTF-8 if it can)
-        try:
-            der_bytes = bytes(data, 'utf-8')  # type: ignore
-        except TypeError:
-            der_bytes = data  # type: ignore
-
-        certs = []
-        if pem.detect(der_bytes):
-            for type_name, headers, der_bytes in pem.unarmor(der_bytes, multiple=True):
-                if type_name == 'CERTIFICATE REQUEST' or type_name == 'NEW CERTIFICATE REQUEST':
-                    certs.append(csr.CertificationRequest.load(der_bytes))
-
-        else:
-            certs.append(csr.CertificationRequest.load(der_bytes))
-
-        raw_output = [_fix_objects(cert.native) for cert in certs]
-
-    return raw_output if raw else _process(raw_output)
+    pass

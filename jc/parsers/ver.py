@@ -113,56 +113,15 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'major', 'minor', 'patch', 'prerelease', 'prerelease_num'}
-
-    for k, v in proc_data.items():
-        if k in int_list:
-            try:
-                proc_data[k] = int(v)
-            except Exception:
-                pass
-
-    if 'components' in proc_data:
-        for i, obj in enumerate(proc_data['components']):
-            try:
-                proc_data['components'][i] = int(obj)
-            except Exception:
-                pass
-
-    return proc_data
+    pass
 
 
 def _strict_parse(vstring):
-    version_re = re.compile(r'^(\d+) \. (\d+) (\. (\d+))? ([ab](\d+))?$', re.VERBOSE)
-    match = version_re.match(vstring)
-    if not match:
-        raise ValueError("invalid version number '%s'" % vstring)
-
-    (major, minor, patch, prerelease, prerelease_num) = \
-        match.group(1, 2, 4, 5, 6)
-
-    if not patch:
-        patch = '0'
-
-    if prerelease:
-        prerelease = prerelease[0]
-    else:
-        prerelease = None
-
-    return {
-        'major': major,
-        'minor': minor,
-        'patch': patch,
-        'prerelease': prerelease,
-        'prerelease_num': prerelease_num
-    }
+    pass
 
 
 def _loose_parse(vstring):
-    component_re = re.compile(r'(\d+ | [a-z]+ | \.)', re.VERBOSE)
-    components = [x for x in component_re.split(vstring) if x and x != '.']
-
-    return components
+    pass
 
 
 def parse(
@@ -183,27 +142,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    strict = True
-
-    if jc.utils.has_data(data):
-
-        # based on distutils/version.py from CPython 3.9.5
-        # PSF License (see https://opensource.org/licenses/Python-2.0)
-
-        data = data.strip()
-
-        try:
-            raw_output = _strict_parse(data)
-
-        except ValueError:
-            raw_output['components'] = _loose_parse(data)
-            strict = False
-
-        if raw_output:
-            raw_output['strict'] = strict
-
-    return raw_output if raw else _process(raw_output)
+    pass

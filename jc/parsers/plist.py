@@ -41,7 +41,7 @@ Examples:
           "UTTypeConformsTo": [
             "public.data",
             "public.content"
-      ...
+      pass
     }
 """
 import sys
@@ -83,19 +83,12 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def _b2a(byte_string: bytes) -> str:
     """Convert a byte string to a colon-delimited hex ascii string"""
-    # need try/except since separator was only introduced in python 3.8.
-    # provides compatibility for python 3.6 and 3.7.
-    try:
-      return binascii.hexlify(byte_string, ':').decode('utf-8')
-    except TypeError:
-      hex_string = binascii.hexlify(byte_string).decode('utf-8')
-      colon_seperated = ':'.join(hex_string[i:i+2] for i in range(0, len(hex_string), 2))
-      return colon_seperated
+    pass
 
 
 def _fix_objects(obj):
@@ -103,38 +96,7 @@ def _fix_objects(obj):
     Recursively traverse the nested dictionary or list and convert objects
     into JSON serializable types.
     """
-    if isinstance(obj, dict):
-        for k, v in obj.copy().items():
-
-            if isinstance(v, datetime):
-                iso = v.isoformat()
-                v = int(round(v.timestamp()))
-                obj.update({k: v, f'{k}_iso': iso})
-                continue
-
-            if isinstance(v, bytes):
-                v = _b2a(v)
-                obj.update({k: v})
-                continue
-
-            if isinstance(v, dict):
-                obj.update({k: _fix_objects(v)})
-                continue
-
-            if isinstance(v, list):
-                newlist = []
-                for i in v:
-                    newlist.append(_fix_objects(i))
-                obj.update({k: newlist})
-                continue
-
-    if isinstance(obj, list):
-        new_list = []
-        for i in obj:
-            new_list.append(_fix_objects(i))
-        obj = new_list
-
-    return obj
+    pass
 
 
 def parse(
@@ -155,37 +117,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        if isinstance(data, str):
-            data = bytes(data, 'utf-8')
-
-        try:
-            raw_output = plistlib.loads(data)
-
-        except Exception:
-            # Try parsing as an old-style NeXTSTEP Plist format
-            # pbPlist library only works on file paths, not strings :(
-            from jc.parsers.pbPlist.pbPlist import PBPlist
-            import tempfile
-            import os
-
-            # use delete=False for windows compatibility
-            with tempfile.NamedTemporaryFile(mode='w+b', delete=False) as plist_file:
-                plist_file_name = plist_file.name
-                plist_file.write(data)
-                plist_file.seek(0)
-                parsed_plist = PBPlist(plist_file_name)
-                raw_output = parsed_plist.root.nativeType()
-
-            # try to delete the temp file
-            if os.path.exists(plist_file_name):
-                os.remove(plist_file_name)
-
-        raw_output = _fix_objects(raw_output)
-
-    return raw_output if raw else _process(raw_output)
+    pass

@@ -67,7 +67,7 @@ Examples:
         "start": "0",
         "end": "EOF"
       },
-      ...
+      pass
     ]
 
     $ cat /proc/locks | jc --proc-locks -p -r
@@ -96,7 +96,7 @@ Examples:
         "start": "0",
         "end": "EOF"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -129,14 +129,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'id', 'pid', 'inode'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -157,31 +150,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            id, class_, type_, access, pid, file, start, end  = line.split()
-            maj, min, inode = file.split(':')
-
-            raw_output.append(
-                {
-                    'id': id[:-1],
-                    'class': class_,
-                    'type': type_,
-                    'access': access,
-                    'pid': pid,
-                    'maj': maj,
-                    'min': min,
-                    'inode': inode,
-                    'start': start,
-                    'end': end
-                }
-            )
-
-    return raw_output if raw else _process(raw_output)
+    pass

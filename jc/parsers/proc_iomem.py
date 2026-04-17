@@ -51,7 +51,7 @@ Examples:
         "end": "0009ffff",
         "device": "Reserved"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -84,7 +84,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -105,27 +105,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            colon_split = line.split(':', maxsplit=1)
-            device = colon_split[1].strip()
-            mem_split = colon_split[0].split('-', maxsplit=1)
-            start = mem_split[0].strip()
-            end = mem_split[1].strip()
-
-            raw_output.append(
-                {
-                    'start': start,
-                    'end': end,
-                    'device': device
-                }
-            )
-
-    return raw_output if raw else _process(raw_output)
+    pass

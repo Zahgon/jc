@@ -73,13 +73,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-
-    # process the data here
-    # rebuild output for added semantic information
-    # use helper functions in jc.utils for int, float, bool
-    # conversions and timestamps
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -100,19 +94,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            # parse the content here
-            # check out helper functions in jc.utils
-            # and jc.parsers.universal
-
-            pass
-
-    return raw_output if raw else _process(raw_output)
+    pass

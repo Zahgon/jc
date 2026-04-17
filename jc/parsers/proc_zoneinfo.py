@@ -333,7 +333,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -354,89 +354,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    ouptput_line: Dict = {}
-    node = None
-    section = 'stats'    # stats, pages, pagesets
-    pageset = None
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            if line == '  per-node stats':
-                continue
-
-            if line.startswith('Node ') and line.endswith('DMA'):
-                if ouptput_line:
-                    raw_output.append(ouptput_line)
-                    ouptput_line = {}
-
-                section = 'stats'
-                _, node, _, zone = line.replace(',', '').split()
-                ouptput_line['node'] = int(node)
-                ouptput_line[zone] = {}
-                continue
-
-            if line.startswith('Node '):
-                section = 'stats'
-
-                if pageset:
-                    ouptput_line[zone]['pagesets'].append(pageset)
-                    pageset = {}
-
-                _, node, _, zone = line.replace(',', '').split()
-                ouptput_line['node'] = int(node)
-                ouptput_line[zone] = {}
-                continue
-
-            if line.startswith('  pages free '):
-                section = 'pages'
-                ouptput_line[zone]['pages'] = {}
-                ouptput_line[zone]['pages']['free'] = int(line.split()[-1])
-                continue
-
-            if line.startswith('  pagesets'):
-                section = 'pagesets'
-                ouptput_line[zone]['pagesets'] = []
-                pageset = {}  # type: ignore
-                continue
-
-            if section == 'stats':
-                key, val = line.split(maxsplit=1)
-                ouptput_line[key] = int(val)
-                continue
-
-            if section == 'pages' and line.startswith('        protection: '):
-                protection = line.replace('(', '').replace(')', '').replace(',', '').split()[1:]
-                ouptput_line[zone]['pages']['protection'] = [int(x) for x in protection]
-                continue
-
-            if section == 'pages':
-                key, val = line.split(maxsplit=1)
-                ouptput_line[zone]['pages'][key] = int(val)
-                continue
-
-            if section == 'pagesets' and line.startswith('    cpu: '):
-                if pageset:
-                    ouptput_line[zone]['pagesets'].append(pageset)
-
-                split_line = line.replace(':', '').split(maxsplit=1)
-                pageset = {"cpu": int(split_line[1])}
-                continue
-
-            if section == 'pagesets':
-                key, val = line.split(':', maxsplit=1)
-                pageset[key.strip()] = int(val)
-                continue
-
-        if ouptput_line:
-            if pageset:
-                ouptput_line[zone]['pagesets'].append(pageset)
-
-            raw_output.append(ouptput_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

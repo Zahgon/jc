@@ -99,26 +99,7 @@ class DNSName(IA5String):
         :param value:
             A unicode string
         """
-
-        if not isinstance(value, str):
-            raise TypeError(unwrap(
-                '''
-                %s value must be a unicode string, not %s
-                ''',
-                type_name(self),
-                type_name(value)
-            ))
-
-        if value.startswith('.'):
-            encoded_value = b'.' + value[1:].encode(self._encoding)
-        else:
-            encoded_value = value.encode(self._encoding)
-
-        self._unicode = value
-        self.contents = encoded_value
-        self._header = None
-        if self._trailer != b'':
-            self._trailer = b''
+        pass
 
 
 class URI(IA5String):
@@ -130,21 +111,7 @@ class URI(IA5String):
         :param value:
             A unicode string
         """
-
-        if not isinstance(value, str):
-            raise TypeError(unwrap(
-                '''
-                %s value must be a unicode string, not %s
-                ''',
-                type_name(self),
-                type_name(value)
-            ))
-
-        self._unicode = value
-        self.contents = iri_to_uri(value)
-        self._header = None
-        if self._trailer != b'':
-            self._trailer = b''
+        pass
 
     def __ne__(self, other):
         return not self == other
@@ -194,8 +161,7 @@ class EmailAddress(IA5String):
         :return:
             A byte string of the DER-encoded contents of the sequence
         """
-
-        return self._contents
+        pass
 
     @contents.setter
     def contents(self, value):
@@ -203,9 +169,7 @@ class EmailAddress(IA5String):
         :param value:
             A byte string of the DER-encoded contents of the sequence
         """
-
-        self._normalized = False
-        self._contents = value
+        pass
 
     def set(self, value):
         """
@@ -214,28 +178,7 @@ class EmailAddress(IA5String):
         :param value:
             A unicode string
         """
-
-        if not isinstance(value, str):
-            raise TypeError(unwrap(
-                '''
-                %s value must be a unicode string, not %s
-                ''',
-                type_name(self),
-                type_name(value)
-            ))
-
-        if value.find('@') != -1:
-            mailbox, hostname = value.rsplit('@', 1)
-            encoded_value = mailbox.encode('ascii') + b'@' + hostname.encode('idna')
-        else:
-            encoded_value = value.encode('ascii')
-
-        self._normalized = True
-        self._unicode = value
-        self.contents = encoded_value
-        self._header = None
-        if self._trailer != b'':
-            self._trailer = b''
+        pass
 
     def __unicode__(self):
         """
@@ -307,12 +250,7 @@ class IPAddress(OctetString):
         """
         This method is not applicable to IP addresses
         """
-
-        raise ValueError(unwrap(
-            '''
-            IP address values can not be parsed
-            '''
-        ))
+        pass
 
     def set(self, value):
         """
@@ -322,68 +260,7 @@ class IPAddress(OctetString):
             A unicode string containing an IPv4 address, IPv4 address with CIDR,
             an IPv6 address or IPv6 address with CIDR
         """
-
-        if not isinstance(value, str):
-            raise TypeError(unwrap(
-                '''
-                %s value must be a unicode string, not %s
-                ''',
-                type_name(self),
-                type_name(value)
-            ))
-
-        original_value = value
-
-        has_cidr = value.find('/') != -1
-        cidr = 0
-        if has_cidr:
-            parts = value.split('/', 1)
-            value = parts[0]
-            cidr = int(parts[1])
-            if cidr < 0:
-                raise ValueError(unwrap(
-                    '''
-                    %s value contains a CIDR range less than 0
-                    ''',
-                    type_name(self)
-                ))
-
-        if value.find(':') != -1:
-            family = socket.AF_INET6
-            if cidr > 128:
-                raise ValueError(unwrap(
-                    '''
-                    %s value contains a CIDR range bigger than 128, the maximum
-                    value for an IPv6 address
-                    ''',
-                    type_name(self)
-                ))
-            cidr_size = 128
-        else:
-            family = socket.AF_INET
-            if cidr > 32:
-                raise ValueError(unwrap(
-                    '''
-                    %s value contains a CIDR range bigger than 32, the maximum
-                    value for an IPv4 address
-                    ''',
-                    type_name(self)
-                ))
-            cidr_size = 32
-
-        cidr_bytes = b''
-        if has_cidr:
-            cidr_mask = '1' * cidr
-            cidr_mask += '0' * (cidr_size - len(cidr_mask))
-            cidr_bytes = int_to_bytes(int(cidr_mask, 2))
-            cidr_bytes = (b'\x00' * ((cidr_size // 8) - len(cidr_bytes))) + cidr_bytes
-
-        self._native = original_value
-        self.contents = inet_pton(family, value) + cidr_bytes
-        self._bytes = self.contents
-        self._header = None
-        if self._trailer != b'':
-            self._trailer = b''
+        pass
 
     @property
     def native(self):
@@ -393,29 +270,7 @@ class IPAddress(OctetString):
         :return:
             A unicode string or None
         """
-
-        if self.contents is None:
-            return None
-
-        if self._native is None:
-            byte_string = self.__bytes__()
-            byte_len = len(byte_string)
-            value = None
-            cidr_int = None
-            if byte_len in set([32, 16]):
-                value = inet_ntop(socket.AF_INET6, byte_string[0:16])
-                if byte_len > 16:
-                    cidr_int = int_from_bytes(byte_string[16:])
-            elif byte_len in set([8, 4]):
-                value = inet_ntop(socket.AF_INET, byte_string[0:4])
-                if byte_len > 4:
-                    cidr_int = int_from_bytes(byte_string[4:])
-            if cidr_int is not None:
-                cidr_bits = '{0:b}'.format(cidr_int)
-                cidr = len(cidr_bits.rstrip('0'))
-                value = value + '/' + str(cidr)
-            self._native = value
-        return self._native
+        pass
 
     def __ne__(self, other):
         return not self == other
@@ -493,11 +348,7 @@ class NotReallyTeletexString(TeletexString):
 
 @contextmanager
 def strict_teletex():
-    try:
-        NotReallyTeletexString._decoding_encoding = 'teletex'
-        yield
-    finally:
-        NotReallyTeletexString._decoding_encoding = 'cp1252'
+    pass
 
 
 class DirectoryString(Choice):
@@ -606,14 +457,7 @@ class NameType(ObjectIdentifier):
             An orderable value.
 
         """
-
-        attr_name = cls.map(attr_name)
-        if attr_name in cls.preferred_order:
-            ordinal = cls.preferred_order.index(attr_name)
-        else:
-            ordinal = len(cls.preferred_order)
-
-        return (ordinal, attr_name)
+        pass
 
     @property
     def human_friendly(self):
@@ -621,43 +465,7 @@ class NameType(ObjectIdentifier):
         :return:
             A human-friendly unicode string to display to users
         """
-
-        return {
-            'common_name': 'Common Name',
-            'surname': 'Surname',
-            'serial_number': 'Serial Number',
-            'country_name': 'Country',
-            'locality_name': 'Locality',
-            'state_or_province_name': 'State/Province',
-            'street_address': 'Street Address',
-            'organization_name': 'Organization',
-            'organizational_unit_name': 'Organizational Unit',
-            'title': 'Title',
-            'business_category': 'Business Category',
-            'postal_code': 'Postal Code',
-            'telephone_number': 'Telephone Number',
-            'name': 'Name',
-            'given_name': 'Given Name',
-            'initials': 'Initials',
-            'generation_qualifier': 'Generation Qualifier',
-            'unique_identifier': 'Unique Identifier',
-            'dn_qualifier': 'DN Qualifier',
-            'pseudonym': 'Pseudonym',
-            'email_address': 'Email Address',
-            'incorporation_locality': 'Incorporation Locality',
-            'incorporation_state_or_province': 'Incorporation State/Province',
-            'incorporation_country': 'Incorporation Country',
-            'domain_component': 'Domain Component',
-            'name_distinguisher': 'Name Distinguisher',
-            'organization_identifier': 'Organization Identifier',
-            'tpm_manufacturer': 'TPM Manufacturer',
-            'tpm_model': 'TPM Model',
-            'tpm_version': 'TPM Version',
-            'platform_manufacturer': 'Platform Manufacturer',
-            'platform_model': 'Platform Model',
-            'platform_version': 'Platform Version',
-            'user_id': 'User ID',
-        }.get(self.native, self.native)
+        pass
 
 
 class NameTypeAndValue(Sequence):
@@ -717,10 +525,7 @@ class NameTypeAndValue(Sequence):
         :return:
             A unicode string
         """
-
-        if self._prepped is None:
-            self._prepped = self._ldap_string_prep(self['value'].native)
-        return self._prepped
+        pass
 
     def __ne__(self, other):
         return not self == other
@@ -755,102 +560,7 @@ class NameTypeAndValue(Sequence):
         :return:
             A prepared unicode string, ready for comparison
         """
-
-        # Map step
-        string = re.sub('[\u00ad\u1806\u034f\u180b-\u180d\ufe0f-\uff00\ufffc]+', '', string)
-        string = re.sub('[\u0009\u000a\u000b\u000c\u000d\u0085]', ' ', string)
-        if sys.maxunicode == 0xffff:
-            # Some installs of Python 2.7 don't support 8-digit unicode escape
-            # ranges, so we have to break them into pieces
-            # Original was: \U0001D173-\U0001D17A and \U000E0020-\U000E007F
-            string = re.sub('\ud834[\udd73-\udd7a]|\udb40[\udc20-\udc7f]|\U000e0001', '', string)
-        else:
-            string = re.sub('[\U0001D173-\U0001D17A\U000E0020-\U000E007F\U000e0001]', '', string)
-        string = re.sub(
-            '[\u0000-\u0008\u000e-\u001f\u007f-\u0084\u0086-\u009f\u06dd\u070f\u180e\u200c-\u200f'
-            '\u202a-\u202e\u2060-\u2063\u206a-\u206f\ufeff\ufff9-\ufffb]+',
-            '',
-            string
-        )
-        string = string.replace('\u200b', '')
-        string = re.sub('[\u00a0\u1680\u2000-\u200a\u2028-\u2029\u202f\u205f\u3000]', ' ', string)
-
-        string = ''.join(map(stringprep.map_table_b2, string))
-
-        # Normalize step
-        string = unicodedata.normalize('NFKC', string)
-
-        # Prohibit step
-        for char in string:
-            if stringprep.in_table_a1(char):
-                raise ValueError(unwrap(
-                    '''
-                    X.509 Name objects may not contain unassigned code points
-                    '''
-                ))
-
-            if stringprep.in_table_c8(char):
-                raise ValueError(unwrap(
-                    '''
-                    X.509 Name objects may not contain change display or
-                    zzzzdeprecated characters
-                    '''
-                ))
-
-            if stringprep.in_table_c3(char):
-                raise ValueError(unwrap(
-                    '''
-                    X.509 Name objects may not contain private use characters
-                    '''
-                ))
-
-            if stringprep.in_table_c4(char):
-                raise ValueError(unwrap(
-                    '''
-                    X.509 Name objects may not contain non-character code points
-                    '''
-                ))
-
-            if stringprep.in_table_c5(char):
-                raise ValueError(unwrap(
-                    '''
-                    X.509 Name objects may not contain surrogate code points
-                    '''
-                ))
-
-            if char == '\ufffd':
-                raise ValueError(unwrap(
-                    '''
-                    X.509 Name objects may not contain the replacement character
-                    '''
-                ))
-
-        # Check bidirectional step - here we ensure that we are not mixing
-        # left-to-right and right-to-left text in the string
-        has_r_and_al_cat = False
-        has_l_cat = False
-        for char in string:
-            if stringprep.in_table_d1(char):
-                has_r_and_al_cat = True
-            elif stringprep.in_table_d2(char):
-                has_l_cat = True
-
-        if has_r_and_al_cat:
-            first_is_r_and_al = stringprep.in_table_d1(string[0])
-            last_is_r_and_al = stringprep.in_table_d1(string[-1])
-
-            if has_l_cat or not first_is_r_and_al or not last_is_r_and_al:
-                raise ValueError(unwrap(
-                    '''
-                    X.509 Name object contains a malformed bidirectional
-                    sequence
-                    '''
-                ))
-
-        # Insignificant space handling step
-        string = ' ' + re.sub(' +', '  ', string).strip() + ' '
-
-        return string
+        pass
 
 
 class RelativeDistinguishedName(SetOf):
@@ -862,15 +572,7 @@ class RelativeDistinguishedName(SetOf):
         :return:
             A unicode string that can be used as a dict key or in a set
         """
-
-        output = []
-        values = self._get_values(self)
-        for key in sorted(values.keys()):
-            output.append('%s: %s' % (key, values[key]))
-        # Unit separator is used here since the normalization process for
-        # values moves any such character, and the keys are all dotted integers
-        # or under_score_words
-        return '\x1F'.join(output)
+        pass
 
     def __ne__(self, other):
         return not self == other
@@ -918,8 +620,7 @@ class RelativeDistinguishedName(SetOf):
             A set object with unicode strings of NameTypeAndValue type field
             values
         """
-
-        return set([ntv['type'].native for ntv in rdn])
+        pass
 
     def _get_values(self, rdn):
         """
@@ -932,10 +633,7 @@ class RelativeDistinguishedName(SetOf):
             A dict object with unicode strings of NameTypeAndValue value field
             values that have been prepped for comparison
         """
-
-        output = {}
-        [output.update([(ntv['type'].native, ntv.prepped_value)]) for ntv in rdn]
-        return output
+        pass
 
 
 class RDNSequence(SequenceOf):
@@ -947,11 +645,7 @@ class RDNSequence(SequenceOf):
         :return:
             A unicode string that can be used as a dict key or in a set
         """
-
-        # Record separator is used here since the normalization process for
-        # values moves any such character, and the keys are all dotted integers
-        # or under_score_words
-        return '\x1E'.join(rdn.hashable for rdn in self)
+        pass
 
     def __ne__(self, other):
         return not self == other
@@ -1007,48 +701,7 @@ class Name(Choice):
         :return:
             An x509.Name object
         """
-
-        rdns = []
-        if not use_printable:
-            encoding_name = 'utf8_string'
-            encoding_class = UTF8String
-        else:
-            encoding_name = 'printable_string'
-            encoding_class = PrintableString
-
-        # Sort the attributes according to NameType.preferred_order
-        name_dict = OrderedDict(
-            sorted(
-                name_dict.items(),
-                key=lambda item: NameType.preferred_ordinal(item[0])
-            )
-        )
-
-        for attribute_name, attribute_value in name_dict.items():
-            attribute_name = NameType.map(attribute_name)
-            if attribute_name == 'email_address':
-                value = EmailAddress(attribute_value)
-            elif attribute_name == 'domain_component':
-                value = DNSName(attribute_value)
-            elif attribute_name in set(['dn_qualifier', 'country_name', 'serial_number']):
-                value = DirectoryString(
-                    name='printable_string',
-                    value=PrintableString(attribute_value)
-                )
-            else:
-                value = DirectoryString(
-                    name=encoding_name,
-                    value=encoding_class(attribute_value)
-                )
-
-            rdns.append(RelativeDistinguishedName([
-                NameTypeAndValue({
-                    'type': attribute_name,
-                    'value': value
-                })
-            ]))
-
-        return cls(name='', value=RDNSequence(rdns))
+        pass
 
     @property
     def hashable(self):
@@ -1056,8 +709,7 @@ class Name(Choice):
         :return:
             A unicode string that can be used as a dict key or in a set
         """
-
-        return self.chosen.hashable
+        pass
 
     def __len__(self):
         return len(self.chosen)
@@ -1082,19 +734,7 @@ class Name(Choice):
 
     @property
     def native(self):
-        if self._native is None:
-            self._native = OrderedDict()
-            for rdn in self.chosen.native:
-                for type_val in rdn:
-                    field_name = type_val['type']
-                    if field_name in self._native:
-                        existing = self._native[field_name]
-                        if not isinstance(existing, list):
-                            existing = self._native[field_name] = [existing]
-                        existing.append(type_val['value'])
-                    else:
-                        self._native[field_name] = type_val['value']
-        return self._native
+        pass
 
     @property
     def human_friendly(self):
@@ -1102,38 +742,7 @@ class Name(Choice):
         :return:
             A human-friendly unicode string containing the parts of the name
         """
-
-        if self._human_friendly is None:
-            data = OrderedDict()
-            last_field = None
-            for rdn in self.chosen:
-                for type_val in rdn:
-                    field_name = type_val['type'].human_friendly
-                    last_field = field_name
-                    if field_name in data:
-                        data[field_name] = [data[field_name]]
-                        data[field_name].append(type_val['value'])
-                    else:
-                        data[field_name] = type_val['value']
-            to_join = []
-            keys = data.keys()
-            if last_field == 'Country':
-                keys = reversed(list(keys))
-            for key in keys:
-                value = data[key]
-                native_value = self._recursive_humanize(value)
-                to_join.append('%s: %s' % (key, native_value))
-
-            has_comma = False
-            for element in to_join:
-                if element.find(',') != -1:
-                    has_comma = True
-                    break
-
-            separator = ', ' if not has_comma else '; '
-            self._human_friendly = separator.join(to_join[::-1])
-
-        return self._human_friendly
+        pass
 
     def _recursive_humanize(self, value):
         """
@@ -1145,12 +754,7 @@ class Name(Choice):
         :return:
             A unicode string
         """
-
-        if isinstance(value, list):
-            return ', '.join(
-                reversed([self._recursive_humanize(sub_value) for sub_value in value])
-            )
-        return value.native
+        pass
 
     @property
     def sha1(self):
@@ -1158,10 +762,7 @@ class Name(Choice):
         :return:
             The SHA1 hash of the DER-encoded bytes of this name
         """
-
-        if self._sha1 is None:
-            self._sha1 = hashlib.sha1(self.dump()).digest()
-        return self._sha1
+        pass
 
     @property
     def sha256(self):
@@ -1169,10 +770,7 @@ class Name(Choice):
         :return:
             The SHA-256 hash of the DER-encoded bytes of this name
         """
-
-        if self._sha256 is None:
-            self._sha256 = hashlib.sha256(self.dump()).digest()
-        return self._sha256
+        pass
 
 
 class AnotherName(Sequence):
@@ -1560,26 +1158,7 @@ class DistributionPoint(Sequence):
         :return:
             None or a unicode string of the distribution point's URL
         """
-
-        if self._url is False:
-            self._url = None
-            name = self['distribution_point']
-            if name.name != 'full_name':
-                raise ValueError(unwrap(
-                    '''
-                    CRL distribution points that are relative to the issuer are
-                    not supported
-                    '''
-                ))
-
-            for general_name in name.chosen:
-                if general_name.name == 'uniform_resource_identifier':
-                    url = general_name.native
-                    if url.lower().startswith(('http://', 'https://', 'ldap://', 'ldaps://')):
-                        self._url = url
-                        break
-
-        return self._url
+        pass
 
 
 class CRLDistributionPoints(SequenceOf):
@@ -2049,10 +1628,7 @@ class SubjectDirectoryAttribute(Sequence):
     }
 
     def _values_spec(self):
-        type_ = self['type'].native
-        if type_ in self._oid_specs:
-            return self._oid_specs[type_]
-        return SetOf
+        pass
 
     _spec_callbacks = {
         'values': _values_spec
@@ -2197,18 +1773,7 @@ class Certificate(Sequence):
         Sets common named extensions to private attributes and creates a list
         of critical extensions
         """
-
-        self._critical_extensions = set()
-
-        for extension in self['tbs_certificate']['extensions']:
-            name = extension['extn_id'].native
-            attribute_name = '_%s_value' % name
-            if hasattr(self, attribute_name):
-                setattr(self, attribute_name, extension['extn_value'].parsed)
-            if extension['critical'].native:
-                self._critical_extensions.add(name)
-
-        self._processed_extensions = True
+        pass
 
     @property
     def critical_extensions(self):
@@ -2219,10 +1784,7 @@ class Certificate(Sequence):
         :return:
             A set of unicode strings
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._critical_extensions
+        pass
 
     @property
     def private_key_usage_period_value(self):
@@ -2233,10 +1795,7 @@ class Certificate(Sequence):
         :return:
             None or a PrivateKeyUsagePeriod object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._private_key_usage_period_value
+        pass
 
     @property
     def subject_directory_attributes_value(self):
@@ -2247,10 +1806,7 @@ class Certificate(Sequence):
         :return:
             None or a SubjectDirectoryAttributes object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._subject_directory_attributes_value
+        pass
 
     @property
     def key_identifier_value(self):
@@ -2262,10 +1818,7 @@ class Certificate(Sequence):
         :return:
             None or an OctetString object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._key_identifier_value
+        pass
 
     @property
     def key_usage_value(self):
@@ -2276,10 +1829,7 @@ class Certificate(Sequence):
         :return:
             None or a KeyUsage
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._key_usage_value
+        pass
 
     @property
     def subject_alt_name_value(self):
@@ -2292,10 +1842,7 @@ class Certificate(Sequence):
         :return:
             None or a GeneralNames object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._subject_alt_name_value
+        pass
 
     @property
     def issuer_alt_name_value(self):
@@ -2306,10 +1853,7 @@ class Certificate(Sequence):
         :return:
             None or an x509.GeneralNames object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._issuer_alt_name_value
+        pass
 
     @property
     def basic_constraints_value(self):
@@ -2321,10 +1865,7 @@ class Certificate(Sequence):
         :return:
             None or a BasicConstraints object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._basic_constraints_value
+        pass
 
     @property
     def name_constraints_value(self):
@@ -2335,10 +1876,7 @@ class Certificate(Sequence):
         :return:
             None or a NameConstraints object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._name_constraints_value
+        pass
 
     @property
     def crl_distribution_points_value(self):
@@ -2349,10 +1887,7 @@ class Certificate(Sequence):
             None or a CRLDistributionPoints object
             extension
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._crl_distribution_points_value
+        pass
 
     @property
     def certificate_policies_value(self):
@@ -2365,10 +1900,7 @@ class Certificate(Sequence):
         :return:
             None or a CertificatePolicies object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._certificate_policies_value
+        pass
 
     @property
     def policy_mappings_value(self):
@@ -2380,10 +1912,7 @@ class Certificate(Sequence):
         :return:
             None or a PolicyMappings object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._policy_mappings_value
+        pass
 
     @property
     def authority_key_identifier_value(self):
@@ -2394,10 +1923,7 @@ class Certificate(Sequence):
         :return:
             None or an AuthorityKeyIdentifier object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._authority_key_identifier_value
+        pass
 
     @property
     def policy_constraints_value(self):
@@ -2408,10 +1934,7 @@ class Certificate(Sequence):
         :return:
             None or a PolicyConstraints object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._policy_constraints_value
+        pass
 
     @property
     def freshest_crl_value(self):
@@ -2421,10 +1944,7 @@ class Certificate(Sequence):
         :return:
             None or an CRLDistributionPoints object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._freshest_crl_value
+        pass
 
     @property
     def inhibit_any_policy_value(self):
@@ -2435,10 +1955,7 @@ class Certificate(Sequence):
         :return:
             None or a Integer object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._inhibit_any_policy_value
+        pass
 
     @property
     def extended_key_usage_value(self):
@@ -2449,10 +1966,7 @@ class Certificate(Sequence):
         :return:
             None or an ExtKeyUsageSyntax object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._extended_key_usage_value
+        pass
 
     @property
     def authority_information_access_value(self):
@@ -2463,10 +1977,7 @@ class Certificate(Sequence):
         :return:
             None or an AuthorityInfoAccessSyntax object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._authority_information_access_value
+        pass
 
     @property
     def subject_information_access_value(self):
@@ -2477,10 +1988,7 @@ class Certificate(Sequence):
         :return:
             None or a SubjectInfoAccessSyntax object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._subject_information_access_value
+        pass
 
     @property
     def tls_feature_value(self):
@@ -2491,10 +1999,7 @@ class Certificate(Sequence):
         :return:
             None or a Features object
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._tls_feature_value
+        pass
 
     @property
     def ocsp_no_check_value(self):
@@ -2506,10 +2011,7 @@ class Certificate(Sequence):
         :return:
             None or a Null object (if present)
         """
-
-        if not self._processed_extensions:
-            self._set_extensions()
-        return self._ocsp_no_check_value
+        pass
 
     @property
     def signature(self):
@@ -2517,8 +2019,7 @@ class Certificate(Sequence):
         :return:
             A byte string of the signature
         """
-
-        return self['signature_value'].native
+        pass
 
     @property
     def signature_algo(self):
@@ -2526,8 +2027,7 @@ class Certificate(Sequence):
         :return:
             A unicode string of "rsassa_pkcs1v15", "rsassa_pss", "dsa", "ecdsa"
         """
-
-        return self['signature_algorithm'].signature_algo
+        pass
 
     @property
     def hash_algo(self):
@@ -2536,8 +2036,7 @@ class Certificate(Sequence):
             A unicode string of "md2", "md5", "sha1", "sha224", "sha256",
             "sha384", "sha512", "sha512_224", "sha512_256"
         """
-
-        return self['signature_algorithm'].hash_algo
+        pass
 
     @property
     def public_key(self):
@@ -2545,8 +2044,7 @@ class Certificate(Sequence):
         :return:
             The PublicKeyInfo object for this certificate
         """
-
-        return self['tbs_certificate']['subject_public_key_info']
+        pass
 
     @property
     def subject(self):
@@ -2554,8 +2052,7 @@ class Certificate(Sequence):
         :return:
             The Name object for the subject of this certificate
         """
-
-        return self['tbs_certificate']['subject']
+        pass
 
     @property
     def issuer(self):
@@ -2563,8 +2060,7 @@ class Certificate(Sequence):
         :return:
             The Name object for the issuer of this certificate
         """
-
-        return self['tbs_certificate']['issuer']
+        pass
 
     @property
     def serial_number(self):
@@ -2572,8 +2068,7 @@ class Certificate(Sequence):
         :return:
             An integer of the certificate's serial number
         """
-
-        return self['tbs_certificate']['serial_number'].native
+        pass
 
     @property
     def key_identifier(self):
@@ -2582,11 +2077,7 @@ class Certificate(Sequence):
             None or a byte string of the certificate's key identifier from the
             key identifier extension
         """
-
-        if not self.key_identifier_value:
-            return None
-
-        return self.key_identifier_value.native
+        pass
 
     @property
     def issuer_serial(self):
@@ -2596,10 +2087,7 @@ class Certificate(Sequence):
             the ascii character ":", concatenated with the serial number as
             an ascii string
         """
-
-        if self._issuer_serial is None:
-            self._issuer_serial = self.issuer.sha256 + b':' + str(self.serial_number).encode('ascii')
-        return self._issuer_serial
+        pass
 
     @property
     def not_valid_after(self):
@@ -2607,7 +2095,7 @@ class Certificate(Sequence):
         :return:
             A datetime of latest time when the certificate is still valid
         """
-        return self['tbs_certificate']['validity']['not_after'].native
+        pass
 
     @property
     def not_valid_before(self):
@@ -2615,7 +2103,7 @@ class Certificate(Sequence):
         :return:
             A datetime of the earliest time when the certificate is valid
         """
-        return self['tbs_certificate']['validity']['not_before'].native
+        pass
 
     @property
     def authority_key_identifier(self):
@@ -2624,11 +2112,7 @@ class Certificate(Sequence):
             None or a byte string of the key_identifier from the authority key
             identifier extension
         """
-
-        if not self.authority_key_identifier_value:
-            return None
-
-        return self.authority_key_identifier_value['key_identifier'].native
+        pass
 
     @property
     def authority_issuer_serial(self):
@@ -2639,18 +2123,7 @@ class Certificate(Sequence):
             character ":", concatenated with the serial number from the
             authority key identifier extension as an ascii string
         """
-
-        if self._authority_issuer_serial is False:
-            akiv = self.authority_key_identifier_value
-            if akiv and akiv['authority_cert_issuer'].native:
-                issuer = self.authority_key_identifier_value['authority_cert_issuer'][0].chosen
-                # We untag the element since it is tagged via being a choice from GeneralName
-                issuer = issuer.untag()
-                authority_serial = self.authority_key_identifier_value['authority_cert_serial_number'].native
-                self._authority_issuer_serial = issuer.sha256 + b':' + str(authority_serial).encode('ascii')
-            else:
-                self._authority_issuer_serial = None
-        return self._authority_issuer_serial
+        pass
 
     @property
     def crl_distribution_points(self):
@@ -2660,10 +2133,7 @@ class Certificate(Sequence):
         :return:
             A list of zero or more DistributionPoint objects
         """
-
-        if self._crl_distribution_points is None:
-            self._crl_distribution_points = self._get_http_crl_distribution_points(self.crl_distribution_points_value)
-        return self._crl_distribution_points
+        pass
 
     @property
     def delta_crl_distribution_points(self):
@@ -2673,10 +2143,7 @@ class Certificate(Sequence):
         :return:
             A list of zero or more DistributionPoint objects
         """
-
-        if self._delta_crl_distribution_points is None:
-            self._delta_crl_distribution_points = self._get_http_crl_distribution_points(self.freshest_crl_value)
-        return self._delta_crl_distribution_points
+        pass
 
     def _get_http_crl_distribution_points(self, crl_distribution_points):
         """
@@ -2689,25 +2156,7 @@ class Certificate(Sequence):
         :return:
             A list of zero or more DistributionPoint objects
         """
-
-        output = []
-
-        if crl_distribution_points is None:
-            return []
-
-        for distribution_point in crl_distribution_points:
-            distribution_point_name = distribution_point['distribution_point']
-            if distribution_point_name is VOID:
-                continue
-            # RFC 5280 indicates conforming CA should not use the relative form
-            if distribution_point_name.name == 'name_relative_to_crl_issuer':
-                continue
-            # This library is currently only concerned with HTTP-based CRLs
-            for general_name in distribution_point_name.chosen:
-                if general_name.name == 'uniform_resource_identifier':
-                    output.append(distribution_point)
-
-        return output
+        pass
 
     @property
     def ocsp_urls(self):
@@ -2716,20 +2165,7 @@ class Certificate(Sequence):
             A list of zero or more unicode strings of the OCSP URLs for this
             cert
         """
-
-        if not self.authority_information_access_value:
-            return []
-
-        output = []
-        for entry in self.authority_information_access_value:
-            if entry['access_method'].native == 'ocsp':
-                location = entry['access_location']
-                if location.name != 'uniform_resource_identifier':
-                    continue
-                url = location.native
-                if url.lower().startswith(('http://', 'https://', 'ldap://', 'ldaps://')):
-                    output.append(url)
-        return output
+        pass
 
     @property
     def valid_domains(self):
@@ -2738,33 +2174,7 @@ class Certificate(Sequence):
             A list of unicode strings of valid domain names for the certificate.
             Wildcard certificates will have a domain in the form: *.example.com
         """
-
-        if self._valid_domains is None:
-            self._valid_domains = []
-
-            # For the subject alt name extension, we can look at the name of
-            # the choice selected since it distinguishes between domain names,
-            # email addresses, IPs, etc
-            if self.subject_alt_name_value:
-                for general_name in self.subject_alt_name_value:
-                    if general_name.name == 'dns_name' and general_name.native not in self._valid_domains:
-                        self._valid_domains.append(general_name.native)
-
-            # If there was no subject alt name extension, and the common name
-            # in the subject looks like a domain, that is considered the valid
-            # list. This is done because according to
-            # https://tools.ietf.org/html/rfc6125#section-6.4.4, the common
-            # name should not be used if the subject alt name is present.
-            else:
-                pattern = re.compile('^(\\*\\.)?(?:[a-zA-Z0-9](?:[a-zA-Z0-9\\-]*[a-zA-Z0-9])?\\.)+[a-zA-Z]{2,}$')
-                for rdn in self.subject.chosen:
-                    for name_type_value in rdn:
-                        if name_type_value['type'].native == 'common_name':
-                            value = name_type_value['value'].native
-                            if pattern.match(value):
-                                self._valid_domains.append(value)
-
-        return self._valid_domains
+        pass
 
     @property
     def valid_ips(self):
@@ -2772,16 +2182,7 @@ class Certificate(Sequence):
         :return:
             A list of unicode strings of valid IP addresses for the certificate
         """
-
-        if self._valid_ips is None:
-            self._valid_ips = []
-
-            if self.subject_alt_name_value:
-                for general_name in self.subject_alt_name_value:
-                    if general_name.name == 'ip_address':
-                        self._valid_ips.append(general_name.native)
-
-        return self._valid_ips
+        pass
 
     @property
     def ca(self):
@@ -2789,8 +2190,7 @@ class Certificate(Sequence):
         :return;
             A boolean - if the certificate is marked as a CA
         """
-
-        return self.basic_constraints_value and self.basic_constraints_value['ca'].native
+        pass
 
     @property
     def max_path_length(self):
@@ -2798,10 +2198,7 @@ class Certificate(Sequence):
         :return;
             None or an integer of the maximum path length
         """
-
-        if not self.ca:
-            return None
-        return self.basic_constraints_value['path_len_constraint'].native
+        pass
 
     @property
     def self_issued(self):
@@ -2810,10 +2207,7 @@ class Certificate(Sequence):
             A boolean - if the certificate is self-issued, as defined by RFC
             5280
         """
-
-        if self._self_issued is None:
-            self._self_issued = self.subject == self.issuer
-        return self._self_issued
+        pass
 
     @property
     def self_signed(self):
@@ -2828,18 +2222,7 @@ class Certificate(Sequence):
             will need to be verified. See the certvalidator package for
             one possible solution.
         """
-
-        if self._self_signed is None:
-            self._self_signed = 'no'
-            if self.self_issued:
-                if self.key_identifier:
-                    if not self.authority_key_identifier:
-                        self._self_signed = 'maybe'
-                    elif self.authority_key_identifier == self.key_identifier:
-                        self._self_signed = 'maybe'
-                else:
-                    self._self_signed = 'maybe'
-        return self._self_signed
+        pass
 
     @property
     def sha1(self):
@@ -2847,10 +2230,7 @@ class Certificate(Sequence):
         :return:
             The SHA-1 hash of the DER-encoded bytes of this complete certificate
         """
-
-        if self._sha1 is None:
-            self._sha1 = hashlib.sha1(self.dump()).digest()
-        return self._sha1
+        pass
 
     @property
     def sha1_fingerprint(self):
@@ -2859,8 +2239,7 @@ class Certificate(Sequence):
             A unicode string of the SHA-1 hash, formatted using hex encoding
             with a space between each pair of characters, all uppercase
         """
-
-        return ' '.join('%02X' % c for c in list(self.sha1))
+        pass
 
     @property
     def sha256(self):
@@ -2869,10 +2248,7 @@ class Certificate(Sequence):
             The SHA-256 hash of the DER-encoded bytes of this complete
             certificate
         """
-
-        if self._sha256 is None:
-            self._sha256 = hashlib.sha256(self.dump()).digest()
-        return self._sha256
+        pass
 
     @property
     def sha256_fingerprint(self):
@@ -2881,8 +2257,7 @@ class Certificate(Sequence):
             A unicode string of the SHA-256 hash, formatted using hex encoding
             with a space between each pair of characters, all uppercase
         """
-
-        return ' '.join('%02X' % c for c in list(self.sha256))
+        pass
 
     def is_valid_domain_ip(self, domain_ip):
         """
@@ -2895,60 +2270,7 @@ class Certificate(Sequence):
         :return:
             A boolean - if the domain or IP is valid for the certificate
         """
-
-        if not isinstance(domain_ip, str):
-            raise TypeError(unwrap(
-                '''
-                domain_ip must be a unicode string, not %s
-                ''',
-                type_name(domain_ip)
-            ))
-
-        encoded_domain_ip = domain_ip.encode('idna').decode('ascii').lower()
-
-        is_ipv6 = encoded_domain_ip.find(':') != -1
-        is_ipv4 = not is_ipv6 and re.match('^\\d+\\.\\d+\\.\\d+\\.\\d+$', encoded_domain_ip)
-        is_domain = not is_ipv6 and not is_ipv4
-
-        # Handle domain name checks
-        if is_domain:
-            if not self.valid_domains:
-                return False
-
-            domain_labels = encoded_domain_ip.split('.')
-
-            for valid_domain in self.valid_domains:
-                encoded_valid_domain = valid_domain.encode('idna').decode('ascii').lower()
-                valid_domain_labels = encoded_valid_domain.split('.')
-
-                # The domain must be equal in label length to match
-                if len(valid_domain_labels) != len(domain_labels):
-                    continue
-
-                if valid_domain_labels == domain_labels:
-                    return True
-
-                is_wildcard = self._is_wildcard_domain(encoded_valid_domain)
-                if is_wildcard and self._is_wildcard_match(domain_labels, valid_domain_labels):
-                    return True
-
-            return False
-
-        # Handle IP address checks
-        if not self.valid_ips:
-            return False
-
-        family = socket.AF_INET if is_ipv4 else socket.AF_INET6
-        normalized_ip = inet_pton(family, encoded_domain_ip)
-
-        for valid_ip in self.valid_ips:
-            valid_family = socket.AF_INET if valid_ip.find('.') != -1 else socket.AF_INET6
-            normalized_valid_ip = inet_pton(valid_family, valid_ip)
-
-            if normalized_valid_ip == normalized_ip:
-                return True
-
-        return False
+        pass
 
     def _is_wildcard_domain(self, domain):
         """
@@ -2962,26 +2284,7 @@ class Certificate(Sequence):
         :return:
             A boolean - if the domain is a valid wildcard domain
         """
-
-        # The * character must be present for a wildcard match, and if there is
-        # most than one, it is an invalid wildcard specification
-        if domain.count('*') != 1:
-            return False
-
-        labels = domain.lower().split('.')
-
-        if not labels:
-            return False
-
-        # Wildcards may only appear in the left-most label
-        if labels[0].find('*') == -1:
-            return False
-
-        # Wildcards may not be embedded in an A-label from an IDN
-        if labels[0][0:4] == 'xn--':
-            return False
-
-        return True
+        pass
 
     def _is_wildcard_match(self, domain_labels, valid_domain_labels):
         """
@@ -2999,26 +2302,7 @@ class Certificate(Sequence):
         :return:
             A boolean - if the domain matches the valid domain
         """
-
-        first_domain_label = domain_labels[0]
-        other_domain_labels = domain_labels[1:]
-
-        wildcard_label = valid_domain_labels[0]
-        other_valid_domain_labels = valid_domain_labels[1:]
-
-        # The wildcard is only allowed in the first label, so if
-        # The subsequent labels are not equal, there is no match
-        if other_domain_labels != other_valid_domain_labels:
-            return False
-
-        if wildcard_label == '*':
-            return True
-
-        wildcard_regex = re.compile('^' + wildcard_label.replace('*', '.*') + '$')
-        if wildcard_regex.match(first_domain_label):
-            return True
-
-        return False
+        pass
 
 
 # The structures are taken from the OpenSSL source file x_x509a.c, and specify

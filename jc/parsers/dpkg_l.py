@@ -83,7 +83,7 @@ Examples:
         "desired": "purge",
         "status": "not installed"
       },
-      ...
+      pass
     ]
 
     $ dpkg -l | jc --dpkg-l -p -r
@@ -123,7 +123,7 @@ Examples:
         "architecture": "all",
         "description": "add and remove users and groups"
       },
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -156,43 +156,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema:
     """
-    desired_map = {
-        'u': 'unknown',
-        'i': 'install',
-        'r': 'remove',
-        'p': 'purge',
-        'h': 'hold'
-    }
-
-    status_map = {
-        'n': 'not installed',
-        'i': 'installed',
-        'c': 'config-files',
-        'u': 'unpacked',
-        'f': 'failed config',
-        'h': 'half installed',
-        'w': 'trigger await',
-        't': 'trigger pending'
-    }
-
-    err_map = {
-        'r': 'reinstall required'
-    }
-
-    for entry in proc_data:
-        if 'codes' in entry:
-            desired, status, *err = list(entry['codes'].lower())
-
-            if desired in desired_map:
-                entry['desired'] = desired_map[desired]
-
-            if status in status_map:
-                entry['status'] = status_map[status]
-
-            if err and err[0] in err_map:
-                entry['error'] = err_map[err[0]]
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -209,31 +173,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    working_list = []
-    raw_output = []
-    header_found = False
-
-    if jc.utils.has_data(data):
-
-        # clean up headers
-        for line in filter(None, data.splitlines()):
-            if 'Architecture' in line:
-                header_found = True
-                working_list.append(line.lower().replace('||/', 'codes'))
-                continue
-
-            if '=========' in line:
-                continue
-
-            if header_found:
-                working_list.append(line)
-
-        raw_output = jc.parsers.universal.simple_table_parse(working_list)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

@@ -131,7 +131,7 @@ Examples:
         "install_date_epoch": 1565891588,
         "install_date_epoch_utc": null
       },
-      ...
+      pass
     ]
 
     $ rpm -qia | jc --rpm-qi -p -r
@@ -177,7 +177,7 @@ Examples:
         "summary": "Legacy data for kbd package",
         "description": "The kbd-legacy package contains original keymaps..."
       },
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -209,32 +209,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {'epoch', 'size', 'installed_size'}
-    split_list = {'depends', 'pre_depends', 'recommends', 'suggests', 'conflicts',
-                  'breaks', 'tag', 'replaces'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-            # for apt-cache show output
-            if key in split_list:
-                val_list = entry[key].split(',')
-                val_list = [x.strip() for x in val_list if x]
-                entry[key] = val_list
-
-        if 'build_date' in entry:
-            timestamp = jc.utils.timestamp(entry['build_date'], format_hint=(3000,))
-            entry['build_epoch'] = timestamp.naive
-            entry['build_epoch_utc'] = timestamp.utc
-
-        if 'install_date' in entry:
-            timestamp = jc.utils.timestamp(entry['install_date'], format_hint=(3000,))
-            entry['install_date_epoch'] = timestamp.naive
-            entry['install_date_epoch_utc'] = timestamp.utc
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -251,55 +226,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-    entry_obj = {}
-    desc_entry = False
-    desc_en_entry = False
-    description = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            split_line = line.split(': ', maxsplit=1)
-
-            if (split_line[0].startswith('Name') or split_line[0] == 'Package') and len(split_line) == 2:
-                if entry_obj:
-                    if description:
-                        entry_obj['description'] = ' '.join(description)
-                    raw_output.append(entry_obj)
-                    entry_obj = {}
-                    desc_entry = False
-                    desc_en_entry = False
-
-            if line.startswith('Description :'):
-                desc_entry = True
-                description = []
-                continue
-
-            # for apt-cache show output
-            if line.startswith('Description-en:'):
-                desc_en_entry = True
-                description = [split_line[1].strip()]
-                continue
-
-            if desc_entry:
-                description.append(line)
-                continue
-
-            if desc_en_entry and line.startswith(' '):
-                description.append(line)
-                continue
-
-            if len(split_line) == 2:
-                keyname = jc.utils.normalize_key(split_line[0])
-                entry_obj[keyname] = split_line[1].strip()
-
-        if entry_obj:
-            if description:
-                entry_obj['description'] = ' '.join(description)
-            raw_output.append(entry_obj)
-
-    return raw_output if raw else _process(raw_output)
+    pass

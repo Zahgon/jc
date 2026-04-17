@@ -99,26 +99,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    key_map = {
-        'needrestart_ver': 'version',
-        'needrestart_kcur': 'running_kernel_version',
-        'needrestart_kexp': 'expected_kernel_version',
-        'needrestart_ksta': 'kernel_status',
-        'needrestart_svc': 'service',
-        'needrestart_cont': 'container',
-        'needrestart_sess': 'session',
-        'needrestart_pid': 'pid'
-    }
-
-    for key, val in proc_data.copy().items():
-        if key == 'needrestart_ksta':
-            proc_data[key] = jc.utils.convert_to_int(val)
-
-        if key in key_map:
-            proc_data[key_map[key]] = proc_data[key]
-            del proc_data[key]
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -139,52 +120,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    sess_list: List[str] = []
-    svc_list: List[str] = []
-    pid_list: List[str] = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            if any([
-                line.startswith('NEEDRESTART-VER'),
-                line.startswith('NEEDRESTART-KCUR'),
-                line.startswith('NEEDRESTART-KEXP'),
-                line.startswith('NEEDRESTART-KSTA'),
-                line.startswith('NEEDRESTART-CONT')
-            ]):
-                key, val = line.split(':', maxsplit=1)
-                key = jc.utils.normalize_key(key)
-                raw_output[key] = val.strip()
-                continue
-
-            if line.startswith('NEEDRESTART-SESS'):
-                _, val = line.split(':', maxsplit=1)
-                sess_list.append(val.strip())
-                continue
-
-            if line.startswith('NEEDRESTART-SVC'):
-                _, val = line.split(':', maxsplit=1)
-                svc_list.append(val.strip())
-                continue
-
-            if line.startswith('NEEDRESTART-PID'):
-                _, val = line.split(':', maxsplit=1)
-                pid_list.append(val.strip())
-                continue
-
-        if sess_list:
-            raw_output['needrestart_sess'] = sess_list
-
-        if svc_list:
-            raw_output['needrestart_svc'] = svc_list
-
-        if pid_list:
-            raw_output['needrestart_pid'] = pid_list
-
-    return raw_output if raw else _process(raw_output)
+    pass

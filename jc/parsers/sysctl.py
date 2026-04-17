@@ -37,7 +37,7 @@ Examples:
       "user.bc_string_max": 1000,
       "user.coll_weights_max": 2,
       "user.expr_nest_max": 32
-      ...
+      pass
     }
 
     $ sysctl -a | jc --sysctl -p -r
@@ -49,7 +49,7 @@ Examples:
       "user.bc_string_max": "1000",
       "user.coll_weights_max": "2",
       "user.expr_nest_max": "32",
-      ...
+      pass
     }
 """
 import jc.utils
@@ -81,15 +81,7 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    for key in proc_data:
-        try:
-            proc_data[key] = int(proc_data[key])
-        except (ValueError):
-            try:
-                proc_data[key] = float(proc_data[key])
-            except (ValueError):
-                pass
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -106,56 +98,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    if jc.utils.has_data(data):
-        data = data.splitlines()
-
-        # linux uses = and bsd uses :
-        if ' = ' in data[0]:
-            delim = ' = '
-        else:
-            delim = ': '
-
-        for line in data:
-            linedata = line.split(delim, maxsplit=1)
-
-            # bsd adds values to newlines, which need to be fixed up with this try/except block
-            try:
-                key = linedata[0]
-                value = linedata[1]
-
-                # syctl -a repeats some keys on linux. Append values from repeating keys
-                # to the previous key value
-                if key in raw_output:
-                    existing_value = raw_output[key]
-                    raw_output[key] = existing_value + '\n' + value
-                    continue
-
-                # fix for weird multiline output in bsd
-                # if the key looks strange (has spaces or no dots) then it's probably a value field
-                # on a separate line. in this case, just append it to the previous key in the dictionary.
-                if '.' not in key or ' ' in key:
-                    previous_key = [*raw_output.keys()][-1]
-                    raw_output[previous_key] = raw_output[previous_key] + '\n' + line
-                    continue
-
-                # if the key looks normal then just add to the dictionary as normal
-                else:
-                    raw_output[key] = value
-                    continue
-
-            # if there is an IndexError exception, then there was no delimiter in the line.
-            # In this case just append the data line as a value to the previous key.
-            except IndexError:
-                prior_key = [*raw_output.keys()][-1]
-                raw_output[prior_key] = raw_output[prior_key] + '\n' + line
-                continue
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

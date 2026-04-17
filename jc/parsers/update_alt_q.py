@@ -156,19 +156,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    int_list = {'priority'}
-
-    if 'value' in proc_data:
-        if proc_data['value'] == 'none':
-            proc_data['value'] = None
-
-    if 'alternatives' in proc_data:
-        for index, alt in enumerate(proc_data['alternatives']):
-            for key in alt:
-                if key in int_list:
-                    proc_data['alternatives'][index][key] = jc.utils.convert_to_int(proc_data['alternatives'][index][key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -189,76 +177,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    slaves: List = []
-    alt_obj: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            line_list = line.split(maxsplit=1)
-
-            if line.startswith('Name: '):
-                raw_output['name'] = line_list[1]
-                continue
-
-            if line.startswith('Link: '):
-                raw_output['link'] = line_list[1]
-                continue
-
-            if line.startswith('Slaves:'):
-                continue
-
-            if line.startswith(' '):
-                s_name = line_list[0].strip()
-                s_path = line_list[1]
-                slaves.append(
-                    {
-                        "name": s_name,
-                        "path": s_path
-                    }
-                )
-                continue
-
-            if line.startswith('Status: '):
-                if slaves:
-                    raw_output['slaves'] = slaves
-                    slaves = []
-                raw_output['status'] = line_list[1]
-                continue
-
-            if line.startswith('Best: '):
-                raw_output['best'] = line_list[1]
-                continue
-
-            if line.startswith('Value: '):
-                raw_output['value'] = line_list[1]
-                continue
-
-            if line.startswith('Alternative: '):
-                if not 'alternatives' in raw_output:
-                    raw_output['alternatives'] = []
-
-                if alt_obj:
-                    if slaves:
-                        alt_obj['slaves'] = slaves
-                        slaves = []
-
-                    raw_output['alternatives'].append(alt_obj)
-
-                alt_obj = {"alternative": line_list[1]}
-                continue
-
-            if line.startswith('Priority: '):
-                alt_obj['priority'] = line_list[1]
-                continue
-
-        if alt_obj:
-            if slaves:
-                alt_obj['slaves'] = slaves
-            raw_output['alternatives'].append(alt_obj)
-
-    return raw_output if raw else _process(raw_output)
+    pass

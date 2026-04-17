@@ -72,49 +72,15 @@ class _Column(Enum):
 
     @classmethod
     def from_header(cls, header: str) -> "_Column":
-        if (header == "NAME") or (header == "Filename"):
-            return cls.NAME
-        elif (header == "TYPE") or (header == "Type"):
-            return cls.TYPE
-        elif (header == "SIZE") or (header == "Size"):
-            return cls.SIZE
-        elif (header == "USED") or (header == "Used"):
-            return cls.USED
-        elif (header == "PRIO") or (header == "Priority"):
-            return cls.PRIO
-        elif header == "LABEL":
-            return cls.LABEL
-        elif header == "UUID":
-            return cls.UUID
-        else:
-            raise ParseError(f"Unknown header: {header}")
+        pass
 
 
 def _parse_size(size: str) -> int:
-    power = None
-    if size[-1] == "B":
-        power = 0
-    if size[-1] == "K":
-        power = 1
-    elif size[-1] == "M":
-        power = 2
-    elif size[-1] == "G":
-        power = 3
-    elif size[-1] == "T":
-        power = 4
-
-    multiplier = 1024**power if power is not None else 1024
-
-    return (int(size[:-1]) if power is not None else int(size)) * multiplier
+    pass
 
 
 def _value(value: str, column: _Column) -> _Value:
-    if column == _Column.SIZE or column == _Column.USED:
-        return _parse_size(value)
-    elif column == _Column.PRIO:
-        return int(value)
-    else:
-        return value
+    pass
 
 
 def _process(proc_data: List[Dict]) -> List[Dict]:
@@ -129,7 +95,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(data: str, raw: bool = False, quiet: bool = False) -> List[_Entry]:
@@ -146,28 +112,4 @@ def parse(data: str, raw: bool = False, quiet: bool = False) -> List[_Entry]:
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[dict] = []
-
-    if jc.utils.has_data(data):
-        lines = iter(data.splitlines())
-        headers = next(lines)
-        columns = headers.split()
-        for each_line in lines:
-            line = each_line.split()
-            diff = len(columns) - len(line)
-            if not 0 <= diff <= 2:
-                raise ParseError(
-                    f"Number of columns ({len(line)}) in line does not match number of headers ({len(columns)})"
-                )
-
-            document: _Entry = {}
-            for each_column, value in zip(columns, line):
-                column = _Column.from_header(each_column)
-                document[column.value] = _value(value, column)
-
-            raw_output.append(document)
-
-    return raw_output if raw else _process(raw_output)
+    pass

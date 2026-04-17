@@ -90,8 +90,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    # no further processing
-    return proc_data
+    pass
 
 
 def parse(
@@ -112,55 +111,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    package: Dict = {}
-    last_key: str = ''
-    last_key_data: List = []
-
-    # Clear any blank lines
-    cleandata = list(filter(None, data.splitlines()))
-
-    if jc.utils.has_data(data):
-
-        for row in cleandata:
-            if row.startswith('---'):
-                if last_key_data:
-                    package[last_key] = package[last_key] + '\n' + '\n'.join(last_key_data)
-
-                raw_output.append(package)
-                package = {}
-                last_key = ''
-                last_key_data = []
-                continue
-
-            if not row.startswith(' '):
-                item_key = row.split(': ', maxsplit=1)[0].lower().replace('-', '_')
-                item_value: Optional[str] = row.split(': ', maxsplit=1)[1]
-
-                if item_value == '':
-                    item_value = None
-
-                if last_key_data and last_key != item_key:
-                    if not isinstance(package[last_key], str):
-                        package[last_key] = ''
-                    package[last_key] = package[last_key] + '\n' + '\n'.join(last_key_data)
-                    last_key_data = []
-
-                package[item_key] = item_value
-                last_key = item_key
-                continue
-
-            if row.startswith(' '):
-                last_key_data.append(row.strip())
-                continue
-
-        if package:
-            if last_key_data:
-                package[last_key] = package[last_key] + '\n' + '\n'.join(last_key_data)
-
-            raw_output.append(package)
-
-    return raw_output if raw else _process(raw_output)
+    pass

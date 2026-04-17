@@ -16,7 +16,4 @@ def fill_width(bytes_, width):
     :return:
         A byte string of the width specified
     """
-
-    while len(bytes_) < width:
-        bytes_ = b'\x00' + bytes_
-    return bytes_
+    pass

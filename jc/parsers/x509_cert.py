@@ -437,24 +437,17 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def _i2b(integer: int) -> bytes:
     """Convert long integers into a bytes object (big endian)"""
-    return integer.to_bytes((integer.bit_length() + 7) // 8, byteorder='big')
+    pass
 
 
 def _b2a(byte_string: bytes) -> str:
     """Convert a byte string to a colon-delimited hex ascii string"""
-    # need try/except since separator was only introduced in python 3.8.
-    # provides compatibility for python 3.6 and 3.7.
-    try:
-      return binascii.hexlify(byte_string, ':').decode('utf-8')
-    except TypeError:
-      hex_string = binascii.hexlify(byte_string).decode('utf-8')
-      colon_seperated = ':'.join(hex_string[i:i+2] for i in range(0, len(hex_string), 2))
-      return colon_seperated
+    pass
 
 
 def _fix_objects(obj):
@@ -462,81 +455,7 @@ def _fix_objects(obj):
     Recursively traverse the nested dictionary or list and convert objects
     into JSON serializable types.
     """
-    if isinstance(obj, tuple):
-        obj = list(obj)
-
-    if isinstance(obj, set):
-        obj = sorted(list(obj))
-
-    if isinstance(obj, OrderedDict):
-        obj = dict(obj)
-
-    if isinstance(obj, dict):
-        for k, v in obj.copy().items():
-            if k == 'serial_number':
-                # according to the spec this field can be string or integer
-                if isinstance(v, int):
-                    v_str = str(v)
-                    if v < 0:
-                        v_hex = "(Negative)" + _b2a(_i2b(abs(v)))
-                    else:
-                        v_hex = _b2a(_i2b(v))
-                else:
-                    v_str = str(v)
-                    v_hex = _b2a(v_str.encode())
-                obj.update(
-                    {
-                        k: v_hex,
-                        f'{k}_str': v_str
-                    }
-                )
-                continue
-
-            if k == 'modulus':
-                obj.update({k: _b2a(_i2b(v))})
-                continue
-
-            if isinstance(v, datetime):
-                iso = v.isoformat()
-                v = int(round(v.timestamp()))
-                obj.update({k: v, f'{k}_iso': iso})
-                continue
-
-            if isinstance(v, bytes):
-                v = _b2a(v)
-                obj.update({k: v})
-                continue
-
-            if isinstance(v, tuple):
-                v = list(v)
-                obj.update({k: v})
-
-            if isinstance(v, set):
-                v = sorted(list(v))
-                obj.update({k: v})
-
-            if isinstance(v, OrderedDict):
-                v = dict(v)
-                obj.update({k: v})
-
-            if isinstance(v, dict):
-                obj.update({k: _fix_objects(v)})
-                continue
-
-            if isinstance(v, list):
-                newlist = []
-                for i in v:
-                    newlist.append(_fix_objects(i))
-                obj.update({k: newlist})
-                continue
-
-    if isinstance(obj, list):
-        new_list = []
-        for i in obj:
-            new_list.append(_fix_objects(i))
-        obj = new_list
-
-    return obj
+    pass
 
 
 def parse(
@@ -557,28 +476,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc_global.quiet = quiet  # to inject quiet setting into asn1crypto library
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-        # convert to bytes, if not already, for PEM detection since that's
-        # what pem.detect() needs. (cli.py will auto-convert to UTF-8 if it can)
-        try:
-            der_bytes = bytes(data, 'utf-8')  # type: ignore
-        except TypeError:
-            der_bytes = data  # type: ignore
-
-        certs = []
-        if pem.detect(der_bytes):
-            for type_name, headers, der_bytes in pem.unarmor(der_bytes, multiple=True):
-                if type_name == 'CERTIFICATE':
-                    certs.append(x509.Certificate.load(der_bytes))
-
-        else:
-            certs.append(x509.Certificate.load(der_bytes))
-
-        raw_output = [_fix_objects(cert.native) for cert in certs]
-
-    return raw_output if raw else _process(raw_output)
+    pass

@@ -51,7 +51,7 @@ Examples:
         "CPU3": 0,
         "CPU4": 0
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -85,7 +85,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -106,25 +106,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        cleandata =  list(filter(None, data.splitlines()))
-        cleandata[0] = 'counter ' + cleandata[0]
-        raw_output = simple_table_parse(cleandata)
-
-        for item in raw_output:
-            if 'counter' in item:
-                item['counter'] = item['counter'][:-1]
-
-            for key in item:
-                try:
-                    item[key] = int(item[key])
-                except Exception:
-                    pass
-
-    return raw_output if raw else _process(raw_output)
+    pass

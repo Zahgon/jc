@@ -111,8 +111,7 @@ def _process(proc_data):
 
         List of Dictionaries. Each dictionary represents a YAML document.
     """
-    # No further processing
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -129,38 +128,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries representing the YAML documents.
     """
-    # check if yaml library is installed and fail gracefully if it is not
-    try:
-        from ruamel.yaml import YAML
-    except Exception:
-        raise LibraryNotInstalled('The ruamel.yaml library is not installed.')
-
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    if jc.utils.has_data(data):
-
-        # monkey patch to disable plugins since we don't use them and in
-        # ruamel.yaml versions prior to 0.17.0 the use of __file__ in the
-        # plugin code is incompatible with the pyoxidizer packager
-        YAML.official_plug_ins = lambda a: []
-
-        # use the default `typ` to correctly load values that start with a literal "="
-        yaml = YAML(typ=None)
-
-        # modify the timestamp constructor to output datetime objects as
-        # strings since JSON does not support datetime objects
-        yaml.constructor.yaml_constructors['tag:yaml.org,2002:timestamp'] = \
-            yaml.constructor.yaml_constructors['tag:yaml.org,2002:str']
-
-        # modify the value constructor to output values starting with a
-        # literal "=" as a string.
-        yaml.constructor.yaml_constructors['tag:yaml.org,2002:value'] =  \
-            yaml.constructor.yaml_constructors['tag:yaml.org,2002:str']
-
-        for document in yaml.load_all(data):
-            raw_output.append(document)
-
-    return raw_output if raw else _process(raw_output)
+    pass

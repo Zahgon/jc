@@ -147,17 +147,7 @@ class _ECPoint():
         :return:
             An ECPoint object
         """
-
-        x_bytes = int(math.ceil(math.log(x, 2) / 8.0))
-        y_bytes = int(math.ceil(math.log(y, 2) / 8.0))
-
-        num_bytes = max(x_bytes, y_bytes)
-
-        byte_string = b'\x04'
-        byte_string += int_to_bytes(x, width=num_bytes)
-        byte_string += int_to_bytes(y, width=num_bytes)
-
-        return cls(byte_string)
+        pass
 
     def to_coords(self):
         """
@@ -167,31 +157,7 @@ class _ECPoint():
         :return:
             A 2-element tuple containing integers (X, Y)
         """
-
-        data = self.native
-        first_byte = data[0:1]
-
-        # Uncompressed
-        if first_byte == b'\x04':
-            remaining = data[1:]
-            field_len = len(remaining) // 2
-            x = int_from_bytes(remaining[0:field_len])
-            y = int_from_bytes(remaining[field_len:])
-            return (x, y)
-
-        if first_byte not in set([b'\x02', b'\x03']):
-            raise ValueError(unwrap(
-                '''
-                Invalid EC public key - first byte is incorrect
-                '''
-            ))
-
-        raise ValueError(unwrap(
-            '''
-            Compressed representations of EC public keys are not supported due
-            to patent US6252960
-            '''
-        ))
+        pass
 
 
 class ECPoint(OctetString, _ECPoint):
@@ -524,28 +490,7 @@ class ECDomainParameters(Choice):
 
     @property
     def key_size(self):
-        if self.name == 'implicit_ca':
-            raise ValueError(unwrap(
-                '''
-                Unable to calculate key_size from ECDomainParameters
-                that are implicitly defined by the CA key
-                '''
-            ))
-
-        if self.name == 'specified':
-            order = self.chosen['order'].native
-            return math.ceil(math.log(order, 2.0) / 8.0)
-
-        oid = self.chosen.dotted
-        if oid not in NamedCurve._key_sizes:
-            raise ValueError(unwrap(
-                '''
-                The asn1crypto.keys.NamedCurve %s does not have a registered key length,
-                please call asn1crypto.keys.NamedCurve.register()
-                ''',
-                repr(oid)
-            ))
-        return NamedCurve._key_sizes[oid]
+        pass
 
 
 class ECPrivateKeyVersion(Integer):
@@ -601,17 +546,13 @@ class ECPrivateKey(Sequence):
         :param key_size:
             An integer byte length to encode the private_key to
         """
-
-        self._key_size = key_size
-        self._update_key_size()
+        pass
 
     def _update_key_size(self):
         """
         Ensure the private_key explicit encoding width is set
         """
-
-        if self._key_size is not None and isinstance(self['private_key'], IntegerOctetString):
-            self['private_key'].set_encoded_width(self._key_size)
+        pass
 
 
 class DSAParams(Sequence):
@@ -706,19 +647,7 @@ class PrivateKeyInfo(Sequence):
     ]
 
     def _private_key_spec(self):
-        algorithm = self['private_key_algorithm']['algorithm'].native
-        return {
-            'rsa': RSAPrivateKey,
-            'rsassa_pss': RSAPrivateKey,
-            'dsa': Integer,
-            'ec': ECPrivateKey,
-            # These should be treated as opaque octet strings according
-            # to RFC 8410
-            'x25519': OctetString,
-            'x448': OctetString,
-            'ed25519': OctetString,
-            'ed448': OctetString,
-        }[algorithm]
+        pass
 
     _spec_callbacks = {
         'private_key': _private_key_spec
@@ -743,59 +672,7 @@ class PrivateKeyInfo(Sequence):
         :return:
             A PrivateKeyInfo object
         """
-
-        if not isinstance(private_key, bytes) and not isinstance(private_key, Asn1Value):
-            raise TypeError(unwrap(
-                '''
-                private_key must be a byte string or Asn1Value, not %s
-                ''',
-                type_name(private_key)
-            ))
-
-        if algorithm == 'rsa' or algorithm == 'rsassa_pss':
-            if not isinstance(private_key, RSAPrivateKey):
-                private_key = RSAPrivateKey.load(private_key)
-            params = Null()
-        elif algorithm == 'dsa':
-            if not isinstance(private_key, DSAPrivateKey):
-                private_key = DSAPrivateKey.load(private_key)
-            params = DSAParams()
-            params['p'] = private_key['p']
-            params['q'] = private_key['q']
-            params['g'] = private_key['g']
-            public_key = private_key['public_key']
-            private_key = private_key['private_key']
-        elif algorithm == 'ec':
-            if not isinstance(private_key, ECPrivateKey):
-                private_key = ECPrivateKey.load(private_key)
-            else:
-                private_key = private_key.copy()
-            params = private_key['parameters']
-            del private_key['parameters']
-        else:
-            raise ValueError(unwrap(
-                '''
-                algorithm must be one of "rsa", "dsa", "ec", not %s
-                ''',
-                repr(algorithm)
-            ))
-
-        private_key_algo = PrivateKeyAlgorithm()
-        private_key_algo['algorithm'] = PrivateKeyAlgorithmId(algorithm)
-        private_key_algo['parameters'] = params
-
-        container = cls()
-        container._algorithm = algorithm
-        container['version'] = Integer(0)
-        container['private_key_algorithm'] = private_key_algo
-        container['private_key'] = private_key
-
-        # Here we save the DSA public key if possible since it is not contained
-        # within the PKCS#8 structure for a DSA key
-        if algorithm == 'dsa':
-            container._public_key = public_key
-
-        return container
+        pass
 
     # This is necessary to ensure any contained ECPrivateKey is the
     # correct size
@@ -824,10 +701,7 @@ class PrivateKeyInfo(Sequence):
         :return:
             An RSAPrivateKey, DSAPrivateKey or ECPrivateKey object
         """
-
-        raise APIException(
-            'asn1crypto.keys.PrivateKeyInfo().unwrap() has been removed, '
-            'please use oscrypto.asymmetric.PrivateKey().unwrap() instead')
+        pass
 
     @property
     def curve(self):
@@ -844,24 +718,7 @@ class PrivateKeyInfo(Sequence):
             an OrderedDict that is the native version of SpecifiedECDomain. If
             "named", the second is a unicode string of the curve name.
         """
-
-        if self.algorithm != 'ec':
-            raise ValueError(unwrap(
-                '''
-                Only EC keys have a curve, this key is %s
-                ''',
-                self.algorithm.upper()
-            ))
-
-        params = self['private_key_algorithm']['parameters']
-        chosen = params.chosen
-
-        if params.name == 'implicit_ca':
-            value = None
-        else:
-            value = chosen.native
-
-        return (params.name, value)
+        pass
 
     @property
     def hash_algo(self):
@@ -875,19 +732,7 @@ class PrivateKeyInfo(Sequence):
         :return:
             A unicode string of "sha1" or "sha2"
         """
-
-        if self.algorithm != 'dsa':
-            raise ValueError(unwrap(
-                '''
-                Only DSA keys are generated using a hash algorithm, this key is
-                %s
-                ''',
-                self.algorithm.upper()
-            ))
-
-        byte_len = math.log(self['private_key_algorithm']['parameters']['q'].native, 2) / 8
-
-        return 'sha1' if byte_len <= 20 else 'sha2'
+        pass
 
     @property
     def algorithm(self):
@@ -895,10 +740,7 @@ class PrivateKeyInfo(Sequence):
         :return:
             A unicode string of "rsa", "rsassa_pss", "dsa" or "ec"
         """
-
-        if self._algorithm is None:
-            self._algorithm = self['private_key_algorithm']['algorithm'].native
-        return self._algorithm
+        pass
 
     @property
     def bit_size(self):
@@ -906,19 +748,7 @@ class PrivateKeyInfo(Sequence):
         :return:
             The bit size of the private key, as an integer
         """
-
-        if self._bit_size is None:
-            if self.algorithm == 'rsa' or self.algorithm == 'rsassa_pss':
-                prime = self['private_key'].parsed['modulus'].native
-            elif self.algorithm == 'dsa':
-                prime = self['private_key_algorithm']['parameters']['p'].native
-            elif self.algorithm == 'ec':
-                prime = self['private_key'].parsed['private_key'].native
-            self._bit_size = int(math.ceil(math.log(prime, 2)))
-            modulus = self._bit_size % 8
-            if modulus != 0:
-                self._bit_size += 8 - modulus
-        return self._bit_size
+        pass
 
     @property
     def byte_size(self):
@@ -926,8 +756,7 @@ class PrivateKeyInfo(Sequence):
         :return:
             The byte size of the private key, as an integer
         """
-
-        return int(math.ceil(self.bit_size / 8))
+        pass
 
     @property
     def public_key(self):
@@ -936,10 +765,7 @@ class PrivateKeyInfo(Sequence):
             If an RSA key, an RSAPublicKey object. If a DSA key, an Integer
             object. If an EC key, an ECPointBitString object.
         """
-
-        raise APIException(
-            'asn1crypto.keys.PrivateKeyInfo().public_key has been removed, '
-            'please use oscrypto.asymmetric.PrivateKey().public_key.unwrap() instead')
+        pass
 
     @property
     def public_key_info(self):
@@ -947,10 +773,7 @@ class PrivateKeyInfo(Sequence):
         :return:
             A PublicKeyInfo object derived from this private key.
         """
-
-        raise APIException(
-            'asn1crypto.keys.PrivateKeyInfo().public_key_info has been removed, '
-            'please use oscrypto.asymmetric.PrivateKey().public_key.asn1 instead')
+        pass
 
     @property
     def fingerprint(self):
@@ -965,10 +788,7 @@ class PrivateKeyInfo(Sequence):
             A byte string that is a sha256 hash of selected components (based
             on the key type)
         """
-
-        raise APIException(
-            'asn1crypto.keys.PrivateKeyInfo().fingerprint has been removed, '
-            'please use oscrypto.asymmetric.PrivateKey().fingerprint instead')
+        pass
 
 
 class EncryptedPrivateKeyInfo(Sequence):
@@ -1069,23 +889,7 @@ class PublicKeyInfo(Sequence):
     ]
 
     def _public_key_spec(self):
-        algorithm = self['algorithm']['algorithm'].native
-        return {
-            'rsa': RSAPublicKey,
-            'rsaes_oaep': RSAPublicKey,
-            'rsassa_pss': RSAPublicKey,
-            'dsa': Integer,
-            # We override the field spec with ECPoint so that users can easily
-            # decompose the byte string into the constituent X and Y coords
-            'ec': (ECPointBitString, None),
-            'dh': Integer,
-            # These should be treated as opaque bit strings according
-            # to RFC 8410, and need not even be valid ASN.1
-            'x25519': (OctetBitString, None),
-            'x448': (OctetBitString, None),
-            'ed25519': (OctetBitString, None),
-            'ed448': (OctetBitString, None),
-        }[algorithm]
+        pass
 
     _spec_callbacks = {
         'public_key': _public_key_spec
@@ -1111,34 +915,7 @@ class PublicKeyInfo(Sequence):
         :return:
             A PublicKeyInfo object
         """
-
-        if not isinstance(public_key, bytes) and not isinstance(public_key, Asn1Value):
-            raise TypeError(unwrap(
-                '''
-                public_key must be a byte string or Asn1Value, not %s
-                ''',
-                type_name(public_key)
-            ))
-
-        if algorithm != 'rsa' and algorithm != 'rsassa_pss':
-            raise ValueError(unwrap(
-                '''
-                algorithm must "rsa", not %s
-                ''',
-                repr(algorithm)
-            ))
-
-        algo = PublicKeyAlgorithm()
-        algo['algorithm'] = PublicKeyAlgorithmId(algorithm)
-        algo['parameters'] = Null()
-
-        container = cls()
-        container['algorithm'] = algo
-        if isinstance(public_key, Asn1Value):
-            public_key = public_key.untag().dump()
-        container['public_key'] = ParsableOctetBitString(public_key)
-
-        return container
+        pass
 
     def unwrap(self):
         """
@@ -1148,10 +925,7 @@ class PublicKeyInfo(Sequence):
         :return:
             An RSAPublicKey object
         """
-
-        raise APIException(
-            'asn1crypto.keys.PublicKeyInfo().unwrap() has been removed, '
-            'please use oscrypto.asymmetric.PublicKey().unwrap() instead')
+        pass
 
     @property
     def curve(self):
@@ -1168,24 +942,7 @@ class PublicKeyInfo(Sequence):
             an OrderedDict that is the native version of SpecifiedECDomain. If
             "named", the second is a unicode string of the curve name.
         """
-
-        if self.algorithm != 'ec':
-            raise ValueError(unwrap(
-                '''
-                Only EC keys have a curve, this key is %s
-                ''',
-                self.algorithm.upper()
-            ))
-
-        params = self['algorithm']['parameters']
-        chosen = params.chosen
-
-        if params.name == 'implicit_ca':
-            value = None
-        else:
-            value = chosen.native
-
-        return (params.name, value)
+        pass
 
     @property
     def hash_algo(self):
@@ -1200,23 +957,7 @@ class PublicKeyInfo(Sequence):
             A unicode string of "sha1" or "sha2" or None if no parameters are
             present
         """
-
-        if self.algorithm != 'dsa':
-            raise ValueError(unwrap(
-                '''
-                Only DSA keys are generated using a hash algorithm, this key is
-                %s
-                ''',
-                self.algorithm.upper()
-            ))
-
-        parameters = self['algorithm']['parameters']
-        if parameters.native is None:
-            return None
-
-        byte_len = math.log(parameters['q'].native, 2) / 8
-
-        return 'sha1' if byte_len <= 20 else 'sha2'
+        pass
 
     @property
     def algorithm(self):
@@ -1224,10 +965,7 @@ class PublicKeyInfo(Sequence):
         :return:
             A unicode string of "rsa", "rsassa_pss", "dsa" or "ec"
         """
-
-        if self._algorithm is None:
-            self._algorithm = self['algorithm']['algorithm'].native
-        return self._algorithm
+        pass
 
     @property
     def bit_size(self):
@@ -1235,21 +973,7 @@ class PublicKeyInfo(Sequence):
         :return:
             The bit size of the public key, as an integer
         """
-
-        if self._bit_size is None:
-            if self.algorithm == 'ec':
-                self._bit_size = int(((len(self['public_key'].native) - 1) / 2) * 8)
-            else:
-                if self.algorithm == 'rsa' or self.algorithm == 'rsassa_pss':
-                    prime = self['public_key'].parsed['modulus'].native
-                elif self.algorithm == 'dsa':
-                    prime = self['algorithm']['parameters']['p'].native
-                self._bit_size = int(math.ceil(math.log(prime, 2)))
-                modulus = self._bit_size % 8
-                if modulus != 0:
-                    self._bit_size += 8 - modulus
-
-        return self._bit_size
+        pass
 
     @property
     def byte_size(self):
@@ -1257,8 +981,7 @@ class PublicKeyInfo(Sequence):
         :return:
             The byte size of the public key, as an integer
         """
-
-        return int(math.ceil(self.bit_size / 8))
+        pass
 
     @property
     def sha1(self):
@@ -1266,10 +989,7 @@ class PublicKeyInfo(Sequence):
         :return:
             The SHA1 hash of the DER-encoded bytes of this public key info
         """
-
-        if self._sha1 is None:
-            self._sha1 = hashlib.sha1(bytes(self['public_key'])).digest()
-        return self._sha1
+        pass
 
     @property
     def sha256(self):
@@ -1277,10 +997,7 @@ class PublicKeyInfo(Sequence):
         :return:
             The SHA-256 hash of the DER-encoded bytes of this public key info
         """
-
-        if self._sha256 is None:
-            self._sha256 = hashlib.sha256(bytes(self['public_key'])).digest()
-        return self._sha256
+        pass
 
     @property
     def fingerprint(self):
@@ -1295,7 +1012,4 @@ class PublicKeyInfo(Sequence):
             A byte string that is a sha256 hash of selected components (based
             on the key type)
         """
-
-        raise APIException(
-            'asn1crypto.keys.PublicKeyInfo().fingerprint has been removed, '
-            'please use oscrypto.asymmetric.PublicKey().fingerprint instead')
+        pass

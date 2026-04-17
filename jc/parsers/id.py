@@ -130,27 +130,11 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    if 'uid' in proc_data:
-        if 'id' in proc_data['uid']:
-            proc_data['uid']['id'] = jc.utils.convert_to_int(proc_data['uid']['id'])
-
-    if 'gid' in proc_data:
-        if 'id' in proc_data['gid']:
-            proc_data['gid']['id'] = jc.utils.convert_to_int(proc_data['gid']['id'])
-
-    if 'groups' in proc_data:
-        for group in proc_data['groups']:
-            if 'id' in group:
-                group['id'] = jc.utils.convert_to_int(group['id'])
-
-    return proc_data
+    pass
 
 
 def _get_item(my_list, index, default=None):
-      if index < len(my_list):
-        return my_list[index]
-
-      return default
+      pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -167,53 +151,4 @@ def parse(data, raw=False, quiet=False):
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = {}
-
-    # re.split produces first element empty
-    cleandata = re.split(r' ?(uid|gid|groups|context)=', data.strip())[1:]
-
-    if jc.utils.has_data(data):
-
-        for key, value in zip(cleandata[0::2], cleandata[1::2]):
-            if key == 'uid':
-                uid_parsed = value.replace('(', '=').replace(')', '=')
-                uid_parsed = uid_parsed.split('=')
-                raw_output['uid'] = {}
-                raw_output['uid']['id'] = uid_parsed[0]
-                raw_output['uid']['name'] = _get_item(uid_parsed, 1)
-
-            if key == 'gid':
-                gid_parsed = value.replace('(', '=').replace(')', '=')
-                gid_parsed = gid_parsed.split('=')
-                raw_output['gid'] = {}
-                raw_output['gid']['id'] = gid_parsed[0]
-                raw_output['gid']['name'] = _get_item(gid_parsed, 1)
-
-            if key == 'groups':
-                groups_parsed = value.replace('(', '=').replace(')', '=')
-                groups_parsed = groups_parsed.replace('groups=', '')
-                groups_parsed = groups_parsed.split(',')
-                raw_output['groups'] = []
-
-                for group in groups_parsed:
-                    group_dict = {}
-                    grp_parsed = group.split('=')
-                    group_dict['id'] = grp_parsed[0]
-                    group_dict['name'] = _get_item(grp_parsed, 1)
-                    raw_output['groups'].append(group_dict)
-
-            if key == 'context':
-                context_parsed = value.split(':', maxsplit=3)
-                raw_output['context'] = {}
-                raw_output['context']['user'] = context_parsed[0]
-                raw_output['context']['role'] = context_parsed[1]
-                raw_output['context']['type'] = context_parsed[2]
-                raw_output['context']['level'] = context_parsed[3]
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

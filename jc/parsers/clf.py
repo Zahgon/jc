@@ -114,7 +114,7 @@ Examples:
         "epoch": 1478862295,
         "epoch_utc": null
       },
-      ...
+      pass
     ]
 
     $ cat file.log | jc --clf -p -r
@@ -163,7 +163,7 @@ Examples:
         "request_url": "/",
         "request_version": null
       },
-      ...
+      pass
     ]
 """
 import re
@@ -197,26 +197,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'day', 'year', 'hour', 'minute', 'second', 'status', 'bytes'}
-
-    for log in proc_data:
-        for key, val in log.items():
-
-            # integer conversions
-            if key in int_list:
-                log[key] = jc.utils.convert_to_int(val)
-
-            # convert `-` and blank values to None
-            if val == '-' or val == '':
-                log[key] = None
-
-        # add unix timestamps
-        if 'date' in log:
-            ts = jc.utils.timestamp(log['date'], format_hint=(1800,))
-            log['epoch'] = ts.naive
-            log['epoch_utc'] = ts.utc
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -237,63 +218,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-    output_line: Dict = {}
-
-    clf_pattern = re.compile(r'''
-        ^(?P<host>-|\S+)\s
-        (?P<ident>-|\S+)\s
-        (?P<authuser>-|\S+)\s
-        \[
-        (?P<date>
-            (?P<day>\d+)/
-            (?P<month>\S\S\S)/
-            (?P<year>\d\d\d\d):
-            (?P<hour>\d\d):
-            (?P<minute>\d\d):
-            (?P<second>\d\d)\s
-            (?P<tz>\S+)
-        )
-        \]\s
-        \"(?P<request>.*?)\"\s
-        (?P<status>-|\d\d\d)\s
-        (?P<bytes>-|\d+)\s?
-        (?:\"(?P<referer>.*?)\"\s?)?
-        (?:\"(?P<user_agent>.*?)\"\s?)?
-        (?P<extra>.*)
-        ''', re.VERBOSE
-    )
-
-    request_pattern = re.compile(r'''
-        (?P<request_method>\S+)\s
-        (?P<request_url>.*?(?=\sHTTPS?/|$))\s?  # positive lookahead for HTTP(S)/ or end of string
-        (?P<request_version>HTTPS?/[\d\.]+)?
-    ''', re.VERBOSE
-    )
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            output_line = {}
-            clf_match = re.match(clf_pattern, line)
-
-            if clf_match:
-                output_line = clf_match.groupdict()
-
-                if output_line.get('request', None):
-                    request_string = output_line['request']
-                    request_match = re.match(request_pattern, request_string)
-                    if request_match:
-                         output_line.update(request_match.groupdict())
-
-                raw_output.append(output_line)
-
-            else:
-                raw_output.append(
-                    {"unparsable": line}
-                )
-
-    return raw_output if raw else _process(raw_output)
+    pass

@@ -56,7 +56,7 @@ Examples:
         "size": 1024,
         "count": 1
       },
-      ...
+      pass
     ]
 
     $ cat /proc/mtrr | jc --proc-mtrr -p -r
@@ -77,7 +77,7 @@ Examples:
         "size": "1024MB",
         "count": "1"
       },
-      ...
+      pass
     ]
 """
 import re
@@ -111,14 +111,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'size', 'count', 'base_mb'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -139,45 +132,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            split_line = re.split(r',|:', line)
-            register = split_line.pop(0)
-            type_ = None
-            key_vals: list = []
-
-            base, base_mb = split_line.pop(0).split(maxsplit=1)
-            key_vals.append(base)
-
-            base_mb = base_mb.replace('(', '').replace(')', '').replace('MB', '').strip()
-            key_vals.append(f'base_mb={base_mb}')
-
-            for item in split_line:
-                if '=' in item:
-                    key_vals.append(item.strip())
-
-                else:
-                    type_ = item.strip()
-
-            output_line = {
-                'register': register,
-                'type': type_
-            }
-
-            kv_dict = {}
-
-            for item in key_vals:
-                key, val = item.split('=')
-                kv_dict[key.strip()] = val.strip()
-
-            output_line.update(kv_dict)
-            raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

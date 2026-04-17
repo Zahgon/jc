@@ -79,7 +79,7 @@ Examples:
           },
         ]
       }
-      ...
+      pass
     ]
 
     $ cat /proc/net/igmp | jc --proc-net-igmp -p -r
@@ -118,7 +118,7 @@ Examples:
           },
         ]
       }
-      ...
+      pass
     }
 """
 from typing import List, Dict
@@ -151,20 +151,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'index', 'count', 'users', 'reporter'}
-
-    for item in proc_data:
-        for key, val in item.items():
-            if key in int_list:
-                item[key] = int(val)
-
-        if 'groups' in item:
-            for group in item['groups']:
-                for key, val in group.items():
-                    if key in int_list:
-                        group[key] = int(val)
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -185,48 +172,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    output_line: Dict = {}
-    groups: List = []
-    group: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()[1:]):
-            if not line.startswith('\t'):
-                if output_line:
-                    if groups:
-                        output_line['groups'] = groups
-                    raw_output.append(output_line)
-                    output_line = {}
-                    groups = []
-                    group = {}
-
-                index, device, _, count, querier = line.split()
-                output_line = {
-                    'index': index,
-                    'device': device,
-                    'count': count,
-                    'querier': querier
-                }
-                continue
-
-            address, users, timer, reporter = line.split()
-            group = {
-                'address': address,
-                'users': users,
-                'timer': timer,
-                'reporter': reporter
-            }
-            groups.append(group)
-            continue
-
-        if output_line:
-            if groups:
-                output_line['groups'] = groups
-            raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

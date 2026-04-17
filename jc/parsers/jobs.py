@@ -117,14 +117,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {'job_number', 'pid'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -141,64 +134,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    # Clear any blank lines
-    cleandata = list(filter(None, data.splitlines()))
-
-    if jc.utils.has_data(data):
-
-        for entry in cleandata:
-            output_line = {}
-            remainder = []
-            job_number = ''
-            pid = ''
-            job_history = ''
-
-            parsed_line = entry.split(maxsplit=2)
-
-            # check if -l was used
-            if parsed_line[1][0].isdecimal():
-                pid = parsed_line.pop(1)
-                remainder = parsed_line.pop(1)
-                job_number = parsed_line.pop(0)
-                remainder = remainder.split(maxsplit=1)
-
-                # rebuild parsed_line
-                parsed_line = []
-
-                for r in remainder:
-                    parsed_line.append(r)
-
-                parsed_line.insert(0, job_number)
-
-            # check for + or - in first field
-            if '+' in parsed_line[0]:
-                job_history = 'current'
-                parsed_line[0] = parsed_line[0].rstrip('+')
-
-            if '-' in parsed_line[0]:
-                job_history = 'previous'
-                parsed_line[0] = parsed_line[0].rstrip('-')
-
-            # clean up first field
-            parsed_line[0] = parsed_line[0].lstrip('[').rstrip(']')
-
-            # create list of dictionaries
-            output_line['job_number'] = parsed_line[0]
-            if pid:
-                output_line['pid'] = pid
-            if job_history:
-                output_line['history'] = job_history
-            output_line['status'] = parsed_line[1]
-            output_line['command'] = parsed_line[2]
-
-            raw_output.append(output_line)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

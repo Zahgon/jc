@@ -45,12 +45,12 @@ Examples:
     $ cat syslog.txt | jc --syslog-bsd-s -p
     {"priority":34,"date":"Oct 11 22:14:15","hostname":"mymachine","t...}
     {"priority":34,"date":"Oct 11 22:14:16","hostname":"mymachine","t...}
-    ...
+    pass
 
     $ cat syslog.txt | jc --syslog-bsd-s -p -r
     {"priority":"34","date":"Oct 11 22:14:15","hostname":"mymachine","...}
     {"priority":"34","date":"Oct 11 22:14:16","hostname":"mymachine","...}
-    ...
+    pass
 """
 from typing import Dict, Iterable, Union
 import re
@@ -87,13 +87,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured data to conform to the schema.
     """
-    int_list = {'priority'}
-
-    for key in proc_data:
-            if key in int_list:
-                proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-    return proc_data
+    pass
 
 
 @add_jc_meta
@@ -120,69 +114,4 @@ def parse(
 
         Iterable of Dictionaries
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    streaming_input_type_check(data)
-
-    # inspired by https://gist.github.com/miticojo/b16bb13e78572c2d2fac82d9516d5c32
-    syslog = re.compile(r'''
-        (?P<priority><\d{1,3}>)?
-        (?P<header>
-            (?P<date>[A-Z][a-z][a-z]\s{1,2}\d{1,2}\s\d{2}?:\d{2}:\d{2})?\s
-            (?P<host>[\w][\w\d\.:@-]*)?\s
-        )
-        (?P<msg>
-            (?P<tag>\w+)?
-            (?P<content>.*)
-        )
-        ''', re.VERBOSE
-    )
-
-    for line in data:
-        try:
-            streaming_line_input_type_check(line)
-            output_line: Dict = {}
-
-            #skip blank lines
-            if not line.strip():
-                continue
-
-            syslog_match = syslog.match(line)
-            if syslog_match:
-                priority = None
-                if syslog_match.group('priority'):
-                    priority = syslog_match.group('priority')[1:-1]
-
-                # check for missing tag
-                hostname = syslog_match.group('host')
-                tag = syslog_match.group('tag')
-                content = syslog_match.group('content')
-                if hostname:
-                    if hostname.endswith(':'):
-                        content = tag + content
-                        tag = None
-                        hostname = hostname[:-1]
-
-                output_line = {
-                    'priority': priority,
-                    'date': syslog_match.group('date'),
-                    'hostname': hostname,
-                    # 'raw_msg': syslog_match.group('msg'),
-                    'tag': tag,
-                    'content': content.lstrip(' :').rstrip()
-                }
-
-            else:
-                output_line = {
-                    'unparsable': line.rstrip()
-                }
-
-                if not quiet:
-                    jc.utils.warning_message(
-                        [f'Unparsable line found: {line.rstrip()}']
-                    )
-
-            if output_line:
-                yield output_line if raw else _process(output_line)
-
-        except Exception as e:
-            yield raise_or_yield(ignore_exceptions, e, line)
+    pass

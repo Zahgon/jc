@@ -268,7 +268,7 @@ Examples:
         "kind": "socket",
         "pid": 1
       },
-      ...
+      pass
     ]
 
     $ netstat -r | jc --netstat -p
@@ -380,38 +380,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {
-        'recv_q', 'send_q', 'pid', 'refcnt', 'inode', 'unit', 'vendor', 'class', 'osx_flags',
-        'subcla', 'pcbcount', 'rcvbuf', 'sndbuf', 'rxbytes', 'txbytes', 'route_refs', 'use',
-        'mtu', 'mss', 'window', 'irtt', 'metric', 'ipkts', 'ierrs', 'opkts', 'oerrs', 'coll',
-        'rx_ok', 'rx_err', 'rx_drp', 'rx_ovr', 'tx_ok', 'tx_err', 'tx_drp', 'tx_ovr', 'idrop',
-        'ibytes', 'obytes', 'r_mbuf', 's_mbuf', 'r_clus', 's_clus', 'r_hiwa', 's_hiwa',
-        'r_lowa', 's_lowa', 'r_bcnt', 's_bcnt', 'r_bmax', 's_bmax', 'rexmit', 'ooorcv', '0_win'
-    }
-
-    float_list = {'rexmt', 'persist', 'keep', '2msl', 'delack', 'rcvtime'}
-
-    for entry in proc_data:
-        # ints and floats
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-            if key in float_list:
-                entry[key] = jc.utils.convert_to_float(entry[key])
-
-        # add number keys
-        if 'local_port' in entry:
-            local_num = jc.utils.convert_to_int(entry['local_port'])
-            if local_num:
-                entry['local_port_num'] = local_num
-
-        if 'foreign_port' in entry:
-            foreign_num = jc.utils.convert_to_int(entry['foreign_port'])
-            if foreign_num:
-                entry['foreign_port_num'] = foreign_num
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -428,37 +397,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    import jc.utils
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    cleandata = list(filter(None, data.splitlines()))
-    raw_output = []
-
-    if jc.utils.has_data(data):
-
-        # check for FreeBSD/OSX vs Linux
-        # is this from FreeBSD/OSX?
-        if cleandata[0] == 'Active Internet connections' \
-           or cleandata[0] == 'Active Internet connections (including servers)' \
-           or cleandata[0] == 'Active Multipath Internet connections' \
-           or cleandata[0] == 'Active LOCAL (UNIX) domain sockets' \
-           or cleandata[0] == 'Registered kernel control modules' \
-           or cleandata[0] == 'Active kernel event sockets' \
-           or cleandata[0] == 'Active kernel control sockets' \
-           or cleandata[0] == 'Routing tables' \
-           or cleandata[0].startswith('Name  '):
-
-            import jc.parsers.netstat_freebsd_osx
-            raw_output = jc.parsers.netstat_freebsd_osx.parse(cleandata)
-        elif cleandata[0] == WINDOWS_NETSTAT_HEADER:  # use windows parser.
-            import jc.parsers.netstat_windows
-            raw_output = jc.parsers.netstat_windows.parse(cleandata)
-        else:  # use linux parser.
-            import jc.parsers.netstat_linux
-            raw_output = jc.parsers.netstat_linux.parse(cleandata)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

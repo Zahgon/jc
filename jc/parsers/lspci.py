@@ -86,7 +86,7 @@ Examples:
         "progif": "01",
         "progif_int": 1
       },
-      ...
+      pass
     ]
 
     $ lspci -nnmmv | jc --lspci -p -r
@@ -110,7 +110,7 @@ Examples:
         "physlot": "37",
         "progif": "01"
       },
-      ...
+      pass
     ]
 """
 import re
@@ -145,22 +145,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list: set[str] = {
-        'domain', 'bus', 'dev', 'function', 'class_id', 'vendor_id', 'device_id',
-        'svendor_id', 'sdevice_id', 'progif'
-    }
-
-    new_list: List[JSONDictType] = []
-
-    for item in proc_data:
-        output: Dict = {}
-        for key, val in item.items():
-            output[key] = val
-            if key in int_list:
-                output[key + '_int'] = int(val, 16)
-        new_list.append(output)
-
-    return new_list
+    pass
 
 
 def parse(
@@ -181,60 +166,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    device_output: Dict = {}
-
-    if jc.utils.has_data(data):
-        item_id_p = re.compile(r'(?P<id>^[0-9a-f]{4}$)')
-        item_id_bracket_p = re.compile(r' \[(?P<id>[0-9a-f]{4})\]$')
-
-        for line in filter(None, data.splitlines()):
-            if line.startswith('Slot:'):
-                if device_output:
-                    raw_output.append(device_output)
-                    device_output = {}
-
-                device_output['slot'] = line.split()[1]
-
-                slot_info = line.split()[1]
-                *domain, bus, dev_fun = slot_info.split(':')
-
-                if domain:
-                    dom = domain[0]
-                else:
-                    dom = "00"
-
-                dev, fun = dev_fun.split('.')
-                device_output['domain'] = dom
-                device_output['bus'] = bus
-                device_output['dev'] = dev
-                device_output['function'] = fun
-                continue
-
-            key, val = line.split(maxsplit=1)
-            key = key[:-1].lower()
-
-            # numeric only (-nmmv)
-            if item_id_p.match(val):
-                device_output[key + '_id'] = val
-                continue
-
-            # string and numeric (-nnmmv)
-            if item_id_bracket_p.search(val):
-                string, idnum = val.rsplit(maxsplit=1)
-                device_output[key] = string
-                device_output[key + '_id'] = idnum[1:-1]
-                continue
-
-            # string only (-mmv)
-            device_output[key] = val
-            continue
-
-
-        if device_output:
-            raw_output.append(device_output)
-
-    return raw_output if raw else _process(raw_output)
+    pass

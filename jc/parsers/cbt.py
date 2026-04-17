@@ -124,19 +124,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    out_data = []
-    for row in proc_data:
-        cells: Dict = {}
-        key_func = lambda cell: (cell["column_family"], cell["column"])
-        all_cells = sorted(row["cells"], key=key_func)
-        for (column_family, column), group in groupby(all_cells, key=key_func):
-            group_list = sorted(group, key=lambda cell: cell["timestamp_iso"], reverse=True)
-            if column_family not in cells:
-                cells[column_family] = {}
-            cells[column_family][column] = group_list[0]["value"]
-        row["cells"] = cells
-        out_data.append(row)
-    return out_data
+    pass
 
 
 def parse(
@@ -157,39 +145,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-
-    if jc.utils.has_data(data):
-        for line in filter(None, data.split("-" * 40)):
-            key = None
-            cells = []
-            column_name = ""
-            timestamp = ""
-            value_next = False
-            for field in line.splitlines():
-                if not field.strip():
-                    continue
-                if field.startswith(" " * 4):
-                    value = field.strip(' "')
-                    if value_next:
-                        dt = jc.utils.timestamp(timestamp, format_hint=(1750, 1755))
-                        cells.append({
-                            "column_family": column_name.split(":", 1)[0],
-                            "column": column_name.split(":", 1)[1],
-                            "value": value,
-                            "timestamp_iso": dt.iso,
-                            "timestamp_epoch": dt.naive,
-                            "timestamp_epoch_utc": dt.utc
-                        })
-                elif field.startswith(" " * 2):
-                    column_name, timestamp = map(str.strip, field.split("@"))
-                    value_next = True
-                else:
-                    key = field
-            if key is not None:
-                raw_output.append({"key": key, "cells": cells})
-
-    return raw_output if raw else _process(raw_output)
+    pass

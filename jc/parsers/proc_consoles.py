@@ -111,14 +111,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'major', 'minor'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -139,51 +132,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    operations_map = {
-        'R': 'read',
-        'W': 'write',
-        'U': 'unblank'
-    }
-
-    flags_map = {
-        'E': 'enabled',
-        'C': 'preferred',
-        'B': 'primary boot',
-        'p': 'printk buffer',
-        'b': 'braille device',
-        'a': 'safe when CPU offline'
-    }
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            # since parens are acting like quotation marks, use shlex.split()
-            # after converting parens to quotes.
-            line = line.replace('(', '"'). replace(')', '"')
-            device, operations, flags, maj_min = shlex.split(line)
-
-            operations_str = operations.replace('-', '')
-            operations_list = [operations_map[i] for i in operations_str]
-
-            flags_str = flags.replace (' ', '')
-            flags_list = [flags_map[i] for i in flags_str]
-
-            raw_output.append(
-                {
-                    'device': device,
-                    'operations': operations,
-                    'operations_list': operations_list,
-                    'flags': flags,
-                    'flags_list': flags_list,
-                    'major': maj_min.split(':')[0],
-                    'minor': maj_min.split(':')[1]
-                }
-            )
-
-    return raw_output if raw else _process(raw_output)
+    pass

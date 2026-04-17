@@ -70,7 +70,7 @@ Examples:
         "maj": "fd",
         "min": "00"
       },
-      ...
+      pass
     ]
 
     $ cat /proc/1/maps | jc --proc-pid-maps -p -r
@@ -91,7 +91,7 @@ Examples:
         "inode": "798126",
         "pathname": "/usr/lib/systemd/systemd"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -125,39 +125,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'inode'}
-
-    perms_map = {
-        'r': 'read',
-        'w': 'write',
-        'x': 'execute',
-        's': 'shared',
-        'p': 'private',
-        '-': None
-    }
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = int(entry[key])
-
-        if 'address' in entry:
-            start, end = entry['address'].split('-')
-            entry['start'] = start
-            entry['end'] = end
-            del entry['address']
-
-        if 'perms' in entry:
-            perms_list = [perms_map[x] for x in entry['perms'] if perms_map[x]]
-            entry['perms'] = perms_list
-
-        if 'dev' in entry:
-            maj, min = entry['dev'].split(':', maxsplit=1)
-            entry['maj'] = maj
-            entry['min'] = min
-            del entry['dev']
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -178,15 +146,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        header = 'address           perms offset  dev   inode      pathname\n'
-        data = header + data
-        raw_output = simple_table_parse(data.splitlines())
-
-    return raw_output if raw else _process(raw_output)
+    pass

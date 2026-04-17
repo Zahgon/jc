@@ -57,7 +57,7 @@ Examples:
         "Window": 0,
         "IRTT": 0
       },
-      ...
+      pass
     ]
 
     $ cat /proc/net/route | jc --proc-net-route -p -r
@@ -75,7 +75,7 @@ Examples:
         "Window": "0",
         "IRTT": "0"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -109,15 +109,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    # field types documented here: https://github.com/torvalds/linux/blob/v4.19/include/uapi/linux/route.h
-    int_list = {'RefCnt', 'Use', 'Metric', 'MTU', 'Window', 'IRTT'}
-
-    for entry in proc_data:
-        for key, val in entry.items():
-            if key in int_list:
-                entry[key] = int(val)
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -138,13 +130,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        raw_output = simple_table_parse(data.splitlines())
-
-    return raw_output if raw else _process(raw_output)
+    pass

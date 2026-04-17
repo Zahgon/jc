@@ -422,32 +422,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for item in proc_data:
-
-        for key in item.copy():
-            if key in INT_HEADERS:
-                item[key] = jc.utils.convert_to_int(item[key])
-
-            if key in FLOAT_HEADERS:
-                item[key] = jc.utils.convert_to_float(item[key])
-
-            if key in DT_HEADERS or key in DT_OR_STR_HEADERS:
-                timestamp = jc.utils.timestamp(item[key], format_hint=(3500,)).utc
-                if timestamp:
-                    item[key + '_epoch_utc'] = timestamp
-
-            if key in DT_OR_INT_HEADERS:
-                timestamp = jc.utils.timestamp(item[key], format_hint=(3500,)).utc
-                if timestamp:
-                    item[key + '_epoch_utc'] = timestamp
-                if item[key].isnumeric():
-                    item[key] = jc.utils.convert_to_int(item[key])
-
-        # special handling
-        if 'x-cache-hits' in item:
-            item['x-cache-hits'] = [jc.utils.convert_to_int(val) for val in item['x-cache-hits']]
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -468,73 +443,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-    output_object: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            first_word = line.split(maxsplit=1)[0]
-            first_word = first_word.rstrip(':')
-            first_word = first_word.lower()
-
-            if first_word in METHODS:
-                if output_object:
-                    raw_output.append(output_object)
-
-                method, uri, version = line.split(maxsplit=2)
-                output_object = {}
-                output_object['_type'] = 'request'
-                output_object['_request_method'] = method
-                output_object['_request_uri'] = uri
-                output_object['_request_version'] = version
-                continue
-
-            if first_word.startswith('http/'):
-                if output_object:
-                    raw_output.append(output_object)
-
-                reason = None
-                version, status, *reason = line.split(maxsplit=2)
-                output_object = {}
-                output_object['_type'] = 'response'
-                output_object['_response_version'] = version
-                output_object['_response_status'] = int(status)
-                output_object['_response_reason'] = reason or None
-                continue
-
-            if first_word in SPLIT_AND_MULTI_HEADERS:
-                key, value = line.split(': ', maxsplit=1)
-                key = key.lower()
-                value_list = value.split(',')
-                value_list = [x.strip() for x in value_list]
-                if key in output_object:
-                    output_object[key].extend(value_list)
-                else:
-                    output_object[key] = []
-                    output_object[key].extend(value_list)
-                continue
-
-            if first_word in MULTI_HEADERS:
-                key, value = line.split(': ', maxsplit=1)
-                key = key.lower()
-                if key in output_object:
-                    output_object[key].append(value)
-                else:
-                    output_object[key] = []
-                    output_object[key].append(value)
-                continue
-
-            # All other headers
-            key, value = line.split(': ', maxsplit=1)
-            key = key.lower()
-            output_object[key] = value
-
-    if output_object:
-        raw_output.append(output_object)
-
-    return raw_output if raw else _process(raw_output)
+    pass

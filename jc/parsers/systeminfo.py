@@ -241,64 +241,7 @@ def _process(proc_data):
         a system already running hyper-v will have an empty
         "hyperv_requirements" object.
     """
-    int_list = {
-        "total_physical_memory_mb",
-        "available_physical_memory_mb",
-        "virtual_memory_max_size_mb",
-        "virtual_memory_available_mb",
-        "virtual_memory_in_use_mb",
-    }
-
-    dt_list = {"original_install_date", "system_boot_time"}
-
-    hyperv_key = "hyperv_requirements"
-
-    hyperv_subkey_list = {
-        "vm_monitor_mode_extensions",
-        "virtualization_enabled_in_firmware",
-        "second_level_address_translation",
-        "data_execution_prevention_available",
-    }
-
-    # convert empty strings to None/null
-    for item in proc_data:
-        if isinstance(proc_data[item], str) and not proc_data[item]:
-            proc_data[item] = None
-
-    for i, nic in enumerate(proc_data["network_cards"]):
-        proc_data["network_cards"][i]["dhcp_enabled"] = jc.utils.convert_to_bool(
-            nic["dhcp_enabled"]
-        )
-
-        # convert empty strings to None/null
-        for item in nic:
-            if isinstance(nic[item], str) and not nic[item]:
-                proc_data["network_cards"][i][item] = None
-
-    for key in int_list:
-        proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-    for key in dt_list:
-        tz = proc_data.get("time_zone", "")
-        if tz:
-            # convert
-            # from: (UTC-08:00) Pacific Time (US & Canada)
-            # to: (UTC-0800)
-            tz_fields = tz.split()
-            tz = " " + tz_fields[0].replace(":", "")
-            ts_formats = (1700, 1705, 1710)
-            ts = jc.utils.timestamp(f"{proc_data.get(key)}{tz}", format_hint=ts_formats)
-        proc_data[key + '_epoch'] = ts.naive
-        proc_data[key + '_epoch_utc'] = ts.utc
-
-    if hyperv_key in proc_data:
-        for key in hyperv_subkey_list:
-            if key in proc_data[hyperv_key]:
-                proc_data[hyperv_key][key] = jc.utils.convert_to_bool(
-                    proc_data[hyperv_key][key]
-                )
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -315,66 +258,7 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    delim = ":"  # k/v delimiter
-    raw_data = {}  # intermediary output
-
-    if jc.utils.has_data(data):
-        # keepends = True, so that multiline data retains return chars
-        lines = [line for line in data.splitlines(keepends=True) if line.strip() != ""]
-
-        # find the character position of the value in the k/v pair of the first line
-        # all subsequent lines of data use the same character position
-        start_value_pos = _get_value_pos(lines[0], delim)
-
-        last_key = None
-        for line in lines:
-            key = line[0:start_value_pos]
-            value = line[start_value_pos:]
-
-            # possible multiline data
-            if last_key:
-                # the value data doesn't start where it should
-                # so this is multiline data
-                if delim not in key:
-                    raw_data[last_key] += line
-                    continue
-
-            raw_data[key] = value
-            last_key = key
-
-    # clean up keys; strip values
-    raw_output = {}
-    for k, v in raw_data.items():
-        k = _transform_key(k)
-
-        # since we split on start_value_pos, the delimiter
-        # is still in the key field. Remove it.
-        k = k.rstrip(delim)
-
-        if k in ["hotfixs", "processors"]:
-            raw_output[k] = _parse_hotfixs_or_processors(v)
-        elif k in ["network_cards"]:
-            raw_output[k] = _parse_network_cards(v)
-        elif k in ["hyperv_requirements"]:
-            raw_output[k] = _parse_hyperv_requirements(v)
-        elif k in [
-            "total_physical_memory",
-            "available_physical_memory",
-            "virtual_memory_max_size",
-            "virtual_memory_available",
-            "virtual_memory_in_use"
-        ]:
-            raw_output[k + "_mb"] = v.strip()
-        else:
-            raw_output[k] = v.strip()
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass
 
 
 def _parse_hotfixs_or_processors(data):
@@ -390,20 +274,7 @@ def _parse_hotfixs_or_processors(data):
     Parameters:
         data: (string) Input string
     """
-    arr_output = []
-    for i, l in enumerate(data.splitlines()):
-        # skip line that says how many are installed
-        if i == 0:
-            continue
-        # we have to make sure this is a complete line
-        # as data could cutoff. Make sure the delimiter
-        # exists. Otherwise, skip it.
-        if ":" in l:
-            k, v = l.split(":")
-            # discard the number sequence
-            arr_output.append(v.strip())
-
-    return arr_output
+    pass
 
 
 def _parse_hyperv_requirements(data):
@@ -414,14 +285,7 @@ def _parse_hyperv_requirements(data):
     Parameters:
         data: (string) Input string
     """
-    output = {}
-    for i, l in enumerate(data.splitlines()):
-        if ":" in l:
-            k, v = l.split(":")
-            # discard the number sequence
-            output[_transform_key(k)] = v.strip()
-
-    return output
+    pass
 
 
 def _parse_network_cards(data):
@@ -431,44 +295,7 @@ def _parse_network_cards(data):
     Parameters:
         data: (string) Input string
     """
-    delim = ":"
-    arr_output = []
-    cur_nic = None
-    is_ip = False
-    nic_value_pos = 0
-
-    for i, line in enumerate(data.splitlines()):
-        # skip first line
-        if i == 0:
-            continue
-
-        if "IP address(es)" in line:
-            is_ip = True
-            continue
-
-        cur_value_pos = len(line) - len(line.lstrip())
-
-        line = line.strip()
-
-        m = re.match(r"\[(\d+)\]" + delim + "(.+)", line)
-        if m and is_ip and cur_value_pos > nic_value_pos:
-            cur_nic["ip_addresses"].append(m.group(2).strip())
-        elif m:
-            if cur_nic:
-                arr_output.append(cur_nic)
-            cur_nic = _default_nic()
-            cur_nic["name"] = m.group(2).strip()
-            nic_value_pos = cur_value_pos
-            is_ip = False
-        elif delim in line:
-            k, v = line.split(delim)
-            k = _transform_key(k)
-            cur_nic[k] = v.strip()
-
-    if cur_nic:
-        arr_output.append(cur_nic)
-
-    return arr_output
+    pass
 
 
 def _convert_to_boolean(value):
@@ -478,7 +305,7 @@ def _convert_to_boolean(value):
     Parameters:
         value: (string) Input value
     """
-    return value == "Yes"
+    pass
 
 
 def _convert_to_int(value):
@@ -488,25 +315,14 @@ def _convert_to_int(value):
     Parameters:
         value: (string) Input value
     """
-    try:
-        value = int(re.sub("[^0-9]", "", value))
-    except ValueError:
-        pass
-    return value
+    pass
 
 
 def _default_nic():
     """
     Returns a default network card object
     """
-    return {
-        "name": "",
-        "connection_name": "",
-        "status": "",
-        "dhcp_enabled": "No",
-        "dhcp_server": "",
-        "ip_addresses": [],
-    }
+    pass
 
 
 def _get_value_pos(line, delim):
@@ -517,11 +333,7 @@ def _get_value_pos(line, delim):
         line: (string) Input string
         delim: (string) The data delimiter
     """
-    fields = line.split(delim, 1)
-    if not len(fields) == 2:
-        raise Exception(f"Expected a '{delim}' delimited field. Actual: {line}")
-
-    return len(line) - len(fields[1].lstrip())
+    pass
 
 
 def _transform_key(key):
@@ -531,10 +343,4 @@ def _transform_key(key):
     Parameters:
         key: (string) Input value
     """
-    # lowercase and replace spaces with underscores
-    key = key.strip().lower().replace(" ", "_")
-
-    # remove invalid key characters
-    for c in ";:!@#$%^&*()-":
-        key = key.replace(c, "")
-    return key
+    pass

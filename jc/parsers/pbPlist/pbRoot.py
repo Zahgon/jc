@@ -40,22 +40,10 @@ import collections
 from .         import pbItem
 
 def StringCmp(obj1, obj2):
-    result = -1
-    if obj1 > obj2:
-        result = 1
-    elif obj1 == obj2:
-        result = 0
-    return result
+    pass
 
 def KeySorter(obj1, obj2):
-    result = 0
-    if str(obj1) == 'isa':
-        result = -1
-    elif str(obj2) == 'isa':
-        result = 1
-    else:
-        result = StringCmp(str(obj1), str(obj2))
-    return result
+    pass
 
 class pbRoot(collections.abc.MutableMapping):
 
@@ -65,10 +53,7 @@ class pbRoot(collections.abc.MutableMapping):
         self.update(dict(*args, **kwargs))  # use the free update to set keys
 
     def __internalKeyCheck(self, key): # pylint: disable=no-self-use
-        safe_key = key
-        if isinstance(safe_key, str):
-            safe_key = pbItem.pbItemResolver(safe_key, 'qstring')
-        return safe_key
+        pass
 
     def __getitem__(self, key):
         return self.store[key]
@@ -105,13 +90,4 @@ class pbRoot(collections.abc.MutableMapping):
         return result
 
     def sortedKeys(self):
-        unsorted_keys = self.key_storage
-        sorted_keys = sorted(unsorted_keys, key=cmp_to_key(KeySorter))
-        can_sort = False
-        if len(sorted_keys) > 0:
-            all_dictionaries = all((isinstance(self[key].value, dict) or isinstance(self[key].value, pbRoot)) for key in unsorted_keys)
-            if all_dictionaries:
-                can_sort = all(self[key].get('isa', None) is not None for key in unsorted_keys)
-                if can_sort:
-                    sorted_keys = sorted(unsorted_keys, key=lambda k: str(self[k]['isa']))
-        return (can_sort, sorted_keys)
+        pass

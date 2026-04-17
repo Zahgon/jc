@@ -81,14 +81,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    int_list = {'min_days_between_password_change', 'max_days_between_password_change',
-                'warning_days_before_password_expires'}
-
-    for key in proc_data:
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -109,44 +102,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            key, val = line.split(':', maxsplit=1)
-            key = key.strip()
-            val = val.strip()
-
-            if key == 'Last password change':
-                raw_output['password_last_changed'] = val
-                continue
-
-            if key == 'Password expires':
-                raw_output['password_expires'] = val
-                continue
-
-            if key == 'Password inactive':
-                raw_output['password_inactive'] = val
-                continue
-
-            if key == 'Account expires':
-                raw_output['account_expires'] = val
-                continue
-
-            if key == 'Minimum number of days between password change':
-                raw_output['min_days_between_password_change'] = val
-                continue
-
-            if key == 'Maximum number of days between password change':
-                raw_output['max_days_between_password_change'] = val
-                continue
-
-            if key == 'Number of days of warning before password expires':
-                raw_output['warning_days_before_password_expires'] = val
-                continue
-
-    return raw_output if raw else _process(raw_output)
+    pass

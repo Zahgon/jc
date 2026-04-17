@@ -70,7 +70,7 @@ Examples:
         "blocksize": 128,
         "digestsize": 64
       },
-      ...
+      pass
     ]
 
     $ cat /proc/crypto | jc --proc_crypto -p -r
@@ -109,7 +109,7 @@ Examples:
         "blocksize": "128",
         "digestsize": "48"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -142,17 +142,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    int_list = {'priority', 'refcnt'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list or key.endswith('size'):
-                try:
-                    entry[key] = int(entry[key])
-                except Exception:
-                    pass
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -173,25 +163,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    output_line: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            if line.startswith('name'):
-                if output_line:
-                    raw_output.append(output_line)
-                output_line = {}
-
-            key, val = line.split(':', maxsplit=1)
-            output_line[key.strip()] = val.strip()
-
-        if output_line:
-            raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

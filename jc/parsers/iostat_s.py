@@ -91,12 +91,12 @@ Examples:
     $ iostat | jc --iostat-s
     {"percent_user":0.14,"percent_nice":0.0,"percent_system":0.16,...}
     {"device":"sda","tps":0.24,"kb_read_s":5.28,"kb_wrtn_s":1.1...}
-    ...
+    pass
 
     $ iostat | jc --iostat-s -r
     {"percent_user":"0.14","percent_nice":"0.00","percent_system":"0.16"...}
     {"device":"sda","tps":"0.24","kb_read_s":"5.28","kb_wrtn_s":"1.10"...}
-    ...
+    pass
 """
 import jc.utils
 from jc.streaming import (
@@ -132,37 +132,15 @@ def _process(proc_data):
 
         Dictionary. Structured data to conform to the schema.
     """
-    float_list = {
-        'percent_user', 'percent_nice', 'percent_system', 'percent_iowait',
-        'percent_steal', 'percent_idle', 'tps', 'kb_read_s', 'mb_read_s', 'kb_wrtn_s',
-        'mb_wrtn_s', 'rrqm_s', 'wrqm_s', 'r_s', 'w_s', 'rmb_s', 'rkb_s', 'wmb_s',
-        'wkb_s', 'avgrq_sz', 'avgqu_sz', 'await', 'r_await', 'w_await', 'svctm',
-        'percent_util', 'percent_rrqm', 'percent_wrqm', 'aqu_sz', 'rareq_sz', 'wareq_sz',
-        'd_s', 'dkb_s', 'dmb_s', 'drqm_s', 'percent_drqm', 'd_await', 'dareq_sz',
-        'f_s', 'f_await', 'kb_dscd_s', 'mb_dscd_s'
-    }
-
-    int_list = {'kb_read', 'mb_read', 'kb_wrtn', 'mb_wrtn', 'kb_dscd', 'mb_dscd'}
-
-    for key in proc_data:
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(proc_data[key])
-
-        if key in float_list:
-            proc_data[key] = jc.utils.convert_to_float(proc_data[key])
-
-    return proc_data
+    pass
 
 
 def _normalize_headers(line):
-    return line.replace('%', 'percent_').replace('/', '_').replace('-', '_').lower()
+    pass
 
 
 def _create_obj_list(section_list, section_name):
-    output_list = jc.parsers.universal.simple_table_parse(section_list)
-    for item in output_list:
-        item['type'] = section_name
-    return output_list
+    pass
 
 
 @add_jc_meta
@@ -183,52 +161,4 @@ def parse(data, raw=False, quiet=False, ignore_exceptions=False):
 
         Iterable of Dictionaries
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    streaming_input_type_check(data)
-
-    section = ''  # either 'cpu' or 'device'
-    headers = ''
-    cpu_list = []
-    device_list = []
-
-    for line in data:
-        try:
-            streaming_line_input_type_check(line)
-            output_line = {}
-
-            # ignore blank lines and header line
-            if not line.strip() or line.startswith('Linux'):
-                continue
-
-            if line.startswith('avg-cpu:'):
-                section = 'cpu'
-                headers = _normalize_headers(line)
-                headers = headers.strip().split(':', maxsplit=1)[1:]
-                headers = ' '.join(headers)
-                continue
-
-            if line.startswith('Device'):
-                section = 'device'
-                headers = _normalize_headers(line)
-                headers = headers.replace(':', ' ')
-                continue
-
-            if section == 'cpu':
-                cpu_list.append(headers)
-                cpu_list.append(line)
-                output_line = _create_obj_list(cpu_list, 'cpu')[0]
-                cpu_list = []
-
-            if section == 'device':
-                device_list.append(headers)
-                device_list.append(line)
-                output_line = _create_obj_list(device_list, 'device')[0]
-                device_list = []
-
-            if output_line:
-                yield output_line if raw else _process(output_line)
-            else:
-                raise ParseError('Not iostat data')
-
-        except Exception as e:
-            yield raise_or_yield(ignore_exceptions, e, line)
+    pass

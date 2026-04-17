@@ -60,7 +60,7 @@ Examples:
         "filename": "ifcfg.json",
         "hash": "01fda0d9ba9a75618b072e64ff512b43"
       },
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -94,9 +94,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-
-    # no further processing for this parser
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -113,32 +111,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            # check for legacy md5 command output
-            if line.startswith('MD5 ('):
-                file_hash = line.split('=', maxsplit=1)[1].strip()
-                file_name = line.split('=', maxsplit=1)[0].strip()
-                file_name = file_name[5:]
-                file_name = file_name[:-1]
-            # standard md5sum and shasum command output
-            else:
-                file_hash = line.split(maxsplit=1)[0]
-                file_name = line.split(maxsplit=1)[1]
-
-            item = {
-                'filename': file_name,
-                'hash': file_hash
-            }
-            raw_output.append(item)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

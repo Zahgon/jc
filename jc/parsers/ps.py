@@ -75,7 +75,7 @@ Examples:
         "time": "00:00:00",
         "cmd": "[kworker/0:0H]"
       },
-      ...
+      pass
     ]
 
     $ ps -ef | jc --ps -p -r
@@ -110,7 +110,7 @@ Examples:
         "time": "00:00:00",
         "cmd": "[kworker/0:0H]"
       },
-      ...
+      pass
     ]
 
     $ ps axu | jc --ps -p
@@ -154,7 +154,7 @@ Examples:
         "time": "0:00",
         "command": "[kworker/0:0H]"
       },
-      ...
+      pass
     ]
 
     $ ps axu | jc --ps -p -r
@@ -198,7 +198,7 @@ Examples:
         "time": "0:00",
         "command": "[kworker/0:0H]"
       },
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -231,36 +231,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {'pid', 'ppid', 'c', 'vsz', 'rss'}
-    float_list = {'cpu_percent', 'mem_percent'}
-
-    for entry in proc_data:
-        # change key name '%cpu' to 'cpu_percent'
-        if '%cpu' in entry:
-            entry['cpu_percent'] = entry.pop('%cpu')
-
-        # change key name '%mem' to 'mem_percent'
-        if '%mem' in entry:
-            entry['mem_percent'] = entry.pop('%mem')
-
-        # convert ints and floats
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_to_int(entry[key])
-
-            if key in float_list:
-                entry[key] = jc.utils.convert_to_float(entry[key])
-
-        # clean up other fields
-        if 'tty' in entry:
-            if entry['tty'] == '?' or entry['tty'] == '??':
-                entry['tty'] = None
-
-        if 'tt' in entry:
-            if entry['tt'] == '??':
-                entry['tt'] = None
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -277,18 +248,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    cleandata = data.splitlines()
-    raw_output = []
-
-    if jc.utils.has_data(data):
-
-        cleandata[0] = cleandata[0].lower()
-        raw_output = jc.parsers.universal.simple_table_parse(cleandata)
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

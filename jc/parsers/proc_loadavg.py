@@ -87,17 +87,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    float_list = {'load_1m', 'load_5m', 'load_15m'}
-    int_list = {'running', 'available', 'last_pid'}
-
-    for key in proc_data:
-        if key in float_list:
-            proc_data[key] = float(proc_data[key])
-
-        if key in int_list:
-            proc_data[key] = int(proc_data[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -118,23 +108,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        load_1m, load_5m, load_15m, runnable, last_pid = data.split()
-        running, available = runnable.split('/')
-
-        raw_output = {
-            'load_1m': load_1m,
-            'load_5m': load_5m,
-            'load_15m': load_15m,
-            'running': running,
-            'available': available,
-            'last_pid': last_pid
-        }
-
-    return raw_output if raw else _process(raw_output)
+    pass

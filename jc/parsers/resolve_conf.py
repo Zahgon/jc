@@ -83,7 +83,7 @@ def _process(proc_data: JSONDictType) -> JSONDictType:
 
         Dictionary. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -104,68 +104,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-    search: List[str] = []
-    nameservers: List[str] = []
-    options: List[str] = []
-    sortlist: List[str] = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            # comments start with # or ; and can be inline
-            if '#' in line or ';' in line:
-                userdata = list(filter(None, re.split("[#;]+", line, maxsplit=1)))
-                userdata = [x for x in userdata if x.strip()]
-                if len(userdata) <= 1:    # whole line is a comment
-                    continue
-
-                userdata_str = userdata[0].strip()
-
-            else:
-                userdata_str = line.strip()
-
-            if userdata_str.startswith('domain'):
-                raw_output['domain'] = userdata_str.split()[1].strip()
-                continue
-
-            if userdata_str.startswith('search'):
-                search_items = userdata_str.split(maxsplit=1)[1]
-                search_list = search_items.split()
-                search.extend(search_list)
-                continue
-
-            if userdata_str.startswith('nameserver'):
-                ns_str = userdata_str.split()[1]
-                nameservers.append(ns_str)
-                continue
-
-            if userdata_str.startswith('options'):
-                option_items = userdata_str.split(maxsplit=1)[1]
-                option_list = option_items.split()
-                options.extend(option_list)
-                continue
-
-            if userdata_str.startswith('sortlist'):
-                sortlist_items = userdata_str.split(maxsplit=1)[1]
-                sortlist_list = sortlist_items.split()
-                sortlist.extend(sortlist_list)
-                continue
-
-    if search:
-        raw_output['search'] = search
-
-    if nameservers:
-        raw_output['nameservers'] = nameservers
-
-    if options:
-        raw_output['options'] = options
-
-    if sortlist:
-        raw_output['sortlist'] = sortlist
-
-    return raw_output if raw else _process(raw_output)
+    pass

@@ -54,7 +54,7 @@ Examples:
         "filename": "centosserial.sh",
         "type": "Bourne-Again shell script text executable, UTF-8 ..."
       },
-      ...
+      pass
     ]
 """
 import jc.utils
@@ -87,8 +87,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    # No further processing
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -105,41 +104,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output = []
-
-    warned = False
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            # fix case for gzip files where description contains ': ' delimiter
-            if 'gzip compressed data, last modified: ' in line:
-                linedata = line.split(': ', maxsplit=1)
-
-            # use rsplit to correctly grab filenames containing ': ' delimiter text
-            else:
-                linedata = line.rsplit(': ', maxsplit=1)
-
-            try:
-                filename = linedata[0].strip()
-                filetype = linedata[1].strip()
-
-                raw_output.append(
-                    {
-                        'filename': filename,
-                        'type': filetype
-                    }
-                )
-            except IndexError:
-                if not warned:
-                    jc.utils.warning_message(['Filenames with newline characters detected. Some filenames may be truncated.'])
-                    warned = True
-
-    if raw:
-        return raw_output
-    else:
-        return _process(raw_output)
+    pass

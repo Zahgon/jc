@@ -172,30 +172,7 @@ def _process(proc_data: List[DeviceData]) -> List[JSONDictType]:
 
         List[Dict]: Structured data that conforms to the schema
     """
-    processed_data: List[JSONDictType] = []
-    for device in proc_data:
-        processed_device = {
-            "device": device["device"],
-            "private_key": device.get("private_key"),
-            "public_key": device.get("public_key"),
-            "listen_port": device.get("listen_port"),
-            "fwmark": device.get("fwmark"),
-            "peers": [
-                {
-                    "public_key": peer_key,
-                    "preshared_key": peer_data.get("preshared_key"),
-                    "endpoint": peer_data.get("endpoint"),
-                    "latest_handshake": peer_data.get("latest_handshake", 0),
-                    "transfer_rx": peer_data.get("transfer_rx", 0),
-                    "transfer_sx": peer_data.get("transfer_sx", 0),
-                    "persistent_keepalive": peer_data.get("persistent_keepalive", -1),
-                    "allowed_ips": peer_data.get("allowed_ips", []),
-                }
-                for peer_key, peer_data in device.get("peers", {}).items()
-            ],
-        }
-        processed_data.append(processed_device)
-    return processed_data
+    pass
 
 
 def parse(data: str, raw: bool = False, quiet: bool = False) -> List[JSONDictType]:
@@ -214,60 +191,4 @@ def parse(data: str, raw: bool = False, quiet: bool = False) -> List[JSONDictTyp
 
         List[Dict]: Parsed data in JSON-friendly format, either raw or processed.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[DeviceData] = []
-    current_device: Optional[str] = None
-    device_data: DeviceData = {}
-
-    if jc.utils.has_data(data):
-        for line in filter(None, data.splitlines()):
-            fields = re.split(r"\s+", line.strip())
-            if len(fields) == 5:
-                device, private_key, public_key, listen_port, fwmark = fields
-                if current_device:
-                    raw_output.append({"device": current_device, **device_data})
-                current_device = device
-                device_data = {
-                    "private_key": private_key if private_key != "(none)" else None,
-                    "public_key": public_key if public_key != "(none)" else None,
-                    "listen_port": int(listen_port) if listen_port != "0" else None,
-                    "fwmark": int(fwmark) if fwmark != "off" else None,
-                    "peers": {},
-                }
-            elif len(fields) == 9:
-                (
-                    interface,
-                    public_key,
-                    preshared_key,
-                    endpoint,
-                    allowed_ips,
-                    latest_handshake,
-                    transfer_rx,
-                    transfer_tx,
-                    persistent_keepalive,
-                ) = fields
-                peer_data: PeerData = {
-                    "preshared_key": preshared_key
-                    if preshared_key != "(none)"
-                    else None,
-                    "endpoint": endpoint if endpoint != "(none)" else None,
-                    "latest_handshake": int(latest_handshake),
-                    "transfer_rx": int(transfer_rx),
-                    "transfer_sx": int(transfer_tx),
-                    "persistent_keepalive": int(persistent_keepalive)
-                    if persistent_keepalive != "off"
-                    else -1,
-                    "allowed_ips": allowed_ips.split(",")
-                    if allowed_ips != "(none)"
-                    else [],
-                }
-                device_data["peers"][public_key] = {
-                    k: v for k, v in peer_data.items() if v is not None
-                }
-
-        if current_device:
-            raw_output.append({"device": current_device, **device_data})
-
-    return raw_output if raw else _process(raw_output)
+    pass

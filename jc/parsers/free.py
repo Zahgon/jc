@@ -99,14 +99,7 @@ def _process(proc_data):
 
         List of Dictionaries. Structured data to conform to the schema.
     """
-    int_list = {'total', 'used', 'free', 'shared', 'buff_cache', 'buffers', 'cache', 'available'}
-
-    for entry in proc_data:
-        for key in entry:
-            if key in int_list:
-                entry[key] = jc.utils.convert_size_to_int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(data, raw=False, quiet=False):
@@ -123,21 +116,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    cleandata = data.splitlines()
-    raw_output = []
-
-    if jc.utils.has_data(data):
-
-        cleandata[0] = cleandata[0].lower()
-        cleandata[0] = cleandata[0].replace('buff/cache', 'buff_cache')
-        cleandata[0] = 'type ' + cleandata[0]
-
-        raw_output = jc.parsers.universal.simple_table_parse(cleandata)
-
-        for entry in raw_output:
-            entry['type'] = entry['type'].rstrip(':')
-
-    return raw_output if raw else _process(raw_output)
+    pass

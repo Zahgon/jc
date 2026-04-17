@@ -39,7 +39,7 @@ Examples:
         "username": "joe:user",
         "password": "abc123"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -72,7 +72,7 @@ def _process(proc_data: List[JSONDictType]) -> List[JSONDictType]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    return proc_data
+    pass
 
 
 def parse(
@@ -93,34 +93,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List[Dict] = []
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            # ignore comment lines
-            if line.strip().startswith('#'):
-                continue
-
-            # convert escaped characters (\ and :)
-            line = line.replace(':', '\u2063')
-            line = line.replace('\\\\', '\\')
-            line = line.replace('\\\u2063', ':')
-
-            hostname, port, database, username, password = line.split('\u2063')
-
-            raw_output.append(
-                {
-                    'hostname': hostname,
-                    'port': port,
-                    'database': database,
-                    'username': username,
-                    'password': password
-                }
-            )
-
-    return raw_output if raw else _process(raw_output)
+    pass

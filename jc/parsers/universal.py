@@ -34,17 +34,7 @@ def simple_table_parse(data: Iterable[str]) -> List[Dict]:
 
         List of Dictionaries
     """
-    # code adapted from Conor Heine at:
-    # https://gist.github.com/cahna/43a1a3ff4d075bcd71f9d7120037a501
-
-    # cast iterable to a list. Also keeps from mutating the caller's list
-    data = list(data)
-
-    headers = [h for h in ' '.join(data[0].strip().split()).split() if h]
-    raw_data = map(lambda s: s.strip().split(None, len(headers) - 1), data[1:])
-    raw_output = [dict(zip(headers, r)) for r in raw_data]
-
-    return raw_output
+    pass
 
 
 def sparse_table_parse(data: Iterable[str], delim: str = '\u2063') -> List[Dict]:
@@ -88,70 +78,4 @@ def sparse_table_parse(data: Iterable[str], delim: str = '\u2063') -> List[Dict]
 
         List of Dictionaries
     """
-    # cast iterable to a list. Also keeps from mutating the caller's list
-    data = list(data)
-
-    # find the longest line and pad all lines with spaces to match
-    max_len = max([len(x) for x in data])
-
-    new_data = []
-    for line in data:
-        new_data.append(line + ' ' * (max_len - len(line)))
-
-    data = new_data
-
-    # find header
-    output: List = []
-    header_text: str = data.pop(0)
-    header_text = header_text + ' '
-    header_list: List = header_text.split()
-
-    # find each column index and end position
-    header_search = [header_list[0]]
-    for h in header_list[1:]:
-        header_search.append(' ' + h + ' ')
-
-    header_spec_list = []
-    for i, column in enumerate(header_list[0:len(header_list) - 1]):
-        header_spec = {
-            'name': column,
-            'end': header_text.find(header_search[i + 1])
-        }
-
-        header_spec_list.append(header_spec)
-
-    # parse lines
-    if data:
-        for entry in data:
-            output_line = {}
-
-            # insert new separator since data can contain spaces
-            for col in reversed(header_list):
-                # find the right header_spec
-                for h_spec in header_spec_list:
-                    if h_spec['name'] == col:
-                        h_end = h_spec['end']
-                        # check if the location contains whitespace. if not
-                        # then move to the left until a space is found
-                        while h_end > 0 and not entry[h_end].isspace():
-                            h_end -= 1
-
-                        # insert custom delimiter
-                        entry = entry[:h_end] + delim + entry[h_end + 1:]
-
-            # create the entry list from the new custom delimiter
-            entry_list = entry.split(delim, maxsplit=len(header_list) - 1)
-
-            # clean up leading and trailing spaces in entry
-            clean_entry_list = []
-            for col in entry_list:
-                clean_entry = col.strip()
-                if clean_entry == '':
-                    clean_entry = None
-
-                clean_entry_list.append(clean_entry)
-
-            output_line = dict(zip(header_list, clean_entry_list))
-            output.append(output_line)
-
-    return output
+    pass

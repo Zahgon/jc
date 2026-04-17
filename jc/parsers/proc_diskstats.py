@@ -97,7 +97,7 @@ Examples:
         "flush_requests_completed_successfully": 0,
         "flushing_time_ms": 0
       },
-      ...
+      pass
     ]
 
     $ cat /proc/diskstats | jc --proc_diskstats -p -r
@@ -168,7 +168,7 @@ Examples:
         "flush_requests_completed_successfully": "0",
         "flushing_time_ms": "0"
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -202,12 +202,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for entry in proc_data:
-        for key in entry:
-            if key != 'device':
-                entry[key] = int(entry[key])
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -228,22 +223,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-
-    if jc.utils.has_data(data):
-
-        header = (
-            'maj min device reads_completed reads_merged sectors_read read_time_ms '
-            'writes_completed writes_merged sectors_written write_time_ms io_in_progress '
-            'io_time_ms weighted_io_time_ms discards_completed_successfully discards_merged '
-            'sectors_discarded discarding_time_ms flush_requests_completed_successfully '
-            'flushing_time_ms\n'
-        )
-        data = header + data
-        cleandata = filter(None, data.splitlines())
-        raw_output = simple_table_parse(cleandata)
-
-    return raw_output if raw else _process(raw_output)
+    pass

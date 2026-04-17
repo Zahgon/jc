@@ -294,40 +294,7 @@ def _process(proc_data: Dict) -> Dict:
 
         Dictionary. Structured to conform to the schema.
     """
-    int_list = {'Tgid', 'Ngid', 'Pid', 'PPid', 'TracerPid', 'FDSize', 'NStgid',
-      'NSpid', 'NSpgid', 'NSsid', 'VmPeak', 'VmSize', 'VmLck', 'VmPin', 'VmHWM',
-      'VmRSS', 'RssAnon', 'RssFile', 'RssShmem', 'VmData', 'VmStk', 'VmExe', 'VmLib',
-      'VmPTE', 'VmSwap', 'HugetlbPages', 'CoreDumping', 'THP_enabled', 'Threads',
-      'NoNewPrivs', 'Seccomp', 'voluntary_ctxt_switches', 'nonvoluntary_ctxt_switches'}
-
-    for key, val in proc_data.items():
-        if key in int_list:
-            proc_data[key] = jc.utils.convert_to_int(val)
-
-    if 'State' in proc_data:
-        st, st_pretty = proc_data['State'].split()
-        proc_data['State'] = st
-        proc_data['State_pretty'] = st_pretty.strip('()')
-
-    if 'Uid' in proc_data:
-        proc_data['Uid'] = [int(x) for x in proc_data['Uid'].split()]
-
-    if 'Gid' in proc_data:
-        proc_data['Gid'] = [int(x) for x in proc_data['Gid'].split()]
-
-    if 'SigQ' in proc_data:
-        current_q, limit_q = proc_data['SigQ'].split('/')
-        proc_data['SigQ_current'] = int(current_q)
-        proc_data['SigQ_limit'] = int(limit_q)
-
-    if 'Cpus_allowed' in proc_data:
-        proc_data['Cpus_allowed'] = proc_data['Cpus_allowed'].split(',')
-
-    if 'Mems_allowed' in proc_data:
-        proc_data['Mems_allowed'] = proc_data['Mems_allowed'].split(',')
-
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -348,15 +315,4 @@ def parse(
 
         Dictionary. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-            key, val = line.split(':', maxsplit=1)
-            raw_output[key] = val.strip()
-
-    return raw_output if raw else _process(raw_output)
+    pass

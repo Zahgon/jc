@@ -181,7 +181,7 @@ Examples:
           "srbds"
         ]
       },
-      ...
+      pass
     ]
 
     $ cat /proc/cpuinfo | jc --proc_cpuinfo -p -r
@@ -213,7 +213,7 @@ Examples:
         "address sizes": "45 bits physical, 48 bits virtual",
         "power management": ""
       },
-      ...
+      pass
     ]
 """
 from typing import List, Dict
@@ -246,46 +246,7 @@ def _process(proc_data: List[Dict]) -> List[Dict]:
 
         List of Dictionaries. Structured to conform to the schema.
     """
-    for entry in proc_data:
-        for key in entry:
-            if entry[key] == '':
-                entry[key] = None
-
-            try:
-                entry[key] = int(entry[key])
-            except Exception:
-                pass
-
-            try:
-                if isinstance(entry[key], str) and (entry[key] == 'yes' or entry[key] == 'no'):
-                    entry[key] = jc.utils.convert_to_bool(entry[key])
-            except Exception:
-                pass
-
-            try:
-                if isinstance(entry[key], str) and '.' in entry[key]:
-                    entry[key] = float(entry[key])
-            except Exception:
-                pass
-
-        if 'address sizes' in entry:
-            phy = int(entry['address sizes'].split()[0])
-            virt = int(entry['address sizes'].split()[3])
-            entry['address_size_physical'] = phy
-            entry['address_size_virtual'] = virt
-
-        if 'cache size' in entry:
-            cache_size_int, unit = entry['cache size'].split()
-            entry['cache_size_num'] = int(cache_size_int)
-            entry['cache_size_unit'] = unit
-
-        if 'flags' in entry:
-            entry['flags'] = entry['flags'].split()
-
-        if 'bugs' in entry:
-            entry['bugs'] = entry['bugs'].split()
-
-    return proc_data
+    pass
 
 
 def parse(
@@ -306,25 +267,4 @@ def parse(
 
         List of Dictionaries. Raw or processed structured data.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    raw_output: List = []
-    output_line: Dict = {}
-
-    if jc.utils.has_data(data):
-
-        for line in filter(None, data.splitlines()):
-
-            if line.startswith('processor'):
-                if output_line:
-                    raw_output.append(output_line)
-                output_line = {}
-
-            key, val = line.split(':', maxsplit=1)
-            output_line[key.strip()] = val.strip()
-
-        if output_line:
-            raw_output.append(output_line)
-
-    return raw_output if raw else _process(raw_output)
+    pass

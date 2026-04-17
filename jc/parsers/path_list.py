@@ -93,18 +93,4 @@ def parse(data, raw=False, quiet=False):
 
         List of Dictionaries representing a Key/Value pair document.
     """
-    jc.utils.compatibility(__name__, info.compatible, quiet)
-    jc.utils.input_type_check(data)
-
-    # This parser uses path.py
-    path.info = info  # type: ignore
-
-    delimiter = ":" if "\\" not in data else ";"
-
-    raw_output = [
-        path.parse(line, raw=raw, quiet=quiet)
-        for line in data.split(delimiter)
-        if jc.utils.has_data(data)
-    ]
-
-    return raw_output
+    pass
